@@ -1,0 +1,209 @@
+<style>
+  .opt-d{font-family:'Georgia',serif;background:#1A0E24;color:#F2EDE8;width:100%;box-sizing:border-box;line-height:1.6}
+  .opt-d *{box-sizing:border-box}
+  .d-nav{background:#1A0E24;border-bottom:1px solid #3A2450;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;position:sticky;top:0;z-index:10}
+  .d-logo-bloom{width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+  .d-logo-bloom img{width:100%;height:100%;object-fit:contain}
+  .d-logo-text{font-size:15px;letter-spacing:0.12em;color:#F2EDE8;font-weight:400;font-family:Georgia,serif}
+  .d-logo-sub{font-size:9px;letter-spacing:0.16em;color:#A898B8}
+  .d-nav-links{display:flex;gap:28px;list-style:none;margin:0;padding:0}
+  .d-nav-links a{color:#A898B8;font-size:13px;text-decoration:none;letter-spacing:0.06em;font-family:Georgia,serif}
+  .d-nav-cta{border:1px solid #C4907A;color:#C4907A;padding:9px 22px;font-size:12px;letter-spacing:0.16em;background:transparent;cursor:pointer;font-family:Georgia,serif}
+  .d-layout{display:flex;min-height:580px}
+  .d-sidebar{width:210px;flex-shrink:0;border-right:1px solid #3A2450;padding:28px 20px;background:#1A0E24}
+  .d-sidebar-label{font-size:10px;letter-spacing:0.2em;color:#C4907A;margin-bottom:14px;font-family:Georgia,serif}
+  .d-sidebar-item{font-size:13px;color:#A898B8;padding:9px 0;border-bottom:1px solid #271540;cursor:pointer;font-style:italic}
+  .d-sidebar-item.active{color:#F2EDE8;font-style:normal}
+  .d-sidebar-gift{margin-top:28px;background:#271540;border:1px solid #3A2450;padding:14px}
+  .d-main{flex:1}
+  .d-hero{padding:64px 44px 52px;background:#271540;border-bottom:1px solid #3A2450;position:relative;overflow:hidden}
+  .d-hero-glow{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 65% 40%,#3A2450 0%,#1A0E24 75%);pointer-events:none}
+  .d-hero-tag{font-size:10px;letter-spacing:0.24em;color:#C4907A;margin-bottom:18px;position:relative}
+  .d-hero-h1{font-size:46px;font-weight:400;line-height:1.18;color:#F2EDE8;margin-bottom:18px;position:relative;max-width:480px;font-style:italic}
+  .d-hero-sub{font-size:16px;color:#A898B8;max-width:380px;line-height:1.8;position:relative;margin-bottom:32px}
+  .d-hero-rule{width:48px;height:1px;background:#C4907A;margin-bottom:20px;position:relative}
+  .d-hero-actions{display:flex;gap:14px;position:relative}
+  .d-btn-primary{background:#C4907A;color:#1A0E24;padding:13px 28px;font-size:12px;letter-spacing:0.16em;border:none;cursor:pointer;font-family:Georgia,serif;font-weight:700}
+  .d-btn-secondary{border:1px solid #3A2450;color:#A898B8;padding:13px 28px;font-size:12px;letter-spacing:0.12em;background:transparent;cursor:pointer;font-family:Georgia,serif;font-style:italic}
+  .d-hero-occasions{position:absolute;right:44px;top:44px}
+  .d-occ-label{font-size:9px;letter-spacing:0.18em;color:#C4907A;margin-bottom:10px}
+  .d-occ-item{font-size:12px;color:#A898B8;padding:6px 0;border-bottom:1px solid #3A2450;font-style:italic}
+  .d-section{padding:40px 44px 0}
+  .d-section-title{font-size:10px;letter-spacing:0.2em;color:#C4907A;margin-bottom:28px}
+  .d-products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:44px}
+  .d-card{background:#271540;border:1px solid #3A2450;cursor:pointer}
+  .d-card:hover{border-color:#C4907A}
+  .d-card-img{height:155px;background:#1A0E24;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #3A2450;position:relative}
+  .d-fig-a{width:46px;height:68px;background:#3A2450;border:1px solid #4A3060}
+  .d-fig-b{width:48px;height:48px;border-radius:50%;background:#3A2450;border:1px solid #4A3060}
+  .d-fig-c{width:72px;height:46px;background:#3A2450;border:1px solid #4A3060}
+  .d-card-tag-line{height:2px;background:#C4907A;opacity:0.3}
+  .d-card-body{padding:14px}
+  .d-card-tag{font-size:9px;letter-spacing:0.2em;color:#C4907A;margin-bottom:5px}
+  .d-card-name{font-size:14px;color:#F2EDE8;margin-bottom:4px;font-style:italic}
+  .d-card-price{font-size:12px;color:#A898B8}
+  .d-card-heart{position:absolute;top:10px;right:10px;width:18px;height:18px;opacity:0.4}
+  .d-tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:44px}
+  .d-tool-card{background:#271540;border:1px solid #3A2450;padding:20px;display:flex;gap:12px;cursor:pointer}
+  .d-tool-icon{width:38px;height:38px;border:1px solid #C4907A;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#1A0E24}
+  .d-rose{width:16px;height:16px;border-radius:50%;background:#C4907A;opacity:0.4}
+  .d-tool-body h4{font-size:13px;color:#F2EDE8;margin-bottom:5px;font-weight:400;font-style:italic}
+  .d-tool-body p{font-size:12px;color:#A898B8;line-height:1.65;margin:0}
+  .d-quote{margin:0 44px 44px;padding:28px;border:1px solid #3A2450;background:#271540;text-align:center}
+  .d-quote-text{font-size:18px;color:#F2EDE8;font-style:italic;line-height:1.7;margin-bottom:12px}
+  .d-quote-rule{width:32px;height:1px;background:#C4907A;margin:0 auto 10px}
+  .d-quote-attr{font-size:11px;color:#A898B8;letter-spacing:0.12em}
+  .d-footer{border-top:1px solid #3A2450;padding:28px 44px;display:flex;justify-content:space-between;align-items:center}
+  .d-footer-brand{font-size:12px;letter-spacing:0.1em;color:#A898B8;font-style:italic}
+  .d-footer-links a{font-size:11px;color:#A898B8;text-decoration:none;margin-left:18px;letter-spacing:0.06em}
+  .d-seal{font-size:9px;letter-spacing:0.14em;color:#C4907A;border:1px solid #3A2450;padding:5px 10px}
+  .d-label{display:inline-block;background:#271540;border:1px solid #C4907A;color:#C4907A;font-size:10px;padding:3px 10px;letter-spacing:0.14em;margin-bottom:18px}
+    
+  /* OPTION 1 */
+  .o1-actions { display: flex; align-items: center; gap: 6px; }
+  .icon-btn { width: 36px; height: 36px; border: 1px solid #3A2450; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn:hover { border-color: #C4907A; }
+  .icon-btn svg { width: 16px; height: 16px; stroke: #A898B8; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-btn:hover svg { stroke: #C4907A; }
+  .badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: #C4907A; border-radius: 50%; font-size: 9px; color: #1A0E24; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; border: 1px solid #1A0E24; }
+  .icon-divider { width: 1px; height: 24px; background: #3A2450; margin: 0 4px; }
+  .login-btn { border: 1px solid #C4907A; color: #C4907A; padding: 8px 18px; font-size: 11px; letter-spacing: 0.16em; background: transparent; cursor: pointer; font-family: Georgia, serif; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #C4907A; background: #271540; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #C4907A; letter-spacing: 0.08em; cursor: pointer; }
+
+</style>
+
+<div class="opt-d">
+  <nav class="d-nav">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="d-logo-bloom">
+        <img src="../logo/C4907A-H3D-logo.png" alt="Hamro3D Logo">
+      </div>
+      <div>
+        <div class="d-logo-text">HAMRO<span style="color:#C4907A;font-style:italic">3D</span></div>
+        <div class="d-logo-sub">हाम्रो 3D</div>
+      </div>
+    </div>
+    <ul class="d-nav-links">
+      <li><a href="#">Explore</a></li>
+      <li><a href="#">Our Story</a></li>
+      <li><a href="#">Connect</a></li>
+    </ul>
+    <div class="o1-actions">
+        <div class="icon-btn" title="Wishlist">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <div class="badge">2</div>
+        </div>
+        <div class="icon-btn" title="Track Order">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="icon-btn" title="Cart">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          <div class="badge">3</div>
+        </div>
+        <div class="icon-divider"></div>
+        <div class="avatar">AS</div>
+    </div>
+  </nav>
+
+  <div class="d-layout">
+
+    <main class="d-main">
+      <div class="d-hero">
+        <div class="d-hero-glow"></div>
+        <div class="d-label">DUSK VIOLET MEMORY · OPTION D</div>
+        <div class="d-hero-rule"></div>
+        <div class="d-hero-tag">FOR THE PEOPLE YOU CANNOT FORGET</div>
+        <h1 class="d-hero-h1">Where emotions take tangible form.</h1>
+        <p class="d-hero-sub">We turn meaningful human moments into objects you can keep forever. Give someone the gift of being remembered.</p>
+        <div class="d-hero-actions">
+          <button class="d-btn-primary">COMMISSION A PIECE</button>
+          <button class="d-btn-secondary">See Collection →</button>
+        </div>
+      </div>
+
+      <div class="d-section">
+        <div class="d-section-title">GIFTS THEY WILL NEVER THROW AWAY</div>
+        <div class="d-products-grid">
+          <div class="d-card">
+            <div class="d-card-img">
+              <div class="d-fig-a"></div>
+              <svg class="d-card-heart" viewBox="0 0 18 18" fill="none"><path d="M9 15s-7-4.5-7-9a4 4 0 0 1 7-2.7A4 4 0 0 1 16 6c0 4.5-7 9-7 9z" stroke="#C4907A" stroke-width="1.2"/></svg>
+            </div>
+            <div class="d-card-tag-line"></div>
+            <div class="d-card-body">
+              <div class="d-card-tag">FOR YOUR LOVE</div>
+              <div class="d-card-name">Custom Human Figurine</div>
+              <div class="d-card-price">From NPR 8,500</div>
+            </div>
+          </div>
+          <div class="d-card">
+            <div class="d-card-img"><div class="d-fig-b"></div></div>
+            <div class="d-card-tag-line"></div>
+            <div class="d-card-body">
+              <div class="d-card-tag">FOR MEMORY</div>
+              <div class="d-card-name">Portrait Litholamp</div>
+              <div class="d-card-price">From NPR 2,200</div>
+            </div>
+          </div>
+          <div class="d-card">
+            <div class="d-card-img"><div class="d-fig-c"></div></div>
+            <div class="d-card-tag-line"></div>
+            <div class="d-card-body">
+              <div class="d-card-tag">FOR THE HOME</div>
+              <div class="d-card-name">Engraved Nameplate</div>
+              <div class="d-card-price">From NPR 1,400</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-section-title">HOW WE MAKE IT MEANINGFUL</div>
+        <div class="d-tools-grid">
+          <div class="d-tool-card">
+            <div class="d-tool-icon"><div class="d-rose"></div></div>
+            <div class="d-tool-body">
+              <h4>Tell Us Your Story</h4>
+              <p>Share the memory. Our artisans will decide the best way to hold it in physical form.</p>
+            </div>
+          </div>
+          <div class="d-tool-card">
+            <div class="d-tool-icon"><div class="d-rose"></div></div>
+            <div class="d-tool-body">
+              <h4>Photo to Object</h4>
+              <p>One photograph. One person. One piece that holds them close when they're far.</p>
+            </div>
+          </div>
+          <div class="d-tool-card">
+            <div class="d-tool-icon"><div class="d-rose"></div></div>
+            <div class="d-tool-body">
+              <h4>Occasion Gifting</h4>
+              <p>Weddings, Dashain, anniversaries, remembrance — we craft for the moments that matter.</p>
+            </div>
+          </div>
+          <div class="d-tool-card">
+            <div class="d-tool-icon"><div class="d-rose"></div></div>
+            <div class="d-tool-body">
+              <h4>Gift Ready Packaging</h4>
+              <p>The presentation is part of the gift. Every piece arrives wrapped with intention.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-quote">
+        <div class="d-quote-text">"A gift they will never throw away."</div>
+        <div class="d-quote-rule"></div>
+        <div class="d-quote-attr">HAMRO3D · KATHMANDU</div>
+      </div>
+
+      <footer class="d-footer">
+        <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+        <div>
+          <a href="#" class="d-footer-links">Privacy</a>
+          <a href="#" class="d-footer-links">Contact</a>
+          <a href="#" class="d-footer-links">Instagram</a>
+        </div>
+        <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+      </footer>
+    </main>
+  </div>
+</div>
