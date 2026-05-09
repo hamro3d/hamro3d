@@ -1,0 +1,177 @@
+---
+description: Hamro3D Nuxt 3 architecture, Vue 3 patterns, Nitro server conventions, and project structure standards
+globs: "**/*.{vue,ts,js,mts,mjs,json}"
+alwaysApply: false
+---
+
+# Hamro3D — Nuxt 3 Engineering Standards
+
+## Framework Stack
+
+- **Nuxt 3** (latest stable) — SSR/ISR hybrid rendering
+- **Vue 3** — Composition API with `<script setup lang="ts">` exclusively
+- **TypeScript** — strict mode, no `any` types
+- **Tailwind CSS v4** — `@theme` tokens mapped to Hamro3D design system
+- **Pinia** — global state management
+- **Nitro** — server routes and API layer
+
+## Vue Component Rules
+
+### Always
+- Use `<script setup lang="ts">` — no Options API, no `defineComponent()`
+- Define props with `defineProps<T>()` — TypeScript interface, not runtime validators
+- Define emits with `defineEmits<T>()`
+- Use `computed()` for derived state, not methods
+- Use `watchEffect()` or `watch()` sparingly — prefer computed
+- Template refs: `const el = useTemplateRef<HTMLElement>('el')`
+
+### Never
+- No `this` keyword — Composition API only
+- No `<style>` blocks — Tailwind utilities only (rare exceptions must be scoped)
+- No `v-html` unless content is sanitized server-side
+- No barrel exports (`index.ts`) in component directories — Nuxt auto-imports
+
+### Component File Order
+```
+<script setup lang="ts"> ... </script>
+<template> ... </template>
+```
+
+## Naming Conventions
+
+| Entity | Convention | Example |
+|--------|-----------|---------|
+| Components | PascalCase, `H3d` prefix | `H3dButton.vue`, `H3dProductCard.vue` |
+| Pages | kebab-case | `our-story.vue`, `[slug].vue` |
+| Composables | camelCase, `use` prefix | `useCommission.ts`, `useCollection.ts` |
+| Server routes | kebab-case with method suffix | `index.get.ts`, `[id].get.ts`, `submit.post.ts` |
+| Pinia stores | camelCase, `use` prefix, `Store` suffix | `useCartStore.ts`, `useAuthStore.ts` |
+| Types/Interfaces | PascalCase | `Piece`, `Commission`, `Collection` |
+| Utilities | camelCase | `formatPrice.ts`, `slugify.ts` |
+
+## Directory Structure
+
+```
+app/
+├── components/
+│   ├── ui/           # H3dButton, H3dInput, H3dBadge, H3dModal
+│   ├── layout/       # H3dNavbar, H3dFooter, H3dHero, H3dSection
+│   ├── product/      # H3dProductCard, H3dProductGallery, H3dPriceTag
+│   ├── commission/   # H3dCommissionForm, H3dCommissionSteps
+│   └── shared/       # H3dLogo, H3dLanguageSwitcher, H3dLoadingReveal
+├── composables/      # Auto-imported composables
+├── layouts/          # default.vue, checkout.vue
+├── pages/            # File-based routing
+├── plugins/          # Client/server plugins
+├── middleware/        # Route middleware
+├── stores/           # Pinia stores
+├── types/            # Shared TypeScript interfaces
+└── utils/            # Auto-imported utility functions
+server/
+├── api/              # Nitro API routes
+├── middleware/        # Server middleware
+├── utils/            # Server-only utilities
+└── plugins/          # Server lifecycle plugins
+```
+
+## Data Fetching
+
+```typescript
+// Page-level data — SSR-rendered
+const { data } = await useFetch('/api/pieces')
+
+// With transform and error handling
+const { data: piece, error } = await useFetch(`/api/pieces/${route.params.id}`, {
+  transform: (raw) => parsePiece(raw),
+})
+
+// Client-side actions (event handlers only)
+async function submitCommission(payload: CommissionPayload) {
+  await $fetch('/api/commission', { method: 'POST', body: payload })
+}
+```
+
+- Always `await` the `useFetch` / `useAsyncData` call at the top level of `<script setup>`
+- Use `transform` to shape API responses
+- Handle errors with `error` ref and show branded error states
+
+## Server Routes (Nitro)
+
+```typescript
+// server/api/pieces/index.get.ts
+export default defineEventHandler(async (event) => {
+  const pieces = await fetchPieces()
+  return pieces
+})
+
+// server/api/commission/index.post.ts
+import { z } from 'zod'
+
+const CommissionSchema = z.object({
+  pieceId: z.string().uuid(),
+  name: z.string().min(1),
+  message: z.string().optional(),
+})
+
+export default defineEventHandler(async (event) => {
+  const body = await readValidatedBody(event, CommissionSchema.parse)
+  const commission = await createCommission(body)
+  return commission
+})
+```
+
+- Validate all inputs with Zod via `readValidatedBody` / `getValidatedQuery`
+- Return proper HTTP status: `createError({ statusCode: 404, message: '...' })`
+- Keep business logic in `server/utils/` — handlers should be thin
+
+## Rendering Strategy
+
+Configure in `nuxt.config.ts` via `routeRules`:
+
+```typescript
+routeRules: {
+  '/':                  { isr: 3600 },      // Homepage — ISR 1hr
+  '/collections/**':    { isr: 3600 },      // Collections — ISR 1hr
+  '/piece/**':          { isr: 600 },       // Pieces — ISR 10min
+  '/commission':        { ssr: true },       // Commission — always fresh SSR
+  '/api/**':            { cors: true },      // API — CORS enabled
+}
+```
+
+## SEO Pattern
+
+Every page must include:
+
+```typescript
+useSeoMeta({
+  title: 'Page Title — Hamro3D',
+  description: 'Warm, brand-voice description',
+  ogTitle: 'Page Title — Hamro3D',
+  ogDescription: 'Warm, brand-voice description',
+  ogImage: '/og/page-name.jpg',
+  ogType: 'website',
+  ogLocale: 'en_NP',
+  twitterCard: 'summary_large_image',
+})
+```
+
+## i18n
+
+- Default locale: `en`
+- Supported: `['en', 'ne']`
+- All user-facing strings use `$t('key')` in templates or `t('key')` in script
+- Devanagari containers get `lang="ne"` attribute
+- Locale files in `i18n/locales/en.json` and `i18n/locales/ne.json`
+
+## Error Handling
+
+- Use `<NuxtErrorBoundary>` in layouts with branded fallback
+- Create `error.vue` at app root with brand-styled error page
+- Server errors return warm copy, never raw status codes
+- Log errors server-side, show human messages client-side
+
+## Testing Guidance
+
+- Component tests with Vitest + Vue Test Utils
+- Server route tests with Vitest + `$fetch` against test server
+- E2E with Playwright for critical flows (commission, navigation)

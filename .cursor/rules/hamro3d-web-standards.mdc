@@ -1,0 +1,135 @@
+---
+description: Hamro3D web performance, SSR/ISR strategy, image optimization, accessibility, SEO, and Nepal-specific standards for Nuxt 3
+globs: "**/*.{vue,ts,js,css,json}"
+alwaysApply: false
+---
+
+# Hamro3D — Web Standards (Nuxt 3)
+
+## Nepal-Specific Performance
+
+Non-negotiable — most customers are on 4G mobile:
+
+- Images via `<NuxtPicture>` or `<NuxtImg>` with `format="webp"` and `sizes` attribute
+- All product images ≤ 180KB WebP for mobile data sensitivity
+- Hero image preloaded via `useHead({ link: [{ rel: 'preload', as: 'image', href: '...' }] })`
+- Below-fold images: `loading="lazy"` (automatic with Nuxt Image)
+- No background video — too data-heavy for 4G
+- Core gifting CTA accessible within 2 taps from homepage
+- Target LCP < 2.5s on simulated 4G
+- Leverage Nuxt's automatic code splitting per route
+- Prefer CSS transitions (`transition-*` Tailwind classes) over JS animation libraries
+
+## Rendering & Caching Strategy
+
+```typescript
+// nuxt.config.ts → routeRules
+routeRules: {
+  '/':                { isr: 3600 },     // Homepage ISR 1hr
+  '/collections/**':  { isr: 3600 },     // Collection pages ISR 1hr
+  '/piece/**':        { isr: 600 },      // Piece detail ISR 10min
+  '/commission':      { ssr: true },      // Always fresh SSR
+  '/our-story':       { prerender: true },// Static — rarely changes
+  '/contact':         { prerender: true },// Static
+  '/api/**':          { cors: true },     // API CORS
+}
+```
+
+- Use ISR for content that changes occasionally (pieces, collections)
+- Use `prerender: true` for static editorial pages
+- Always SSR for authenticated/dynamic routes (commission flow)
+
+## Responsive Architecture
+
+### Desktop (≥1240px / `lg:`)
+- Warm editorial, centered layouts, image-forward
+- Hero at 100vh, product images min 500px
+- Max-width 1240px container (`max-w-h3d-max mx-auto`)
+
+### Tablet (768–1024px / `md:`)
+- 2-column product cards
+- Editorial text width preserved
+- Hero reduced to 80vh
+- 60px section padding (`py-[60px]`)
+
+### Mobile (<768px / default)
+- Intimate, personal feel
+- Large text: H1 at 38px, body at 16px (handled by clamp tokens)
+- Warm full-width imagery
+- CTAs pinned bottom, 56px height (`h-14`)
+- Max-width 390px content
+- Touch targets minimum 44px (`min-h-11 min-w-11`)
+
+## Accessibility
+
+- Color contrast: cream `text-h3d-text` on plum `bg-h3d-base` — meets WCAG AA
+- Semantic HTML: proper heading hierarchy, `<nav>`, `<main>`, `<aside>`, `<footer>`
+- All images need descriptive `alt` text reflecting emotional intent
+- Focus states: rose gold outline via `focus-visible:outline-2 focus-visible:outline-h3d-accent`
+- Respect `prefers-reduced-motion` — use `motion-reduce:` variant to disable animations
+- Support `prefers-color-scheme` awareness (brand is dark-first)
+- Form inputs: visible `<label>` elements, not just placeholders
+- Use `<NuxtLink>` for all internal navigation (provides prefetching)
+- ARIA attributes on interactive custom components (modals, dropdowns, tabs)
+
+## SEO & Meta
+
+Every page must include via `useSeoMeta()`:
+
+```typescript
+useSeoMeta({
+  title: 'Unique Page Title — Hamro3D',
+  description: 'Brand-voice description of the page content',
+  ogTitle: 'Same or adapted title',
+  ogDescription: 'Social-optimized description',
+  ogImage: '/og/page-specific.jpg',
+  ogType: 'website',
+  ogLocale: 'en_NP',
+  twitterCard: 'summary_large_image',
+})
+```
+
+Additional requirements:
+- JSON-LD structured data for pieces: name, price (NPR), image, description via `useHead`
+- `hreflang` tags for Nepali/English via i18n module
+- Canonical URLs — handled automatically by Nuxt SEO if configured
+- Sitemap via `@nuxtjs/sitemap` module
+
+## Image Standards
+
+```vue
+<!-- Product image -->
+<NuxtPicture
+  :src="piece.image"
+  :alt="piece.altText"
+  format="webp"
+  sizes="sm:100vw md:50vw lg:370px"
+  loading="lazy"
+  class="aspect-[4/5] object-cover"
+/>
+
+<!-- Hero image (preloaded) -->
+<NuxtImg
+  :src="heroSrc"
+  alt="Dusk atmosphere — handcrafted keepsakes in warm light"
+  format="webp"
+  sizes="100vw"
+  preload
+  class="w-full h-full object-cover"
+/>
+```
+
+- Always use `<NuxtPicture>` or `<NuxtImg>` — never raw `<img>`
+- Set `sizes` attribute for responsive image loading
+- Hero images use `preload` prop
+- Product images use `loading="lazy"` (default for non-preloaded)
+- Provide emotional, descriptive `alt` text — not just "product image"
+
+## Code Conventions
+
+- Tailwind `h3d-` token classes for all design values — no hardcoded hex
+- Component naming: `H3d` prefix, PascalCase
+- Mobile-first CSS via Tailwind responsive prefixes (`sm:`, `md:`, `lg:`)
+- HTML should read like a gift: semantic, clean, well-structured
+- Devanagari text wrapped in `lang="ne"` attribute
+- No inline styles — Tailwind utilities or CSS custom properties only

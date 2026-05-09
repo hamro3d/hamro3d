@@ -1,0 +1,144 @@
+---
+description: Hamro3D "Dusk Violet Memory" design system — color palette, typography, spacing, components, and visual effects for Nuxt/Vue/Tailwind
+globs: "**/*.{vue,ts,css,scss,js,tsx,jsx}"
+alwaysApply: false
+---
+
+# Hamro3D — Dusk Violet Memory Design System (Nuxt Edition)
+
+Design direction: *The color of the hour between day and memory. Where things become precious.*
+
+## Color Palette
+
+### Core Hierarchy (Tailwind token → HEX)
+| Tailwind Class | Role | HEX |
+|---------------|------|-----|
+| `bg-h3d-base` / `text-h3d-base` | Background (Deep Plum) | `#1A0E24` |
+| `bg-h3d-surface` | Cards, modals | `#271540` |
+| `text-h3d-text` | Primary text (Warm Cream) | `#F2EDE8` |
+| `text-h3d-muted` | Secondary text (Lavender Grey) | `#A898B8` |
+| `border-h3d-border` | Borders, dividers | `#3A2450` |
+
+### Accent & Functional
+| Tailwind Class | Role | HEX |
+|---------------|------|-----|
+| `bg-h3d-accent` / `text-h3d-accent` | CTAs, highlights (Aged Rose Gold) | `#C4907A` |
+| `hover:bg-h3d-accent-hover` | Hover states | `#A07060` |
+| `text-h3d-success` | Confirmation | `#6B8A70` |
+| `text-h3d-error` / `bg-h3d-error` | Critical feedback | `#8B2A3A` |
+
+### Usage Ratio
+- 70% Deep Plum (backgrounds, atmosphere)
+- 20% Violet Mid + Lavender (containers, readable areas)
+- 10% Rose Gold (CTAs, emotional highlights)
+
+### NEVER
+- Use bright purple (reads as tech startup)
+- Use pure white — always warm cream `text-h3d-text` / `#F2EDE8`
+- Use cold/blue-white tones anywhere
+- Use `rounded-lg` or larger — brand is precise (max `rounded-sm` / 3px)
+
+## Typography
+
+### Font Stack (Tailwind classes)
+- **Display / Emotional:** `font-h3d-display` → EB Garamond (serif)
+- **Structural / UI:** `font-h3d-body` → Jost (sans-serif)
+- **Devanagari Display:** `font-h3d-devanagari` → Rozha One
+- **Devanagari Body:** `font-h3d-devanagari-body` → Noto Sans Devanagari
+
+### Scale
+| Level | Tailwind Classes | Use |
+|-------|-----------------|-----|
+| H1 | `font-h3d-display text-h3d-hero leading-[1.18]` | Hero headlines |
+| H2 | `font-h3d-display text-h3d-h2` | Section headers |
+| H3 | `font-h3d-body text-h3d-h3 font-medium tracking-[0.06em]` | Sub-sections |
+| H4 | `font-h3d-body text-h3d-h4` | Card titles |
+| H5 | `font-h3d-body text-h3d-h5 uppercase tracking-[0.2em]` | Labels, categories |
+| Lead | `font-h3d-display text-h3d-lead leading-[1.8]` | Intro paragraphs |
+| Body | `font-h3d-body text-h3d-body leading-[1.82]` | Primary body text |
+| CTA | `font-h3d-body text-h3d-cta font-semibold uppercase tracking-[0.22em]` | Buttons |
+| Nav | `font-h3d-body text-h3d-nav font-medium tracking-[0.1em]` | Navigation |
+
+### Typography Rules
+- Headlines use natural letter-spacing, not tight
+- CTAs and labels: ALL CAPS with wide tracking
+- Body line-height: 1.82
+- Quote text: EB Garamond Italic, rose gold tint, centered
+
+## Visual Effects
+
+### Gradients (Tailwind arbitrary values)
+```html
+<!-- Hero "velvet spotlight" -->
+<div class="bg-[radial-gradient(ellipse_at_65%_40%,var(--color-h3d-surface)_0%,var(--color-h3d-base)_75%)]">
+
+<!-- Center glow -->
+<div class="bg-[radial-gradient(circle_at_50%_50%,var(--color-h3d-surface)_0%,var(--color-h3d-base)_80%)]">
+```
+
+### Shadows
+Use `shadow-h3d-card` (defined in theme) for card and modal elevation.
+
+### Glass / Transparency
+```html
+<div class="backdrop-blur-[14px] bg-[rgba(39,21,64,0.9)]">
+```
+
+### Texture
+Soft-light grain overlay at 6–10% opacity on dark surfaces (via CSS pseudo-element or texture image).
+
+## Layout Grid
+
+- 12-column grid, `gap-h3d-gutter` (24px), `max-w-h3d-max` (1240px)
+- Text containers: `max-w-h3d-text` (660px) centered
+- Product grid: `max-w-h3d-grid` (1100px)
+- Section vertical spacing: `py-h3d-section` (clamp 80–220px)
+- 8px base spacing unit
+
+## Vue Component Patterns
+
+### H3dProductCard
+```vue
+<template>
+  <NuxtLink
+    :to="`/piece/${piece.id}`"
+    class="block bg-h3d-surface border border-h3d-border transition-colors duration-300 hover:border-h3d-accent"
+  >
+    <div class="aspect-[4/5] bg-h3d-base flex items-center justify-center border-b border-h3d-border">
+      <NuxtPicture :src="piece.image" :alt="piece.altText" format="webp" loading="lazy" />
+    </div>
+    <div class="p-h3d-md space-y-2">
+      <span class="font-h3d-body text-h3d-h5 uppercase tracking-[0.2em] text-h3d-accent">
+        {{ piece.collection }}
+      </span>
+      <h3 class="font-h3d-display italic text-h3d-text text-h3d-h4">
+        {{ piece.name }}
+      </h3>
+      <span class="font-h3d-body text-h3d-body-sm text-h3d-muted">
+        NPR {{ piece.price }}
+      </span>
+    </div>
+  </NuxtLink>
+</template>
+```
+
+### H3dButton
+- Primary: `bg-h3d-accent text-h3d-base hover:bg-h3d-accent-hover` + CTA typography
+- Secondary: `border border-h3d-border text-h3d-muted hover:border-h3d-accent hover:text-h3d-text bg-transparent` + italic display font
+- Always include `focus-visible:outline-2 focus-visible:outline-h3d-accent focus-visible:outline-offset-2`
+
+### H3dHero
+- Full-bleed dusk atmosphere with radial glow gradient
+- Rose gold rule line (`border-b border-h3d-accent`) beneath headline
+- Arrival should feel like entering a gifting space
+
+## Animation
+
+- Warm fade-up reveals: `duration-700 ease-out`, staggered
+- Use the `h3d-animate-in` utility class (defined in main.css)
+- Transitions feel like "gifts appearing under warm light"
+- No jarring or snappy animations
+- Always respect `prefers-reduced-motion`:
+  ```html
+  <div class="h3d-animate-in motion-reduce:!animate-none motion-reduce:opacity-100">
+  ```

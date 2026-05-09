@@ -1,0 +1,94 @@
+---
+description: Hamro3D core brand identity, values, and strategic filter — governs all code, copy, and design decisions
+alwaysApply: true
+---
+
+# Hamro3D — Brand Identity
+
+You are building for **Hamro3D**, a premium emotionally-driven craft brand from Kathmandu, Nepal that preserves meaningful human moments in tangible form.
+
+## Source Documents
+
+- Brand foundation: `docs/brand/0. hamro3d-brand-foundation.md`
+- Design guidelines: `docs/brand/brandguidelines(option-d-dusk-violet-memory0.md`
+
+## Core Identity
+
+- **Purpose:** Preserve meaningful human moments in tangible form
+- **Promise:** We turn meaningful human moments into objects you can keep forever
+- **Tagline (current Phase 0):** *Crafted with care. Made to mean something.*
+- **Tagline (long-term):** *Where emotions take tangible form.*
+
+## What Hamro3D IS
+
+A memory-to-object studio. Technology is a tool. Emotion is the product.
+
+## What Hamro3D is NOT
+
+- A 3D printing service or print shop
+- A gift shop or price-driven business
+- A mass manufacturing or trend-following brand
+
+## Core Values (ranked)
+
+1. Emotional Authenticity over Technical Output
+2. Meaning over Utility
+3. Craft over Speed
+4. Depth over Scale
+5. Quality over Price
+
+> If it does not evoke emotion, it does not meet the standard.
+
+## Brand Personality
+
+- Quiet, not loud
+- Confident, not flashy
+- Artistic, not technical
+- Intentional, not fast
+- Emotional, not commercial
+
+## Strategic Filter
+
+Every decision — code, copy, UI, feature — must pass this test:
+
+> **"Does this feel like a memory — or just a product?"**
+
+If it feels like just a product, it does not align.
+
+## Brand Discipline (apply to all outputs)
+
+- Sell meaning, not features
+- Highlight outcomes, not tools
+- Build significance, not volume
+- Refine, do not rush
+
+## Phase 0 Context (current)
+
+- Products: keychains, litholamps, moon lamps, nameplates, puzzles, early figurines
+- Every product must feel personal and gift-worthy
+- Emphasize story and meaning, not function
+- Never overpromise realism or position as a "3D printing service"
+
+## Copy & Language Guidelines
+
+- Write in a warm, intimate, editorial tone — never salesy or corporate
+- Nepali cultural context matters: Dashain, Tihar, weddings, anniversaries, remembrance
+- Preferred terms: "piece" (not product), "commission" (not order), "craft" (not manufacture), "artisan" (not technician)
+- Devanagari support is part of the brand identity (हाम्रो 3D)
+
+## Copy Translation Table
+
+| Instead of... | Write... |
+|---------------|----------|
+| "Add to Cart" | "Commission This Piece" |
+| "Buy Now" | "Gift This" |
+| "Product" | "Piece" or "Creation" |
+| "Order" | "Commission" |
+| "Category" | "Collection" |
+| "Customer" | "You" / personal address |
+| "Checkout" | "Complete Your Gift" |
+| "Shipping" | "Delivery" |
+| "Reviews" | "Stories" or "Memories Shared" |
+| "Cart" | "Your Selections" |
+| "Wishlist" | "Saved Memories" |
+| "Account" | "Your Space" |
