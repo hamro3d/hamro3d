@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1A0E24;
+      --surface: #271540;
+      --border: #3A2450;
+      --text: #F2EDE8;
+      --muted: #A898B8;
+      --accent: #C4907A;
+      --accent-dk: #A07060;
+      --success: #6B8A70;
+      --error: #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans: 'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── ADMIN NAV ─── */
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 64px - 72px);
+    }
+
+    .profile-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-user {
+      padding: 0 28px 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .sidebar-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .sidebar-name {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 300;
+      margin-bottom: 4px;
+    }
+    .sidebar-email {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      letter-spacing: 0.04em;
+    }
+    .sidebar-member-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      font-family: var(--font-sans);
+      margin-top: 10px;
+    }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      padding: 16px 28px 8px;
+    }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav-item:hover { background: rgba(196, 144, 122, 0.06); }
+    .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196, 144, 122, 0.08); }
+    .sidebar-nav-item svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .sidebar-nav-item.active svg { stroke: var(--accent); }
+    .sidebar-nav-item span {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .sidebar-nav-item.active span { color: var(--text); }
+    .sidebar-logout {
+      padding: 20px 28px 0;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--error); }
+    .logout-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .profile-main { padding: 48px 52px; }
+
+    .profile-section-header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: var(--accent);
+      font-family: var(--font-sans);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text);
+    }
+    .section-desc { font-size: 13px; color: var(--muted); font-family: var(--font-sans); margin-top: 6px; line-height: 1.6; }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 22px;
+    }
+    .summary-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .summary-num {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+    .trend-up {
+      color: var(--success);
+      flex-shrink: 0;
+    }
+    .trend-up svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .summary-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      margin-top: 8px;
+    }
+
+    /* Panel + table */
+    .profile-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .panel-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+    .panel-body { padding: 0; }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-sans);
+      font-size: 13px;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 14px 24px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .data-table tbody tr:hover { background: rgba(196, 144, 122, 0.04); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .badge-status {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+    .badge-accent { background: rgba(196, 144, 122, 0.2); color: var(--accent); }
+    .badge-success { background: rgba(107, 138, 112, 0.2); color: var(--success); }
+    .badge-muted { background: rgba(168, 152, 184, 0.12); color: var(--muted); }
+    .panel-footer-link {
+      display: block;
+      padding: 16px 24px;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      text-decoration: none;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      border-top: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .panel-footer-link:hover { background: rgba(196, 144, 122, 0.06); }
+
+    /* Quick actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .quick-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 22px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .quick-card:hover { border-color: var(--accent); background: rgba(196, 144, 122, 0.05); }
+    .quick-card-icon {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .quick-card-icon svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 1.4; }
+    .quick-card-label {
+      font-size: 13px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+    .quick-card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .d-footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; font-family: var(--font-sans); transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; font-family: var(--font-sans); }
+
+    @media (max-width: 1023px) {
+      .admin-layout { grid-template-columns: 220px 1fr; }
+      .profile-main { padding: 36px 32px; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-actions { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 767px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .profile-sidebar { display: none; }
+      .profile-main { padding: 28px 20px; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+<div class="admin-layout">
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <main class="profile-main" id="main-content">
+      <header class="profile-section-header">
+        <div class="section-eyebrow">ADMIN DASHBOARD</div>
+        <h1 class="section-title">Overview</h1>
+        <p class="section-desc">Business snapshot for Hamro3D</p>
+      </header>
+
+      <section class="summary-grid" aria-label="Summary statistics">
+        <article class="summary-card">
+          <div class="summary-card-top">
+            <div class="summary-num">47</div>
+            <span class="trend-up" aria-label="Trending up" title="Up from last month">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+            </span>
+          </div>
+          <div class="summary-label">TOTAL ORDERS</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-num">18</div>
+          <div class="summary-label">TOTAL PRODUCTS</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-num">124</div>
+          <div class="summary-label">ACTIVE USERS</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-num" style="font-size:26px;">NPR 4,82,500</div>
+          <div class="summary-label">REVENUE</div>
+        </article>
+      </section>
+
+      <section class="profile-panel" aria-labelledby="recent-orders-title">
+        <div class="panel-header">
+          <h2 class="panel-title" id="recent-orders-title">RECENT ORDERS</h2>
+        </div>
+        <div class="panel-body">
+          <div class="table-scroll" role="region" aria-label="Recent orders table" tabindex="0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">ORDER #</th>
+                  <th scope="col">CUSTOMER</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col">STATUS</th>
+                  <th scope="col">TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#H3D-2025-0047</td>
+                  <td>Aarav Sharma</td>
+                  <td>May 1</td>
+                  <td><span class="badge-status badge-accent">In Progress</span></td>
+                  <td>NPR 8,500</td>
+                </tr>
+                <tr>
+                  <td>#H3D-2025-0046</td>
+                  <td>Priya Maharjan</td>
+                  <td>Apr 30</td>
+                  <td><span class="badge-status badge-success">Delivered</span></td>
+                  <td>NPR 2,200</td>
+                </tr>
+                <tr>
+                  <td>#H3D-2025-0045</td>
+                  <td>Bikash Tamang</td>
+                  <td>Apr 28</td>
+                  <td><span class="badge-status badge-muted">Processing</span></td>
+                  <td>NPR 14,000</td>
+                </tr>
+                <tr>
+                  <td>#H3D-2025-0044</td>
+                  <td>Sita Karki</td>
+                  <td>Apr 25</td>
+                  <td><span class="badge-status badge-success">Delivered</span></td>
+                  <td>NPR 1,400</td>
+                </tr>
+                <tr>
+                  <td>#H3D-2025-0043</td>
+                  <td>Rohan Thapa</td>
+                  <td>Apr 22</td>
+                  <td><span class="badge-status badge-success">Delivered</span></td>
+                  <td>NPR 850</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <a href="OrderList.html" class="panel-footer-link">VIEW ALL ORDERS</a>
+      </section>
+
+      <section aria-label="Quick actions">
+        <div class="quick-actions">
+          <a href="AddProduct.html" class="quick-card">
+            <div class="quick-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="quick-card-label">Add New Product</div>
+              <div class="quick-card-sub">List a new catalog piece</div>
+            </div>
+          </a>
+          <a href="ProductList.html" class="quick-card">
+            <div class="quick-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+            </div>
+            <div>
+              <div class="quick-card-label">View All Products</div>
+              <div class="quick-card-sub">Edit inventory &amp; pricing</div>
+            </div>
+          </a>
+          <a href="UserList.html" class="quick-card">
+            <div class="quick-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="quick-card-label">Manage Users</div>
+              <div class="quick-card-sub">Customers &amp; roles</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    (function () {
+      var burger = document.getElementById('adminHamburger');
+      var overlay = document.getElementById('adminMobileNav');
+      var closeBtn = document.getElementById('adminMobileClose');
+      function openNav() {
+        overlay.classList.add('open');
+        burger.setAttribute('aria-expanded', 'true');
+      }
+      function closeNav() {
+        overlay.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+      if (burger) burger.addEventListener('click', function () {
+        if (overlay.classList.contains('open')) closeNav(); else openNav();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeNav);
+      overlay.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeNav); });
+    })();
+  </script>
+</body>
+</html>

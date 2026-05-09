@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Human Figurine — Hamro3D</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Georgia',serif;background:#1A0E24;color:#F2EDE8;line-height:1.6;min-height:100vh}
+
+  /* NAV */
+  .d-nav{background:#1A0E24;border-bottom:1px solid #3A2450;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;position:sticky;top:0;z-index:100}
+  .d-logo-text{font-size:15px;letter-spacing:0.12em;color:#F2EDE8;font-weight:400;font-family:Georgia,serif}
+  .d-logo-sub{font-size:9px;letter-spacing:0.16em;color:#A898B8}
+  .d-logo-bloom{width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+  .d-logo-bloom svg{width:100%;height:100%}
+  .d-nav-links{display:flex;gap:28px;list-style:none}
+  .d-nav-links a{color:#A898B8;font-size:13px;text-decoration:none;letter-spacing:0.06em;font-family:Georgia,serif;transition:color 0.2s}
+  .d-nav-links a:hover{color:#C4907A}
+  .d-nav-cta{border:1px solid #C4907A;color:#C4907A;padding:9px 22px;font-size:12px;letter-spacing:0.16em;background:transparent;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s}
+  .d-nav-cta:hover{background:#C4907A;color:#1A0E24}
+
+  /* BREADCRUMB */
+  .breadcrumb{padding:16px 44px;font-size:12px;color:#A898B8;letter-spacing:0.06em;border-bottom:1px solid #3A2450}
+  .breadcrumb a{color:#A898B8;text-decoration:none}
+  .breadcrumb a:hover{color:#C4907A}
+  .breadcrumb span{color:#C4907A;margin:0 8px}
+
+  /* PRODUCT LAYOUT */
+  .product-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:1240px;margin:0 auto;padding:48px 44px}
+  @media(max-width:768px){.product-layout{grid-template-columns:1fr;padding:24px 20px}.d-nav-links{display:none}.breadcrumb{padding:12px 20px}}
+
+  /* GALLERY */
+  .gallery{position:sticky;top:80px;align-self:start}
+  .gallery-main{background:#271540;border:1px solid #3A2450;height:420px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:zoom-in;margin-bottom:12px}
+  .gallery-main:hover .zoom-hint{opacity:1}
+  .gallery-fig{width:120px;height:180px;background:radial-gradient(ellipse at 50% 30%,#4A3060,#271540);border:1px solid #3A2450;position:relative;transition:transform 0.3s}
+  .gallery-fig::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:60%;height:4px;background:#C4907A;opacity:0.3;border-radius:2px}
+  .gallery-main:hover .gallery-fig{transform:scale(1.08)}
+  .zoom-hint{position:absolute;bottom:12px;right:12px;font-size:10px;letter-spacing:0.12em;color:#A898B8;opacity:0;transition:opacity 0.2s}
+  .gallery-badge{position:absolute;top:12px;left:12px;background:#271540;border:1px solid #C4907A;color:#C4907A;font-size:9px;padding:4px 10px;letter-spacing:0.16em}
+  .gallery-thumbs{display:flex;gap:8px}
+  .thumb{width:80px;height:80px;background:#271540;border:1px solid #3A2450;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s;flex-shrink:0}
+  .thumb.active,.thumb:hover{border-color:#C4907A}
+  .thumb-fig{width:28px;height:42px;background:#3A2450;border:1px solid #4A3060}
+  .thumb-fig.b{width:36px;height:36px;border-radius:50%}
+  .thumb-fig.c{width:42px;height:28px}
+  .thumb-fig.d{width:32px;height:32px;border-radius:4px}
+
+  /* PRODUCT INFO */
+  .product-info{padding-left:52px}
+  @media(max-width:768px){.product-info{padding-left:0;padding-top:32px}}
+  .p-tag{font-size:10px;letter-spacing:0.22em;color:#C4907A;margin-bottom:12px}
+  .p-title{font-size:36px;font-weight:300;color:#F2EDE8;line-height:1.2;margin-bottom:8px}
+  .p-subtitle{font-size:14px;color:#A898B8;letter-spacing:0.06em;margin-bottom:20px}
+  .p-rule{width:48px;height:1px;background:#C4907A;margin-bottom:20px}
+  .p-price{font-size:28px;color:#F2EDE8;font-family:Georgia,serif;margin-bottom:6px}
+  .p-price-note{font-size:12px;color:#A898B8;margin-bottom:24px;letter-spacing:0.04em}
+  .p-divider{border:none;border-top:1px solid #3A2450;margin:24px 0}
+
+  /* OPTIONS */
+  .opt-label{font-size:10px;letter-spacing:0.2em;color:#C4907A;margin-bottom:10px}
+  .opt-group{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .opt-btn{border:1px solid #3A2450;color:#A898B8;padding:8px 16px;font-size:12px;letter-spacing:0.08em;background:transparent;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s}
+  .opt-btn.active,.opt-btn:hover{border-color:#C4907A;color:#F2EDE8}
+
+  /* QUANTITY */
+  .qty-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+  .qty-label{font-size:10px;letter-spacing:0.2em;color:#C4907A}
+  .qty-ctrl{display:flex;align-items:center;border:1px solid #3A2450}
+  .qty-btn{width:36px;height:36px;background:transparent;border:none;color:#A898B8;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color 0.2s}
+  .qty-btn:hover{color:#C4907A}
+  .qty-num{width:44px;text-align:center;font-size:14px;color:#F2EDE8;background:transparent;border:none;border-left:1px solid #3A2450;border-right:1px solid #3A2450;height:36px;line-height:36px;font-family:Georgia,serif}
+  .qty-num:focus{outline:none}
+
+  /* CART BUTTONS */
+  .btn-cart{width:100%;background:#C4907A;color:#1A0E24;padding:14px;font-size:12px;letter-spacing:0.2em;border:none;cursor:pointer;font-family:Georgia,serif;font-weight:700;margin-bottom:10px;transition:opacity 0.2s}
+  .btn-cart:hover{opacity:0.88}
+  .btn-wishlist{width:100%;border:1px solid #3A2450;color:#A898B8;padding:13px;font-size:12px;letter-spacing:0.12em;background:transparent;cursor:pointer;font-family:Georgia,serif;font-weight:300;transition:all 0.2s}
+  .btn-wishlist:hover{border-color:#C4907A;color:#F2EDE8}
+
+  /* SPECS */
+  .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}
+  .spec-item{background:#271540;border:1px solid #3A2450;padding:12px}
+  .spec-key{font-size:9px;letter-spacing:0.18em;color:#C4907A;margin-bottom:4px}
+  .spec-val{font-size:13px;color:#F2EDE8;font-weight:300}
+
+  /* TABS */
+  .tabs{margin-top:32px}
+  .tab-nav{display:flex;border-bottom:1px solid #3A2450;margin-bottom:20px}
+  .tab-btn{padding:10px 20px;font-size:12px;letter-spacing:0.1em;color:#A898B8;background:transparent;border:none;cursor:pointer;font-family:Georgia,serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+  .tab-btn.active{color:#C4907A;border-bottom-color:#C4907A}
+  .tab-panel{display:none;font-size:14px;color:#A898B8;line-height:1.8}
+  .tab-panel.active{display:block}
+  .tab-panel p{margin-bottom:12px}
+
+  /* RELATED */
+  .related{padding:0 44px 64px;max-width:1240px;margin:0 auto}
+  @media(max-width:768px){.related{padding:0 20px 48px}}
+  .section-title{font-size:10px;letter-spacing:0.22em;color:#C4907A;margin-bottom:28px}
+  .related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:768px){.related-grid{grid-template-columns:repeat(2,1fr)}}
+  .d-card{background:#271540;border:1px solid #3A2450;cursor:pointer;transition:border-color 0.2s}
+  .d-card:hover{border-color:#C4907A}
+  .d-card-img{height:130px;background:#1A0E24;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #3A2450}
+  .d-fig-a{width:36px;height:56px;background:#3A2450;border:1px solid #4A3060}
+  .d-fig-b{width:40px;height:40px;border-radius:50%;background:#3A2450;border:1px solid #4A3060}
+  .d-fig-c{width:56px;height:36px;background:#3A2450;border:1px solid #4A3060}
+  .d-fig-d{width:44px;height:44px;background:#3A2450;border:1px solid #4A3060;border-radius:2px}
+  .d-card-tag-line{height:2px;background:#C4907A;opacity:0.3}
+  .d-card-body{padding:12px}
+  .d-card-tag{font-size:9px;letter-spacing:0.2em;color:#C4907A;margin-bottom:4px}
+  .d-card-name{font-size:13px;color:#F2EDE8;margin-bottom:4px;font-weight:300}
+  .d-card-price{font-size:12px;color:#A898B8}
+
+  /* FOOTER */
+  .d-footer{border-top:1px solid #3A2450;padding:28px 44px;display:flex;justify-content:space-between;align-items:center}
+  @media(max-width:768px){.d-footer{flex-direction:column;gap:16px;padding:24px 20px;text-align:center}}
+  .d-footer-brand{font-size:12px;letter-spacing:0.1em;color:#A898B8;font-weight:300}
+  .d-footer-links a{font-size:11px;color:#A898B8;text-decoration:none;margin-left:18px;letter-spacing:0.06em}
+  .d-seal{font-size:9px;letter-spacing:0.14em;color:#C4907A;border:1px solid #3A2450;padding:5px 10px}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:#271540;border:1px solid #C4907A;color:#F2EDE8;padding:14px 28px;font-size:13px;letter-spacing:0.08em;z-index:999;opacity:0;transition:all 0.3s;font-family:Georgia,serif;font-weight:300}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb" aria-label="Breadcrumb">
+  <a href="Home.html">Home</a><span>›</span><a href="Products.html">Collection</a><span>›</span>Custom Human Figurine
+</div>
+
+<!-- PRODUCT -->
+<div class="product-layout">
+
+  <!-- GALLERY -->
+  <section class="gallery" aria-label="Product gallery">
+    <div class="gallery-main" role="img" aria-label="Custom Human Figurine - front view">
+      <div class="gallery-badge">BESTSELLER</div>
+      <div class="gallery-fig" id="mainFig"></div>
+      <div class="zoom-hint">HOVER TO ZOOM</div>
+    </div>
+    <div class="gallery-thumbs" role="list" aria-label="Product thumbnails">
+      <div class="thumb active" role="listitem" tabindex="0" aria-label="Front view" onclick="setThumb(this,0)"><div class="thumb-fig"></div></div>
+      <div class="thumb" role="listitem" tabindex="0" aria-label="Side view" onclick="setThumb(this,1)"><div class="thumb-fig b"></div></div>
+      <div class="thumb" role="listitem" tabindex="0" aria-label="Detail view" onclick="setThumb(this,2)"><div class="thumb-fig c"></div></div>
+      <div class="thumb" role="listitem" tabindex="0" aria-label="Base view" onclick="setThumb(this,3)"><div class="thumb-fig d"></div></div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section class="product-info" aria-label="Product details">
+    <div class="p-tag">FOR YOUR LOVE · CUSTOM PIECE</div>
+    <h1 class="p-title">Custom Human Figurine</h1>
+    <div class="p-subtitle">Handcrafted · Made to Order · 4–6 Week Delivery</div>
+    <div class="p-rule"></div>
+    <div class="p-price">NPR 8,500</div>
+    <div class="p-price-note">Includes gift-ready packaging · Free delivery within Kathmandu</div>
+
+    <hr class="p-divider">
+
+    <div class="opt-label">MATERIAL</div>
+    <div class="opt-group" role="group" aria-label="Material selection">
+      <button class="opt-btn active" onclick="selectOpt(this)">PLA+ Resin</button>
+      <button class="opt-btn" onclick="selectOpt(this)">High-Detail Resin</button>
+      <button class="opt-btn" onclick="selectOpt(this)">Full Colour</button>
+    </div>
+
+    <div class="opt-label">SIZE</div>
+    <div class="opt-group" role="group" aria-label="Size selection">
+      <button class="opt-btn active" onclick="selectOpt(this)">10 cm</button>
+      <button class="opt-btn" onclick="selectOpt(this)">15 cm</button>
+      <button class="opt-btn" onclick="selectOpt(this)">20 cm</button>
+    </div>
+
+    <div class="qty-row">
+      <div class="qty-label">QTY</div>
+      <div class="qty-ctrl" role="group" aria-label="Quantity selector">
+        <button class="qty-btn" aria-label="Decrease quantity" onclick="changeQty(-1)">−</button>
+        <input class="qty-num" type="number" id="qty" value="1" min="1" max="10" aria-label="Quantity">
+        <button class="qty-btn" aria-label="Increase quantity" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+
+    <button class="btn-cart" onclick="addToCart()" aria-label="Add to cart">ADD TO CART</button>
+    <button class="btn-wishlist" aria-label="Save to wishlist">♡ &nbsp;Save to Wishlist</button>
+
+    <div class="specs-grid" aria-label="Product specifications">
+      <div class="spec-item"><div class="spec-key">PROCESS</div><div class="spec-val">FDM + Resin Finish</div></div>
+      <div class="spec-item"><div class="spec-key">MATERIAL</div><div class="spec-val">PLA+ / Resin</div></div>
+      <div class="spec-item"><div class="spec-key">LEAD TIME</div><div class="spec-val">4–6 Weeks</div></div>
+      <div class="spec-item"><div class="spec-key">ORIGIN</div><div class="spec-val">Handcrafted, Kathmandu</div></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab-nav" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab(this,'desc')">Description</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab(this,'process')">Our Process</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab(this,'care')">Care</button>
+      </div>
+      <div id="desc" class="tab-panel active" role="tabpanel">
+        <p>A figurine is not a product. It is a moment made permanent — a person you love, rendered in physical form so they are never truly out of reach.</p>
+        <p>Send us one clear photograph. Our artisans study your image, understand the person, and craft a piece that holds the feeling of them — not just their likeness.</p>
+        <p>Every figurine is hand-finished and painted in our Kathmandu studio. No two are identical. Each arrives in our signature gift packaging with a handwritten commission card.</p>
+      </div>
+      <div id="process" class="tab-panel" role="tabpanel">
+        <p><strong style="color:#C4907A;font-style:normal">Step 1 — Commission:</strong> Place your order and share your reference photograph and any details about the person.</p>
+        <p><strong style="color:#C4907A;font-style:normal">Step 2 — Sculpt Preview:</strong> We share a 3D preview for your approval before production begins.</p>
+        <p><strong style="color:#C4907A;font-style:normal">Step 3 — Craft:</strong> Our team prints, refines, and hand-finishes your figurine over 2–4 weeks.</p>
+        <p><strong style="color:#C4907A;font-style:normal">Step 4 — Deliver:</strong> Your piece arrives gift-ready, wrapped with care. Kathmandu delivery free of charge.</p>
+      </div>
+      <div id="care" class="tab-panel" role="tabpanel">
+        <p>Keep away from direct sunlight to preserve the finish. Dust gently with a soft dry cloth. Do not expose to moisture or extreme heat.</p>
+        <p>Your figurine is a precious object — treat it as one. Store on a flat, stable surface. Each piece is warrantied against manufacturing defects for 90 days.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- RELATED PRODUCTS -->
+<div class="related">
+  <div class="section-title">YOU MAY ALSO LOVE</div>
+  <div class="related-grid" aria-label="Related products">
+    <div class="d-card" tabindex="0" aria-label="Portrait Litholamp">
+      <div class="d-card-img"><div class="d-fig-b"></div></div>
+      <div class="d-card-tag-line"></div>
+      <div class="d-card-body">
+        <div class="d-card-tag">FOR MEMORY</div>
+        <div class="d-card-name">Portrait Litholamp</div>
+        <div class="d-card-price">From NPR 2,200</div>
+      </div>
+    </div>
+    <div class="d-card" tabindex="0" aria-label="Moon Lamp">
+      <div class="d-card-img"><div class="d-fig-b" style="width:50px;height:50px;background:radial-gradient(#4A3060,#271540)"></div></div>
+      <div class="d-card-tag-line"></div>
+      <div class="d-card-body">
+        <div class="d-card-tag">FOR THE NIGHT</div>
+        <div class="d-card-name">Custom Moon Lamp</div>
+        <div class="d-card-price">From NPR 3,400</div>
+      </div>
+    </div>
+    <div class="d-card" tabindex="0" aria-label="Engraved Nameplate">
+      <div class="d-card-img"><div class="d-fig-c"></div></div>
+      <div class="d-card-tag-line"></div>
+      <div class="d-card-body">
+        <div class="d-card-tag">FOR THE HOME</div>
+        <div class="d-card-name">Engraved Nameplate</div>
+        <div class="d-card-price">From NPR 1,400</div>
+      </div>
+    </div>
+    <div class="d-card" tabindex="0" aria-label="Memory Keychain">
+      <div class="d-card-img"><div class="d-fig-d"></div></div>
+      <div class="d-card-tag-line"></div>
+      <div class="d-card-body">
+        <div class="d-card-tag">CARRY WITH YOU</div>
+        <div class="d-card-name">Memory Keychain</div>
+        <div class="d-card-price">From NPR 650</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="d-footer">
+  <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+  <div class="d-footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+  </div>
+  <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Added to your collection →</div>
+
+<script>
+  function setThumb(el, idx) {
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function selectOpt(el) {
+    el.closest('.opt-group').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function changeQty(d) {
+    var inp = document.getElementById('qty');
+    var v = parseInt(inp.value) + d;
+    if(v >= 1 && v <= 10) inp.value = v;
+  }
+  function addToCart() {
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  function switchTab(el, id) {
+    document.querySelectorAll('.tab-btn').forEach(b => {b.classList.remove('active');b.setAttribute('aria-selected','false')});
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    el.setAttribute('aria-selected','true');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+</body>
+</html>

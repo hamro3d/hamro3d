@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1A0E24;
+      --surface:   #271540;
+      --border:    #3A2450;
+      --text:      #F2EDE8;
+      --muted:     #A898B8;
+      --accent:    #C4907A;
+      --accent-dk: #A07060;
+      --success:   #6B8A70;
+      --error:     #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans:  'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+    .d-nav { background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .d-nav-links { display: flex; gap: 28px; list-style: none; }
+    .d-nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; letter-spacing: 0.08em; font-family: var(--font-sans); font-weight: 500; transition: color 0.2s; }
+    .d-nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.2s; }
+    .icon-btn:hover { border-color: var(--accent); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-btn:hover svg { stroke: var(--accent); }
+    .badge { position: absolute; top: -4px; right: -4px; min-width: 14px; height: 14px; padding: 0 3px; background: var(--accent); border-radius: 50%; font-size: 9px; color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); border: 1px solid var(--bg); }
+    .icon-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; cursor: pointer; font-family: var(--font-sans); }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    .checkout-shell { min-height: calc(100vh - 64px - 72px); }
+    .checkout-inner { max-width: 800px; margin: 0 auto; padding: 48px 32px 56px; }
+
+    .checkout-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .section-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; margin-bottom: 8px; }
+    .section-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); }
+
+    /* Steps */
+    .checkout-steps { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; gap: 8px; }
+    .checkout-step { flex: 1; display: flex; align-items: center; gap: 0; min-width: 0; }
+    .checkout-step-node {
+      flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); position: relative; z-index: 1;
+    }
+    .checkout-step.active .checkout-step-node { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 3px rgba(196, 144, 122, 0.25); }
+    .checkout-step.done .checkout-step-node { border-color: var(--success); background: var(--success); }
+    .checkout-step-line { flex: 1; height: 2px; background: var(--border); margin: 0 4px; min-width: 12px; }
+    .checkout-step.last .checkout-step-line { display: none; }
+    .checkout-step-labels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: -8px; margin-bottom: 32px; text-align: center; }
+    .checkout-step-label { font-size: 10px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .checkout-step-label.is-active { color: var(--accent); font-weight: 600; }
+
+    .checkout-panels { display: flex; flex-direction: column; gap: 24px; }
+
+    .profile-panel { background: var(--surface); border: 1px solid var(--border); }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .panel-title { font-size: 10px; letter-spacing: 0.2em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; }
+    .panel-body { padding: 24px; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 11px; letter-spacing: 0.18em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; }
+    .form-input, .form-select, .form-textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      appearance: none;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); opacity: 0.6; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A898B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .form-select option { background: var(--surface); color: var(--text); }
+
+    /* Payment radios */
+    .pay-options { display: flex; flex-direction: column; gap: 0; }
+    .pay-option { border-bottom: 1px solid var(--border); }
+    .pay-option:last-child { border-bottom: none; }
+    .pay-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .pay-option label {
+      display: flex; align-items: center; gap: 14px; padding: 16px 4px; cursor: pointer; font-size: 14px; color: var(--text); font-family: var(--font-sans);
+    }
+    .pay-option label::before {
+      content: ''; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .pay-option input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .pay-option input:checked + label::before { border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 8px var(--accent); }
+    .pay-option-desc { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+
+    /* Order summary */
+    .summary-items { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+    .summary-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .summary-row:last-of-type { border-bottom: none; }
+    .summary-name { font-family: var(--font-serif); font-size: 15px; color: var(--text); font-weight: 300; }
+    .summary-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .summary-price { font-size: 14px; color: var(--text); font-weight: 500; white-space: nowrap; }
+    .summary-totals { border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .summary-total-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+    .summary-total-row.grand { font-size: 16px; color: var(--text); font-weight: 600; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--border); }
+    .summary-total-row.grand span:last-child { color: var(--accent); font-family: var(--font-serif); font-weight: 300; }
+
+    .d-btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 16px 28px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .d-btn-primary:hover { background: var(--accent-dk); }
+    .d-btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .d-footer { border-top: 1px solid var(--border); padding: 24px 44px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; font-family: var(--font-sans); transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; font-family: var(--font-sans); }
+
+    .order-toast {
+      position: fixed; bottom: 32px; right: 32px; left: 32px; max-width: 360px; margin-left: auto;
+      background: var(--success); color: var(--bg); padding: 14px 24px;
+      font-size: 12px; letter-spacing: 0.12em; font-family: var(--font-sans); font-weight: 600;
+      opacity: 0; transform: translateY(12px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 200;
+    }
+    .order-toast.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .checkout-inner { padding: 28px 20px 40px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .checkout-steps { flex-wrap: wrap; }
+      .d-footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 374px) {
+      .section-title { font-size: 24px; }
+    }
+
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <div class="checkout-shell">
+    <main class="checkout-inner" aria-label="Checkout">
+      <header class="checkout-header">
+        <p class="section-eyebrow">CHECKOUT</p>
+        <h1 class="section-title">Complete Your Order</h1>
+      </header>
+
+      <div aria-label="Checkout progress" role="group">
+        <div class="checkout-steps">
+          <div class="checkout-step active">
+            <span class="checkout-step-node" aria-hidden="true"></span>
+            <span class="checkout-step-line" aria-hidden="true"></span>
+          </div>
+          <div class="checkout-step">
+            <span class="checkout-step-node" aria-hidden="true"></span>
+            <span class="checkout-step-line" aria-hidden="true"></span>
+          </div>
+          <div class="checkout-step last">
+            <span class="checkout-step-node" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="checkout-step-labels">
+          <span class="checkout-step-label is-active">Shipping</span>
+          <span class="checkout-step-label">Payment</span>
+          <span class="checkout-step-label">Confirmation</span>
+        </div>
+      </div>
+
+      <form id="checkoutForm" class="checkout-panels" novalidate>
+        <section class="profile-panel" aria-labelledby="shipHeading">
+          <div class="panel-header">
+            <h2 class="panel-title" id="shipHeading">SHIPPING ADDRESS</h2>
+          </div>
+          <div class="panel-body">
+            <div class="form-row-2">
+              <div class="form-group full">
+                <label class="form-label" for="fullName">FULL NAME</label>
+                <input class="form-input" type="text" id="fullName" name="fullName" autocomplete="name" value="Aarav Sharma" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="phone">PHONE (+977)</label>
+                <input class="form-input" type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" value="+977 98XXXXXXXX" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="postal">POSTAL CODE</label>
+                <input class="form-input" type="text" id="postal" name="postal" autocomplete="postal-code" value="44600" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:16px;">
+              <label class="form-label" for="street">STREET ADDRESS</label>
+              <input class="form-input" type="text" id="street" name="street" autocomplete="street-address" value="Thamel, Ward 26" required />
+            </div>
+            <div class="form-row-2" style="margin-top:16px;">
+              <div class="form-group">
+                <label class="form-label" for="city">CITY</label>
+                <select class="form-select" id="city" name="city" required>
+                  <option value="kathmandu" selected>Kathmandu</option>
+                  <option value="lalitpur">Lalitpur (Patan)</option>
+                  <option value="bhaktapur">Bhaktapur</option>
+                  <option value="pokhara">Pokhara</option>
+                  <option value="biratnagar">Biratnagar</option>
+                  <option value="birgunj">Birgunj</option>
+                  <option value="nepalgunj">Nepalgunj</option>
+                  <option value="other">Other — Nepal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="province">PROVINCE</label>
+                <select class="form-select" id="province" name="province" required>
+                  <option value="bagmati" selected>Bagmati Province</option>
+                  <option value="koshi">Koshi Province</option>
+                  <option value="madhesh">Madhesh Province</option>
+                  <option value="gandaki">Gandaki Province</option>
+                  <option value="lumbini">Lumbini Province</option>
+                  <option value="karnali">Karnali Province</option>
+                  <option value="sudurpashchim">Sudurpashchim Province</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:16px;">
+              <label class="form-label" for="notes">DELIVERY NOTES</label>
+              <textarea class="form-textarea" id="notes" name="notes" placeholder="Gate code, landmark near Durbar Marg, or a safe drop spot for our courier in Kathmandu."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-panel" aria-labelledby="payHeading">
+          <div class="panel-header">
+            <h2 class="panel-title" id="payHeading">PAYMENT METHOD</h2>
+          </div>
+          <div class="panel-body" style="padding:0 24px;">
+            <fieldset class="pay-options" style="border:none;">
+              <legend class="visually-hidden">Choose payment method</legend>
+              <div class="pay-option">
+                <input type="radio" id="payCod" name="payment" value="cod" checked />
+                <label for="payCod">Cash on Delivery <span class="pay-option-desc">Pay in NPR when your parcel arrives — available across major cities in Nepal.</span></label>
+              </div>
+              <div class="pay-option">
+                <input type="radio" id="payEsewa" name="payment" value="esewa" />
+                <label for="payEsewa">eSewa <span class="pay-option-desc">We will send a payment request to your wallet after you place the order.</span></label>
+              </div>
+              <div class="pay-option">
+                <input type="radio" id="payKhalti" name="payment" value="khalti" />
+                <label for="payKhalti">Khalti <span class="pay-option-desc">Secure checkout via Khalti — link shared by email and SMS.</span></label>
+              </div>
+              <div class="pay-option">
+                <input type="radio" id="payBank" name="payment" value="bank" />
+                <label for="payBank">Bank Transfer <span class="pay-option-desc">NPR transfer to our Nepal-registered business account — details on the next screen.</span></label>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <section class="profile-panel" aria-labelledby="sumHeading">
+          <div class="panel-header">
+            <h2 class="panel-title" id="sumHeading">ORDER SUMMARY</h2>
+          </div>
+          <div class="panel-body">
+            <div class="summary-items">
+              <div class="summary-row">
+                <div>
+                  <div class="summary-name">Custom Human Figurine</div>
+                  <div class="summary-meta">15 cm · Matte finish</div>
+                </div>
+                <div class="summary-price">NPR 8,500</div>
+              </div>
+              <div class="summary-row">
+                <div>
+                  <div class="summary-name">Portrait Litholamp</div>
+                  <div class="summary-meta">Warm white base · Custom etching</div>
+                </div>
+                <div class="summary-price">NPR 3,750</div>
+              </div>
+              <div class="summary-row">
+                <div>
+                  <div class="summary-name">Engraved Keychain Set</div>
+                  <div class="summary-meta">Pair · Brass tone</div>
+                </div>
+                <div class="summary-price">NPR 1,500</div>
+              </div>
+            </div>
+            <div class="summary-totals">
+              <div class="summary-total-row"><span>Subtotal</span><span>NPR 13,750</span></div>
+              <div class="summary-total-row"><span>Shipping (Kathmandu)</span><span>NPR 200</span></div>
+              <div class="summary-total-row grand"><span>Total</span><span>NPR 13,950</span></div>
+            </div>
+            <button type="button" class="d-btn-primary" id="placeOrderBtn" aria-label="Place order for NPR 13,950">PLACE ORDER — NPR 13,950</button>
+          </div>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <div class="order-toast" id="orderToast" role="status" aria-live="polite">ORDER PLACED ✓ THANK YOU</div>
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    document.getElementById('placeOrderBtn').addEventListener('click', function () {
+      var btn = this;
+      btn.disabled = true;
+      btn.textContent = 'PLACING ORDER…';
+      setTimeout(function () {
+        var t = document.getElementById('orderToast');
+        t.classList.add('visible');
+        btn.textContent = 'ORDER CONFIRMED ✓';
+        btn.style.background = 'var(--success)';
+        setTimeout(function () { t.classList.remove('visible'); }, 3200);
+      }, 900);
+    });
+  </script>
+</body>
+</html>

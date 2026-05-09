@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Products — Admin — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1A0E24;
+      --surface: #271540;
+      --border: #3A2450;
+      --text: #F2EDE8;
+      --muted: #A898B8;
+      --accent: #C4907A;
+      --accent-dk: #A07060;
+      --success: #6B8A70;
+      --error: #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans: 'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .d-nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .d-nav-links { display: flex; gap: 22px; list-style: none; flex-wrap: wrap; }
+    .d-nav-links a {
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .d-nav-links a:hover, .d-nav-links a.active { color: var(--text); }
+    .d-nav-links a.active { color: var(--accent); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    .mobile-nav-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(26, 14, 36, 0.97); padding: 24px; flex-direction: column; }
+    .mobile-nav-overlay.open { display: flex; }
+    .mobile-nav-close { align-self: flex-end; background: transparent; border: none; color: var(--muted); font-size: 12px; letter-spacing: 0.1em; cursor: pointer; padding: 8px 0; }
+    .mobile-nav-overlay .d-nav-links { flex-direction: column; gap: 0; margin-top: 24px; }
+    .mobile-nav-overlay .d-nav-links a { display: block; padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+
+    .admin-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 64px - 72px); }
+
+    .profile-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-user { padding: 0 28px 32px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+    .sidebar-avatar {
+      width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--accent);
+      background: var(--bg); display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-serif); font-size: 18px; color: var(--accent); margin-bottom: 14px;
+    }
+    .sidebar-name { font-family: var(--font-serif); font-size: 18px; color: var(--text); font-weight: 300; margin-bottom: 4px; }
+    .sidebar-email { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+    .sidebar-member-badge {
+      display: inline-block; font-size: 9px; letter-spacing: 0.16em; color: var(--accent);
+      border: 1px solid var(--border); padding: 3px 8px; margin-top: 10px;
+    }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav-label { font-size: 9px; letter-spacing: 0.22em; color: var(--muted); padding: 16px 28px 8px; }
+    .sidebar-nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 28px; text-decoration: none;
+      border-left: 2px solid transparent; transition: background 0.2s;
+    }
+    .sidebar-nav-item:hover { background: rgba(196, 144, 122, 0.06); }
+    .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196, 144, 122, 0.08); }
+    .sidebar-nav-item svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 1.4; flex-shrink: 0; }
+    .sidebar-nav-item.active svg { stroke: var(--accent); }
+    .sidebar-nav-item span { font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; }
+    .sidebar-nav-item.active span { color: var(--text); }
+    .sidebar-logout { padding: 20px 28px 0; border-top: 1px solid var(--border); margin-top: auto; }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px; background: transparent; border: none; cursor: pointer;
+      padding: 0; font-size: 13px; color: var(--muted); transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--error); }
+    .logout-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+
+    .profile-main { padding: 48px 52px; }
+    .profile-section-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 20px; flex-wrap: wrap;
+      margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .section-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); }
+    .section-desc { font-size: 13px; color: var(--muted); margin-top: 6px; max-width: 480px; }
+    .d-btn-primary {
+      background: var(--accent); color: var(--bg); padding: 12px 28px; font-size: 11px;
+      letter-spacing: 0.2em; border: none; cursor: pointer; font-weight: 600; transition: background 0.2s;
+      text-decoration: none; display: inline-block; text-align: center;
+    }
+    .d-btn-primary:hover { background: var(--accent-dk); }
+
+    .admin-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .search-wrap { position: relative; min-width: 0; }
+    .search-wrap svg {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.4; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      font-size: 14px; padding: 12px 16px 12px 42px; outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); opacity: 0.6; }
+    .filter-select {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      font-size: 12px; letter-spacing: 0.08em; padding: 12px 36px 12px 16px;
+      appearance: none; cursor: pointer; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A898B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    .toolbar-count { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; white-space: nowrap; }
+    .toolbar-count span { color: var(--text); font-weight: 500; }
+
+    .table-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th {
+      text-align: left; padding: 14px 20px; font-size: 10px; letter-spacing: 0.14em;
+      color: var(--accent); font-weight: 500; border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .data-table td {
+      padding: 14px 20px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle;
+    }
+    .data-table tbody tr:hover { background: rgba(196, 144, 122, 0.04); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .product-cell { display: flex; align-items: center; gap: 14px; min-width: 200px; }
+    .product-thumb {
+      width: 48px; height: 48px; background: var(--bg); border: 1px solid var(--border);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .product-thumb span { width: 22px; height: 32px; background: var(--border); opacity: 0.6; display: block; }
+    .product-thumb span.lamp { width: 24px; height: 36px; border-radius: 4px 4px 0 0; }
+    .product-thumb.round span { width: 28px; height: 28px; border-radius: 50%; }
+    .product-thumb.wide span { width: 36px; height: 22px; }
+    .product-name { font-family: var(--font-serif); font-weight: 300; font-size: 14px; }
+
+    .btn-ghost-sm {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      font-size: 10px; letter-spacing: 0.1em; padding: 6px 12px; cursor: pointer;
+      font-family: var(--font-sans); transition: border-color 0.2s, color 0.2s; text-decoration: none; display: inline-block;
+    }
+    .btn-ghost-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost-sm.danger:hover { border-color: var(--error); color: var(--error); }
+    .action-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .status-toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .status-label { font-size: 11px; color: var(--muted); }
+    .row-toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .row-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .row-toggle-track {
+      position: absolute; inset: 0; background: var(--border); cursor: pointer; transition: background 0.25s;
+    }
+    .row-toggle input:checked + .row-toggle-track { background: var(--success); }
+    .row-toggle-thumb {
+      position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--muted);
+      transition: transform 0.25s; pointer-events: none;
+    }
+    .row-toggle input:checked ~ .row-toggle-thumb { transform: translateX(18px); background: var(--bg); }
+
+    .d-footer {
+      border-top: 1px solid var(--border); padding: 24px 44px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+    }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; }
+
+    @media (max-width: 1023px) {
+      .admin-layout { grid-template-columns: 220px 1fr; }
+      .profile-main { padding: 36px 32px; }
+    }
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .admin-layout { grid-template-columns: 1fr; }
+      .profile-sidebar { display: none; }
+      .profile-main { padding: 28px 20px; }
+      .admin-toolbar { grid-template-columns: 1fr; }
+      .toolbar-count { order: 3; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <div class="admin-layout">
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <main class="profile-main">
+      <header class="profile-section-header">
+        <div>
+          <div class="section-eyebrow">PRODUCT MANAGEMENT</div>
+          <h1 class="section-title">All Products</h1>
+          <p class="section-desc">Manage your product catalog</p>
+        </div>
+        <a href="AddProduct.html" class="d-btn-primary">ADD NEW PRODUCT</a>
+      </header>
+
+      <div class="admin-toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <label class="visually-hidden" for="productSearch">Search products</label>
+          <input type="search" id="productSearch" class="search-input" placeholder="Search by name or SKU…" aria-label="Search products" />
+        </div>
+        <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
+          <option value="">All categories</option>
+          <option value="figurine">Figurine</option>
+          <option value="litholamp">Litholamp</option>
+          <option value="moon">Moon Lamp</option>
+          <option value="nameplate">Nameplate</option>
+          <option value="keychain">Keychain</option>
+          <option value="puzzle">Puzzle</option>
+        </select>
+        <div class="toolbar-count">Showing <span id="productCount">9</span> products</div>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-scroll" role="region" aria-label="Products table" tabindex="0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">PRODUCT</th>
+                <th scope="col">CATEGORY</th>
+                <th scope="col">PRICE (NPR)</th>
+                <th scope="col">STOCK</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody">
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span></span></div>
+                    <span class="product-name">Custom Human Figurine</span>
+                  </div>
+                </td>
+                <td>Figurine</td>
+                <td>8,500</td>
+                <td>12</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Custom Human Figurine">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span class="lamp"></span></div>
+                    <span class="product-name">Portrait Litholamp</span>
+                  </div>
+                </td>
+                <td>Litholamp</td>
+                <td>2,200</td>
+                <td>24</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Portrait Litholamp">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span class="wide"></span></div>
+                    <span class="product-name">Engraved Nameplate</span>
+                  </div>
+                </td>
+                <td>Nameplate</td>
+                <td>1,400</td>
+                <td>30</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Engraved Nameplate">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb round" aria-hidden="true"><span class="round"></span></div>
+                    <span class="product-name">Custom Moon Lamp</span>
+                  </div>
+                </td>
+                <td>Moon Lamp</td>
+                <td>1,800</td>
+                <td>18</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Custom Moon Lamp">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span></span></div>
+                    <span class="product-name">Couple Figurine Set</span>
+                  </div>
+                </td>
+                <td>Figurine</td>
+                <td>14,000</td>
+                <td>5</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Couple Figurine Set">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span></span></div>
+                    <span class="product-name">Photo Keychain</span>
+                  </div>
+                </td>
+                <td>Keychain</td>
+                <td>850</td>
+                <td>50</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Photo Keychain">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span class="wide"></span></div>
+                    <span class="product-name">Family Portrait Litholamp</span>
+                  </div>
+                </td>
+                <td>Litholamp</td>
+                <td>3,200</td>
+                <td>15</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Family Portrait Litholamp">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span class="wide"></span></div>
+                    <span class="product-name">Custom Photo Puzzle</span>
+                  </div>
+                </td>
+                <td>Puzzle</td>
+                <td>1,200</td>
+                <td>20</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Custom Photo Puzzle">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+              <tr data-product-row>
+                <td>
+                  <div class="product-cell">
+                    <div class="product-thumb" aria-hidden="true"><span></span></div>
+                    <span class="product-name">Memorial Figurine</span>
+                  </div>
+                </td>
+                <td>Figurine</td>
+                <td>9,500</td>
+                <td>8</td>
+                <td>
+                  <div class="status-toggle-wrap">
+                    <label class="row-toggle" aria-label="Toggle active status for Memorial Figurine">
+                      <input type="checkbox" checked data-status-toggle />
+                      <span class="row-toggle-track"></span>
+                      <span class="row-toggle-thumb"></span>
+                    </label>
+                    <span class="status-label" data-status-text>Active</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="EditProduct.html" class="btn-ghost-sm">EDIT</a>
+                    <button type="button" class="btn-ghost-sm danger" data-delete-btn>DELETE</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <style>
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+  <script>
+    (function () {
+      var burger = document.getElementById('adminHamburger');
+      var overlay = document.getElementById('adminMobileNav');
+      var closeBtn = document.getElementById('adminMobileClose');
+      function toggleNav(open) {
+        overlay.classList.toggle('open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      burger.addEventListener('click', function () { toggleNav(!overlay.classList.contains('open')); });
+      closeBtn.addEventListener('click', function () { toggleNav(false); });
+      overlay.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { toggleNav(false); }); });
+
+      document.querySelectorAll('[data-status-toggle]').forEach(function (input) {
+        var row = input.closest('tr');
+        var label = row.querySelector('[data-status-text]');
+        function sync() { label.textContent = input.checked ? 'Active' : 'Inactive'; }
+        input.addEventListener('change', sync);
+        sync();
+      });
+
+      document.querySelectorAll('[data-delete-btn]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var nameEl = btn.closest('tr').querySelector('.product-name');
+          var name = nameEl ? nameEl.textContent : 'this product';
+          if (window.confirm('Remove “' + name + '” from the catalog? This cannot be undone from this screen.')) {
+            window.alert('Product removed (demo). In production this would call your API.');
+          }
+        });
+      });
+
+      var tbody = document.getElementById('productTableBody');
+      var countEl = document.getElementById('productCount');
+      function updateCount() {
+        countEl.textContent = String(tbody.querySelectorAll('[data-product-row]').length);
+      }
+      document.getElementById('productSearch').addEventListener('input', function () {
+        var q = this.value.toLowerCase().trim();
+        tbody.querySelectorAll('[data-product-row]').forEach(function (row) {
+          var name = row.querySelector('.product-name');
+          var text = name ? name.textContent.toLowerCase() : '';
+          row.style.display = !q || text.indexOf(q) !== -1 ? '' : 'none';
+        });
+        var vis = tbody.querySelectorAll('[data-product-row]');
+        var n = 0;
+        vis.forEach(function (r) { if (r.style.display !== 'none') n++; });
+        countEl.textContent = String(n);
+      });
+      document.getElementById('categoryFilter').addEventListener('change', function () {
+        var cat = this.value.toLowerCase();
+        tbody.querySelectorAll('[data-product-row]').forEach(function (row) {
+          var cell = row.cells[1];
+          var val = cell ? cell.textContent.toLowerCase().replace(/\s+/g, '') : '';
+          var match = !cat || val.indexOf(cat.replace(/-/g, '')) !== -1 || (cat === 'moon' && val.indexOf('moon') !== -1);
+          row.style.display = match ? '' : 'none';
+        });
+        var n = 0;
+        tbody.querySelectorAll('[data-product-row]').forEach(function (r) { if (r.style.display !== 'none') n++; });
+        countEl.textContent = String(n);
+      });
+      updateCount();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Hamro3D</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --plum:      #1A0E24;
+    --surface:   #271540;
+    --surface2:  #321960;
+    --border:    #3A2450;
+    --cream:     #F2EDE8;
+    --lavender:  #A898B8;
+    --rose:      #C4907A;
+    --rose-deep: #A07060;
+    --sage:      #6B8A70;
+    --violet:    #6B4E8A;
+  }
+  
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--plum);
+    color: var(--cream);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  
+  /* ── NAV ── */
+  .d-nav {
+    background: var(--plum);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .d-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .d-logo-mark {
+    width: 34px; height: 34px; border: 1px solid var(--rose); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; background: var(--surface);
+  }
+  .d-logo-text { font-family: 'EB Garamond', serif; font-size: 15px; letter-spacing: 0.12em; color: var(--cream); }
+  .d-logo-text em { color: var(--rose); font-style: italic; }
+  .d-logo-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--lavender); }
+  .d-nav-links { display: flex; gap: 28px; list-style: none; }
+  .d-nav-links a { color: var(--lavender); font-size: 12px; text-decoration: none; letter-spacing: 0.1em; font-weight: 500; transition: color .2s; }
+  .d-nav-links a:hover { color: var(--cream); }
+  .d-nav-links a.active { color: var(--cream); }
+  .d-nav-right { display: flex; align-items: center; gap: 12px; }
+  .d-nav-wa {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.3);
+    color: #25D366; padding: 8px 16px; font-size: 11px; letter-spacing: 0.14em;
+    font-family: 'Jost', sans-serif; font-weight: 600; cursor: pointer;
+    text-decoration: none; transition: all .25s;
+  }
+  .d-nav-wa:hover { background: rgba(37, 211, 102, 0.18); }
+  .d-nav-wa svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .d-nav-cta {
+    border: 1px solid var(--rose); color: var(--rose); padding: 9px 22px;
+    font-size: 11px; letter-spacing: 0.18em; background: transparent; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-weight: 600; transition: all .25s;
+  }
+  .d-nav-cta:hover { background: var(--rose); color: var(--plum); }
+  
+  /* ── PAGE HERO ── */
+  .page-hero {
+    padding: 80px 40px 64px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .page-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 50%, var(--surface2) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .page-hero-inner { max-width: 1160px; margin: 0 auto; position: relative; }
+  .hero-eyebrow { font-size: 10px; letter-spacing: 0.24em; color: var(--rose); margin-bottom: 16px; }
+  .hero-rule { width: 40px; height: 1px; background: var(--rose); margin-bottom: 20px; opacity: .7; }
+  .hero-h1 {
+    font-family: 'EB Garamond', serif; font-size: 52px; font-weight: 400;
+    line-height: 1.12; color: var(--cream); font-style: italic; max-width: 560px;
+    margin-bottom: 18px;
+  }
+  .hero-sub { font-size: 15px; color: var(--lavender); max-width: 420px; line-height: 1.8; font-weight: 300; }
+  .hero-meta {
+    position: absolute; right: 0; top: 0;
+    font-size: 11px; color: var(--lavender); text-align: right; line-height: 1.9;
+  }
+  .hero-meta strong { color: var(--rose); font-weight: 500; display: block; letter-spacing: 0.12em; margin-bottom: 4px; font-size: 9px; }
+  
+  /* ── MAIN LAYOUT ── */
+  .page-body { max-width: 1160px; margin: 0 auto; padding: 64px 40px 100px; }
+  
+  /* ── SECTION LABELS ── */
+  .sec-label { font-size: 10px; letter-spacing: 0.22em; color: var(--rose); margin-bottom: 28px; }
+  
+  /* ── PRIMARY CONTACT STRIP ── */
+  .primary-strip {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .p-contact-block {
+    background: var(--surface); padding: 28px 28px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: background .25s;
+  }
+  .p-contact-block:hover { background: var(--surface2); }
+  .pcb-icon {
+    width: 42px; height: 42px; border: 1px solid var(--rose);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; background: rgba(196,144,122,.06);
+  }
+  .pcb-icon svg { width: 18px; height: 18px; }
+  .pcb-label { font-size: 9px; letter-spacing: 0.22em; color: var(--rose); }
+  .pcb-name { font-family: 'EB Garamond', serif; font-size: 18px; color: var(--cream); font-style: italic; }
+  .pcb-value { font-size: 12px; color: var(--lavender); font-weight: 300; word-break: break-all; line-height: 1.6; }
+  .pcb-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; letter-spacing: 0.14em; color: var(--rose);
+    text-decoration: none; font-weight: 500; transition: color .2s; margin-top: auto;
+  }
+  .pcb-cta:hover { color: var(--cream); }
+  .pcb-cta svg { width: 12px; height: 12px; }
+  
+  /* ── WHATSAPP FEATURE BLOCK ── */
+  .wa-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 0; margin-bottom: 56px; overflow: hidden;
+    position: relative;
+  }
+  .wa-block::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: #25D366;
+  }
+  .wa-content { padding: 32px 36px 32px 40px; }
+  .wa-label { font-size: 9px; letter-spacing: 0.22em; color: #25D366; margin-bottom: 12px; }
+  .wa-title { font-family: 'EB Garamond', serif; font-size: 28px; color: var(--cream); font-style: italic; margin-bottom: 10px; }
+  .wa-desc { font-size: 13px; color: var(--lavender); line-height: 1.75; max-width: 440px; margin-bottom: 22px; font-weight: 300; }
+  .wa-features { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .wa-feat { font-size: 11px; color: var(--lavender); display: flex; align-items: center; gap: 6px; }
+  .wa-feat::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #25D366; flex-shrink: 0; }
+  .wa-btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: #25D366; color: #0d1f0d;
+    padding: 13px 26px; font-size: 11px; letter-spacing: 0.2em;
+    font-family: 'Jost', sans-serif; font-weight: 700;
+    text-decoration: none; cursor: pointer; transition: background .25s;
+  }
+  .wa-btn:hover { background: #1dba56; }
+  .wa-btn svg { width: 16px; height: 16px; }
+  .wa-qr-side {
+    width: 200px; flex-shrink: 0; background: var(--plum);
+    border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; gap: 14px;
+  }
+  .qr-frame {
+    width: 130px; height: 130px; border: 1px solid var(--border);
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .qr-placeholder {
+    display: grid; grid-template-columns: repeat(9,1fr); gap: 2px;
+    padding: 10px; width: 100%; height: 100%;
+  }
+  .qr-cell { background: var(--border); border-radius: 1px; }
+  .qr-cell.on { background: var(--cream); }
+  .qr-cell.rose { background: var(--rose); }
+  .qr-label { font-size: 9px; letter-spacing: 0.14em; color: var(--lavender); text-align: center; line-height: 1.6; }
+  
+  /* ── SOCIAL GRID ── */
+  .social-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 56px;
+  }
+  .social-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 22px 20px 18px;
+    cursor: pointer; transition: all .25s;
+    text-decoration: none; display: block;
+    position: relative; overflow: hidden;
+  }
+  .social-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; opacity: 0; transition: opacity .25s;
+  }
+  .social-card:hover { border-color: var(--rose); }
+  .social-card:hover::after { opacity: 1; }
+  .social-card.ig::after { background: linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+  .social-card.yt::after { background: #FF0000; }
+  .social-card.tt::after { background: #69C9D0; }
+  .social-card.fb::after { background: #1877F2; }
+  .social-card.ln::after { background: #0A66C2; }
+  .social-card.pt::after { background: #BD081C; }
+  .social-card.th::after { background: #000000; }
+  .social-card.vi::after { background: #7360F2; }
+  .social-card.sc::after { background: #FFFC00; }
+  .social-card.gb::after { background: #4285F4; }
+  .social-card.ws::after { background: var(--rose); }
+  .social-card.em::after { background: var(--rose); }
+  
+  .sc-platform { font-size: 9px; letter-spacing: 0.2em; color: var(--lavender); margin-bottom: 10px; }
+  .sc-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; transition: transform .25s;
+  }
+  .social-card:hover .sc-icon { transform: scale(1.08); }
+  .sc-icon svg { width: 20px; height: 20px; }
+  .sc-name { font-family: 'EB Garamond', serif; font-size: 16px; color: var(--cream); font-style: italic; margin-bottom: 4px; }
+  .sc-handle { font-size: 11px; color: var(--lavender); font-weight: 300; margin-bottom: 10px; word-break: break-all; }
+  .sc-desc { font-size: 11px; color: var(--lavender); line-height: 1.6; font-weight: 300; }
+  .sc-arrow {
+    position: absolute; top: 18px; right: 18px;
+    font-size: 14px; color: var(--border); transition: color .25s;
+  }
+  .social-card:hover .sc-arrow { color: var(--rose); }
+  .sc-status {
+    display: inline-block; font-size: 9px; letter-spacing: 0.14em;
+    padding: 2px 8px; margin-top: 8px;
+    border: 1px solid; border-radius: 2px;
+  }
+  .sc-status.live { color: var(--sage); border-color: var(--sage); }
+  .sc-status.setup { color: var(--lavender); border-color: var(--border); }
+  
+  /* ── COMING SOON ROW ── */
+  .coming-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 56px;
+  }
+  .coming-card {
+    border: 1px dashed var(--border); padding: 20px;
+    opacity: .6; transition: opacity .2s;
+  }
+  .coming-card:hover { opacity: .9; }
+  .cc-platform { font-size: 9px; letter-spacing: 0.18em; color: var(--lavender); margin-bottom: 8px; }
+  .cc-icon {
+    width: 32px; height: 32px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+  }
+  .cc-icon svg { width: 17px; height: 17px; }
+  .cc-name { font-size: 14px; color: var(--lavender); font-style: italic; font-family: 'EB Garamond', serif; margin-bottom: 6px; }
+  .cc-soon { font-size: 9px; letter-spacing: 0.16em; color: var(--border); }
+  
+  /* ── GOOGLE BUSINESS BLOCK ── */
+  .gb-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0; margin-bottom: 56px; overflow: hidden;
+  }
+  .gb-info { padding: 36px 36px; border-right: 1px solid var(--border); }
+  .gb-label { font-size: 9px; letter-spacing: 0.22em; color: #4285F4; margin-bottom: 12px; }
+  .gb-title { font-family: 'EB Garamond', serif; font-size: 26px; color: var(--cream); font-style: italic; margin-bottom: 10px; }
+  .gb-desc { font-size: 13px; color: var(--lavender); line-height: 1.75; margin-bottom: 22px; font-weight: 300; }
+  .gb-detail { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .gb-row { display: flex; gap: 12px; align-items: flex-start; }
+  .gb-row-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; opacity: .6; }
+  .gb-row-icon svg { width: 100%; height: 100%; }
+  .gb-row-text h6 { font-size: 10px; letter-spacing: 0.12em; color: var(--cream); margin-bottom: 2px; }
+  .gb-row-text p { font-size: 12px; color: var(--lavender); font-weight: 300; }
+  .gb-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid #4285F4; color: #4285F4;
+    padding: 11px 22px; font-size: 11px; letter-spacing: 0.16em;
+    font-family: 'Jost', sans-serif; font-weight: 600;
+    text-decoration: none; transition: all .25s;
+  }
+  .gb-cta:hover { background: #4285F4; color: var(--plum); }
+  .gb-map {
+    background: var(--plum);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; min-height: 280px;
+    background: radial-gradient(ellipse at 50% 50%, var(--surface2) 0%, var(--plum) 70%);
+    overflow: hidden;
+  }
+  .map-placeholder { text-align: center; }
+  .map-pin { margin-bottom: 12px; }
+  .map-label { font-size: 12px; color: var(--lavender); font-weight: 300; margin-bottom: 4px; }
+  .map-sublabel { font-size: 10px; color: var(--border); letter-spacing: 0.12em; }
+  /* Map grid lines decoration */
+  .map-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 36px 36px; opacity: .2;
+  }
+  
+  /* ── CONTACT FORM ── */
+  .contact-form-section { margin-bottom: 56px; }
+  .cf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .cf-left h2 { font-family: 'EB Garamond', serif; font-size: 32px; color: var(--cream); font-style: italic; margin-bottom: 12px; line-height: 1.25; }
+  .cf-left p { font-size: 13px; color: var(--lavender); line-height: 1.8; margin-bottom: 24px; font-weight: 300; }
+  .cf-note { border: 1px solid var(--border); padding: 16px 18px; background: rgba(39,21,64,.4); }
+  .cf-note p { font-family: 'EB Garamond', serif; font-size: 15px; color: var(--lavender); font-style: italic; line-height: 1.7; }
+  .cf-note cite { font-size: 9px; color: var(--rose); letter-spacing: 0.14em; font-style: normal; display: block; margin-top: 6px; }
+  
+  .cf-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: span 2; }
+  .form-label { font-size: 10px; letter-spacing: 0.16em; color: var(--rose); }
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--cream); padding: 12px 14px; font-size: 13px;
+    font-family: 'Jost', sans-serif; font-weight: 300; outline: none;
+    transition: border-color .2s; width: 100%;
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--lavender); opacity: .5; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--rose); }
+  .form-select { appearance: none; cursor: pointer; }
+  .form-select option { background: var(--surface); }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .prefer-contact { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pref-chip {
+    font-size: 10px; letter-spacing: 0.12em; color: var(--lavender);
+    border: 1px solid var(--border); padding: 6px 14px; cursor: pointer;
+    transition: all .2s;
+  }
+  .pref-chip:hover { border-color: var(--lavender); color: var(--cream); }
+  .pref-chip.on { border-color: var(--rose); color: var(--cream); background: rgba(196,144,122,.08); }
+  .form-submit {
+    background: var(--rose); color: var(--plum);
+    padding: 14px 28px; font-size: 11px; letter-spacing: 0.22em;
+    border: none; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 700;
+    width: 100%; transition: background .25s; margin-top: 4px;
+  }
+  .form-submit:hover { background: var(--rose-deep); }
+  
+  /* ── QUOTE ── */
+  .quote-block { padding: 36px; border: 1px solid var(--border); background: var(--surface); text-align: center; margin-bottom: 56px; }
+  .quote-block q { font-family: 'EB Garamond', serif; font-size: 20px; color: var(--cream); font-style: italic; line-height: 1.7; quotes: none; display: block; margin-bottom: 14px; }
+  .quote-rule { width: 32px; height: 1px; background: var(--rose); margin: 0 auto 10px; }
+  .quote-attr { font-size: 10px; color: var(--lavender); letter-spacing: 0.14em; }
+  
+  /* ── FOOTER ── */
+  .d-footer { border-top: 1px solid var(--border); padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--lavender); font-style: italic; }
+  .footer-social { display: flex; align-items: center; gap: 16px; }
+  .footer-social a {
+    width: 30px; height: 30px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; transition: border-color .2s, background .2s;
+  }
+  .footer-social a:hover { border-color: var(--rose); background: rgba(196,144,122,.08); }
+  .footer-social a svg { width: 13px; height: 13px; }
+  .footer-links a { font-size: 11px; color: var(--lavender); text-decoration: none; margin-left: 16px; letter-spacing: 0.06em; }
+  .footer-links a:hover { color: var(--cream); }
+  .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--rose); border: 1px solid var(--border); padding: 5px 10px; }
+  
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .page-body > * { animation: fadeUp .5s ease both; }
+  .page-body > *:nth-child(2) { animation-delay:.05s; }
+  .page-body > *:nth-child(3) { animation-delay:.1s; }
+  .page-body > *:nth-child(4) { animation-delay:.15s; }
+  .page-body > *:nth-child(5) { animation-delay:.2s; }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+  <iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <!-- ── PAGE HERO ── -->
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="hero-eyebrow">REACH US · FIND US · FOLLOW US</div>
+      <div class="hero-rule"></div>
+      <h1 class="hero-h1">Every conversation begins with a memory.</h1>
+      <p class="hero-sub">Tell us your story. We'll tell you how we can hold it in physical form. Reach us on any platform — we're here.</p>
+      <div class="hero-meta">
+        <strong>BASED IN</strong>
+        Kathmandu, Nepal<br>
+        <strong style="margin-top:12px">RESPONSE TIME</strong>
+        Within 24 hours<br>
+        <strong style="margin-top:12px">COMMISSION OPEN</strong>
+        Year-round
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="page-body">
+
+    <!-- SOCIAL MEDIA GRID — LIVE -->
+    <div class="sec-label">FOLLOW OUR WORK</div>
+    <div class="social-grid">
+
+      <!-- Instagram -->
+      <a class="social-card ig" href="https://www.instagram.com/hamro3d/" target="_blank">
+        <div class="sc-platform">INSTAGRAM</div>
+        <div class="sc-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </div>
+        <div class="sc-name">Instagram</div>
+        <div class="sc-handle">@hamro3d</div>
+        <div class="sc-desc">Our main visual portfolio. Products, behind-the-scenes, gifting moments.</div>
+        <div class="sc-status live">LIVE</div>
+        <div class="sc-arrow">↗</div>
+      </a>
+
+      <!-- TikTok -->
+      <a class="social-card tt" href="https://www.tiktok.com/@hamro3d" target="_blank">
+        <div class="sc-platform">TIKTOK</div>
+        <div class="sc-icon" style="background:#010101">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.55a8.27 8.27 0 0 0 4.83 1.54V6.62a4.85 4.85 0 0 1-1.06.07z"/></svg>
+        </div>
+        <div class="sc-name">TikTok</div>
+        <div class="sc-handle">@hamro3d</div>
+        <div class="sc-desc">Short craft videos. Process reveals, before & after, gifting reactions.</div>
+        <div class="sc-status live">LIVE</div>
+        <div class="sc-arrow">↗</div>
+      </a>
+
+      <!-- Facebook -->
+      <a class="social-card fb" href="https://www.facebook.com/people/Hamro3D/61572084002623/" target="_blank">
+        <div class="sc-platform">FACEBOOK</div>
+        <div class="sc-icon" style="background:#1877F2">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </div>
+        <div class="sc-name">Facebook</div>
+        <div class="sc-handle">Hamro3D</div>
+        <div class="sc-desc">Community, longer-form posts, local Kathmandu audience, festival campaigns.</div>
+        <div class="sc-status live">LIVE</div>
+        <div class="sc-arrow">↗</div>
+      </a>
+
+      <!-- YouTube -->
+      <a class="social-card yt" href="https://www.youtube.com/@Hamro3d" target="_blank">
+        <div class="sc-platform">YOUTUBE</div>
+        <div class="sc-icon" style="background:#FF0000">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+        </div>
+        <div class="sc-name">YouTube</div>
+        <div class="sc-handle">@Hamro3d</div>
+        <div class="sc-desc">Longer craft videos, process documentaries, gifting stories, tutorials.</div>
+        <div class="sc-status live">LIVE</div>
+        <div class="sc-arrow">↗</div>
+      </a>
+
+    </div>
+
+    <!-- COMING SOON PLATFORMS -->
+    <div class="sec-label">EXPANDING TO</div>
+    <div class="coming-row">
+
+      <div class="coming-card">
+        <div class="cc-platform">VIBER</div>
+        <div class="cc-icon" style="background:#7360F2;border-radius:7px">
+          <svg viewBox="0 0 24 24" fill="white" width="17" height="17"><path d="M11.4 0C8.956.012 3.49.245 1.07 2.466-.41 3.946.036 6.097.036 11.97c0 4.832-.753 9.838 3.532 11.013L3.58 24l4.63-1.27c1.57.43 3.181.643 4.802.636 8.493 0 14.986-5.447 14.986-15.868C27.998 3.508 19.893-.041 11.4 0zm8.348 18.02c-.52.99-1.87 1.98-3.049 2.24-.792.17-1.828.305-5.318-1.143-4.468-1.842-7.344-6.383-7.565-6.678-.22-.294-1.853-2.461-1.853-4.694s1.156-3.509 1.566-3.989c.408-.48.89-.6 1.188-.6.296 0 .592.003.851.016.272.014.637-.103.996.76.373.895 1.265 3.093 1.376 3.317.11.223.184.484.037.777-.147.294-.22.477-.44.737-.22.258-.462.578-.661.776-.22.22-.449.46-.192.899.257.44 1.143 1.885 2.451 3.053 1.683 1.5 3.1 1.963 3.54 2.183.44.22.693.184.951-.11.258-.293 1.1-1.283 1.395-1.723.293-.44.587-.367 1.026-.22.44.147 2.784 1.312 3.264 1.55.48.24.8.36.918.563.117.202.117 1.178-.432 2.276z"/></svg>
+        </div>
+        <div class="cc-name">Viber</div>
+        <div class="cc-soon">COMING SOON</div>
+      </div>
+
+      <div class="coming-card">
+        <div class="cc-platform">SNAPCHAT</div>
+        <div class="cc-icon" style="background:#FFFC00;border-radius:7px">
+          <svg viewBox="0 0 24 24" fill="#000" width="17" height="17"><path d="M12.017 0C8.396 0 5.403.985 3.517 2.946 1.905 4.62 1.125 7.022 1.075 10.028v.48c0 .12.006.239.006.358C1.081 15.05 0 17.033 0 17.033l3.174.528s.132.53 1.332.53c.347 0 .782-.067 1.31-.24.879-.281 1.812-.643 2.796-.643.228 0 .455.017.683.05 1.089.161 1.797.887 3.734.887 1.935 0 2.641-.726 3.73-.887.228-.033.455-.05.683-.05.984 0 1.917.362 2.796.642.527.174.963.241 1.31.241 1.2 0 1.332-.53 1.332-.53L24 17.033s-1.081-1.983-1.087-6.167c0-.119.006-.238.006-.358v-.48c-.05-3.006-.83-5.408-2.442-7.082C18.591.985 15.637 0 12.017 0z"/></svg>
+        </div>
+        <div class="cc-name">Snapchat</div>
+        <div class="cc-soon">COMING SOON</div>
+      </div>
+
+      <div class="coming-card">
+        <div class="cc-platform">WHATSAPP</div>
+        <div class="cc-icon" style="background:#25D366;border-radius:7px">
+          <svg viewBox="0 0 24 24" fill="white" width="17" height="17"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.022 0-2.042-.315-2.926-.91l-.21-.124-2.177.571.581-2.126-.137-.217a4.888 4.888 0 01.746-2.603c1.254-1.589 3.169-2.592 5.125-2.592 1.399 0 2.714.41 3.854 1.244 1.141.834 1.996 1.966 2.472 3.254.477 1.289.715 2.694.715 4.125 0 1.022-.04 2.047-.124 3.064-.331 3.897-2.857 7.01-6.514 7.792-1.399.301-2.948.301-4.345 0-3.265-.7-5.906-3.141-6.661-6.244-.32-1.347-.32-2.735 0-4.082.299-1.412.924-2.77 1.856-3.900l.137-.165.173.05c1.044.296 2.038.753 2.926 1.347l.21.124.227-.062c.631-.172 1.264-.26 1.902-.26z"/></svg>
+        </div>
+        <div class="cc-name">WhatsApp</div>
+        <div class="cc-soon">COMING SOON</div>
+      </div>
+
+      <div class="coming-card">
+        <div class="cc-platform">MORE PLATFORMS</div>
+        <div class="cc-icon" style="background:var(--surface);border:1px solid var(--border);border-radius:7px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#A898B8" stroke-width="1.5" width="17" height="17"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+        <div class="cc-name">And more</div>
+        <div class="cc-soon">EXPANDING IN 2025</div>
+      </div>
+
+    </div>
+
+    <!-- CONTACT FORM -->
+    <div class="sec-label">SEND US A MESSAGE</div>
+    <div class="contact-form-section">
+      <div class="cf-grid">
+        <div class="cf-left">
+          <h2>Start your commission with a conversation.</h2>
+          <p>Tell us who this is for, what moment you want to preserve, and which product you have in mind. We'll reply within 24 hours with everything you need to begin.</p>
+          <div class="cf-note">
+            <p>"Every meaningful piece begins with a story. Tell us yours."</p>
+            <cite>HAMRO3D · HANDCRAFTED IN NEPAL</cite>
+          </div>
+        </div>
+        <div class="cf-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">YOUR NAME</label>
+              <input class="form-input" type="text" placeholder="Aarav Sharma">
+            </div>
+            <div class="form-group">
+              <label class="form-label">PHONE / WHATSAPP</label>
+              <input class="form-input" type="tel" placeholder="+977 9869666056">
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">EMAIL</label>
+            <input class="form-input" type="email" placeholder="your@email.com">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">PRODUCT INTEREST</label>
+            <select class="form-select">
+              <option value="" disabled selected>Select a product</option>
+              <option>Personalized Realistic Figurine</option>
+              <option>Personalized Anime Figurine</option>
+              <option>Lithophane Portrait Lamp</option>
+              <option>Moonlight Portrait Lamp</option>
+              <option>Custom LED Lamp</option>
+              <option>3D Name Desk Sign</option>
+              <option>Script Name Sign</option>
+              <option>Name Pencil Holder</option>
+              <option>Custom Nameplate</option>
+              <option>Name Keychain</option>
+              <option>Character Keychain</option>
+              <option>3D Dinosaur Puzzle</option>
+              <option>Not sure — need guidance</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">OCCASION</label>
+            <div class="prefer-contact">
+              <div class="pref-chip on" onclick="toggleChip(this)">Dashain / Tihar</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Wedding</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Anniversary</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Birthday</div>
+              <div class="pref-chip" onclick="toggleChip(this)">In Memory Of</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Just Because</div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">PREFERRED CONTACT METHOD</label>
+            <div class="prefer-contact">
+              <div class="pref-chip" onclick="toggleChip(this)">Email</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Instagram DM</div>
+              <div class="pref-chip" onclick="toggleChip(this)">Phone Call</div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">YOUR STORY</label>
+            <textarea class="form-textarea" placeholder="Tell us who this is for and what moment you want to keep forever. The more you share, the better we can serve you."></textarea>
+          </div>
+          <button class="form-submit">SEND MY MESSAGE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTE -->
+    <div class="quote-block">
+      <q>We are not building a product company. We are building a brand that turns human emotion into something you can hold.</q>
+      <div class="quote-rule"></div>
+      <div class="quote-attr">HAMRO3D · BRAND FOUNDATION · 2025</div>
+    </div>
+
+  </div><!-- /page-body -->
+
+  <script>
+  function toggleChip(el) {
+    el.classList.toggle('on');
+  }
+  </script>
+</body>
+</html>

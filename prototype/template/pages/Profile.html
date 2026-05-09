@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1A0E24;
+      --surface:   #271540;
+      --border:    #3A2450;
+      --text:      #F2EDE8;
+      --muted:     #A898B8;
+      --accent:    #C4907A;
+      --accent-dk: #A07060;
+      --success:   #6B8A70;
+      --error:     #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans:  'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+    /* ─── NAVBAR ─────────────────────────────────────── */
+    .d-nav { background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .d-nav-links { display: flex; gap: 28px; list-style: none; }
+    .d-nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; letter-spacing: 0.08em; font-family: var(--font-sans); font-weight: 500; transition: color 0.2s; }
+    .d-nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.2s; }
+    .icon-btn:hover { border-color: var(--accent); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-btn:hover svg { stroke: var(--accent); }
+    .badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; font-size: 9px; color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); border: 1px solid var(--bg); }
+    .icon-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; cursor: pointer; font-family: var(--font-sans); }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    /* ─── PAGE LAYOUT ────────────────────────────────── */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 64px - 72px);
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────────── */
+    .profile-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-user {
+      padding: 0 28px 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .sidebar-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 20px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .sidebar-name {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 300;
+      margin-bottom: 4px;
+    }
+    .sidebar-email {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      letter-spacing: 0.04em;
+    }
+    .sidebar-member-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      font-family: var(--font-sans);
+      margin-top: 10px;
+    }
+
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      padding: 16px 28px 8px;
+    }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav-item:hover { background: rgba(196,144,122,0.06); }
+    .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196,144,122,0.08); }
+    .sidebar-nav-item svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .sidebar-nav-item.active svg { stroke: var(--accent); }
+    .sidebar-nav-item span { font-size: 13px; color: var(--muted); font-family: var(--font-sans); font-weight: 500; letter-spacing: 0.04em; }
+    .sidebar-nav-item.active span { color: var(--text); }
+
+    .sidebar-logout {
+      padding: 20px 28px 0;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--error); }
+    .logout-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ─── MAIN CONTENT ───────────────────────────────── */
+    .profile-main { padding: 48px 52px; }
+
+    .profile-section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; margin-bottom: 8px; }
+    .section-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); }
+    .section-desc { font-size: 13px; color: var(--muted); font-family: var(--font-sans); margin-top: 6px; line-height: 1.6; }
+
+    .edit-toggle-btn {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 20px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .edit-toggle-btn:hover, .edit-toggle-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── PROFILE PANELS ─────────────────────────────── */
+    .profile-panels { display: flex; flex-direction: column; gap: 32px; }
+
+    .profile-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-title { font-size: 10px; letter-spacing: 0.2em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; }
+    .panel-body { padding: 24px; }
+
+    /* View mode: info grid */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .info-item {}
+    .info-item-label { font-size: 10px; letter-spacing: 0.18em; color: var(--muted); font-family: var(--font-sans); margin-bottom: 5px; }
+    .info-item-value { font-family: var(--font-serif); font-size: 16px; color: var(--text); }
+    .info-item-value.empty { font-weight: 300; color: var(--muted); font-size: 14px; }
+
+    /* Edit mode: form */
+    .edit-form { display: none; flex-direction: column; gap: 20px; }
+    .edit-form.visible { display: flex; }
+    .view-data { display: grid; }
+    .view-data.hidden { display: none; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 11px; letter-spacing: 0.18em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; }
+    .form-input, .form-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      appearance: none;
+    }
+    .form-input::placeholder { color: var(--muted); opacity: 0.6; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A898B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .form-select option { background: var(--surface); color: var(--text); }
+
+    .form-actions { display: flex; gap: 12px; padding-top: 4px; }
+    .d-btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 12px 28px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .d-btn-primary:hover { background: var(--accent-dk); }
+    .d-btn-ghost {
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 12px 24px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .d-btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ─── STATS ROW ──────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .stat-cell {
+      padding: 24px 28px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-num { font-family: var(--font-serif); font-size: 36px; font-weight: 400; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+    .stat-label { font-size: 10px; letter-spacing: 0.18em; color: var(--muted); font-family: var(--font-sans); }
+
+    /* ─── ADDRESS SECTION ────────────────────────────── */
+    .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .address-card {
+      border: 1px solid var(--border);
+      padding: 20px;
+      position: relative;
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .address-card:hover { border-color: var(--accent); }
+    .address-card.default { border-color: var(--accent); }
+    .address-default-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      font-family: var(--font-sans);
+      background: var(--surface);
+    }
+    .address-name { font-family: var(--font-serif); font-size: 15px; color: var(--text); margin-bottom: 6px; font-weight: 300; }
+    .address-line { font-size: 13px; color: var(--muted); font-family: var(--font-sans); line-height: 1.6; }
+    .address-actions { display: flex; gap: 12px; margin-top: 14px; }
+    .address-action-btn {
+      font-size: 11px;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      letter-spacing: 0.08em;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .address-action-btn:hover { color: var(--accent); }
+    .address-add-card {
+      border: 1px dashed var(--border);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: transparent;
+      min-height: 120px;
+    }
+    .address-add-card:hover { border-color: var(--accent); }
+    .address-add-card svg { width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+    .address-add-card span { font-size: 12px; color: var(--muted); font-family: var(--font-sans); letter-spacing: 0.1em; }
+
+    /* ─── NOTIFICATION PREFS ─────────────────────────── */
+    .pref-list { display: flex; flex-direction: column; gap: 0; }
+    .pref-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pref-item:last-child { border-bottom: none; }
+    .pref-info {}
+    .pref-name { font-size: 14px; color: var(--text); font-family: var(--font-sans); margin-bottom: 3px; }
+    .pref-desc { font-size: 12px; color: var(--muted); font-family: var(--font-sans); }
+    /* Toggle switch */
+    .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--accent); }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: var(--muted);
+      transition: transform 0.25s, background 0.25s;
+      pointer-events: none;
+    }
+    .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); background: var(--bg); }
+
+    /* ─── SAVE TOAST ─────────────────────────────────── */
+    .save-toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--success);
+      color: var(--bg);
+      padding: 12px 24px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .save-toast.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    .d-footer { border-top: 1px solid var(--border); padding: 24px 44px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; font-family: var(--font-sans); transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; font-family: var(--font-sans); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 1023px) {
+      .profile-layout { grid-template-columns: 220px 1fr; }
+      .profile-main { padding: 36px 32px; }
+    }
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .profile-layout { grid-template-columns: 1fr; }
+      .profile-sidebar { display: none; }
+      .profile-main { padding: 28px 20px; }
+      .info-grid { grid-template-columns: 1fr; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .stat-cell { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-cell:last-child { border-bottom: none; }
+      .address-grid { grid-template-columns: 1fr; }
+      .d-footer { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAVBAR ─────────────────────────────────────── -->
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <!-- ─── PROFILE LAYOUT ────────────────────────────── -->
+  <div class="profile-layout">
+
+    <!-- SIDEBAR -->
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <!-- MAIN -->
+    <main class="profile-main" aria-label="Profile settings">
+
+      <div class="profile-section-header">
+        <div>
+          <div class="section-eyebrow">MY ACCOUNT</div>
+          <h1 class="section-title">Your Profile</h1>
+          <p class="section-desc">Manage your personal details, addresses, and preferences.</p>
+        </div>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="stats-row" role="list" aria-label="Account statistics">
+        <div class="stat-cell" role="listitem">
+          <div class="stat-num">4</div>
+          <div class="stat-label">ORDERS PLACED</div>
+        </div>
+        <div class="stat-cell" role="listitem">
+          <div class="stat-num">2</div>
+          <div class="stat-label">WISHLIST ITEMS</div>
+        </div>
+        <div class="stat-cell" role="listitem">
+          <div class="stat-num">1</div>
+          <div class="stat-label">IN PROGRESS</div>
+        </div>
+      </div>
+
+      <div class="profile-panels">
+
+        <!-- PANEL 1: Personal Info -->
+        <div class="profile-panel">
+          <div class="panel-header">
+            <div class="panel-title">PERSONAL INFORMATION</div>
+            <button class="edit-toggle-btn" id="editPersonalBtn" aria-expanded="false">EDIT</button>
+          </div>
+          <div class="panel-body">
+
+            <!-- View mode -->
+            <div class="view-data info-grid" id="personalView">
+              <div class="info-item">
+                <div class="info-item-label">FIRST NAME</div>
+                <div class="info-item-value">Aarav</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">LAST NAME</div>
+                <div class="info-item-value">Sharma</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">EMAIL ADDRESS</div>
+                <div class="info-item-value">aarav@example.com</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">PHONE NUMBER</div>
+                <div class="info-item-value">+977 98XXXXXXXX</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">CITY</div>
+                <div class="info-item-value">Kathmandu</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">MEMBER SINCE</div>
+                <div class="info-item-value">January 2025</div>
+              </div>
+            </div>
+
+            <!-- Edit mode -->
+            <div class="edit-form" id="personalEdit">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="editFirst">FIRST NAME</label>
+                  <input class="form-input" type="text" id="editFirst" value="Aarav" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="editLast">LAST NAME</label>
+                  <input class="form-input" type="text" id="editLast" value="Sharma" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editEmail">EMAIL ADDRESS</label>
+                <input class="form-input" type="email" id="editEmail" value="aarav@example.com" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editPhone">PHONE NUMBER</label>
+                <input class="form-input" type="tel" id="editPhone" value="+977 98XXXXXXXX" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editCity">CITY</label>
+                <select class="form-select" id="editCity">
+                  <option value="kathmandu" selected>Kathmandu</option>
+                  <option value="lalitpur">Lalitpur (Patan)</option>
+                  <option value="bhaktapur">Bhaktapur</option>
+                  <option value="pokhara">Pokhara</option>
+                  <option value="biratnagar">Biratnagar</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="d-btn-primary" onclick="savePanel('personal')">SAVE CHANGES</button>
+                <button type="button" class="d-btn-ghost" onclick="cancelEdit('personal')">CANCEL</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANEL 2: Change Password -->
+        <div class="profile-panel">
+          <div class="panel-header">
+            <div class="panel-title">PASSWORD &amp; SECURITY</div>
+            <button class="edit-toggle-btn" id="editPasswordBtn" aria-expanded="false">CHANGE</button>
+          </div>
+          <div class="panel-body">
+            <div class="view-data info-grid" id="passwordView">
+              <div class="info-item">
+                <div class="info-item-label">PASSWORD</div>
+                <div class="info-item-value">••••••••••••</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">LAST CHANGED</div>
+                <div class="info-item-value">3 months ago</div>
+              </div>
+            </div>
+            <div class="edit-form" id="passwordEdit">
+              <div class="form-group">
+                <label class="form-label" for="currentPwd">CURRENT PASSWORD</label>
+                <input class="form-input" type="password" id="currentPwd" placeholder="Enter current password" />
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="newPwd">NEW PASSWORD</label>
+                  <input class="form-input" type="password" id="newPwd" placeholder="Minimum 8 characters" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="confirmPwd">CONFIRM NEW PASSWORD</label>
+                  <input class="form-input" type="password" id="confirmPwd" placeholder="Repeat new password" />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="d-btn-primary" onclick="savePanel('password')">UPDATE PASSWORD</button>
+                <button type="button" class="d-btn-ghost" onclick="cancelEdit('password')">CANCEL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: Saved Addresses -->
+        <div class="profile-panel">
+          <div class="panel-header">
+            <div class="panel-title">SAVED ADDRESSES</div>
+          </div>
+          <div class="panel-body">
+            <div class="address-grid">
+              <div class="address-card default">
+                <div class="address-default-badge">DEFAULT</div>
+                <div class="address-name">Aarav Sharma</div>
+                <div class="address-line">Thamel, Ward 26<br />Kathmandu, Bagmati Province<br />+977 98XXXXXXXX</div>
+                <div class="address-actions">
+                  <button class="address-action-btn">EDIT</button>
+                  <span style="color:var(--border);font-size:12px;">·</span>
+                  <button class="address-action-btn">REMOVE</button>
+                </div>
+              </div>
+              <button class="address-add-card" aria-label="Add new address">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>ADD NEW ADDRESS</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 4: Notification Preferences -->
+        <div class="profile-panel">
+          <div class="panel-header">
+            <div class="panel-title">NOTIFICATION PREFERENCES</div>
+          </div>
+          <div class="panel-body">
+            <div class="pref-list">
+              <div class="pref-item">
+                <div class="pref-info">
+                  <div class="pref-name">Order updates</div>
+                  <div class="pref-desc">Status changes, dispatch notifications, delivery confirmations</div>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle order updates">
+                  <input type="checkbox" checked />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+              <div class="pref-item">
+                <div class="pref-info">
+                  <div class="pref-name">Commission updates</div>
+                  <div class="pref-desc">Progress reports on your custom pieces from our artisans</div>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle commission updates">
+                  <input type="checkbox" checked />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+              <div class="pref-item">
+                <div class="pref-info">
+                  <div class="pref-name">New collection alerts</div>
+                  <div class="pref-desc">Be the first to know when new products and seasonal pieces arrive</div>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle new collection alerts">
+                  <input type="checkbox" />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+              <div class="pref-item">
+                <div class="pref-info">
+                  <div class="pref-name">Occasion reminders</div>
+                  <div class="pref-desc">Gentle reminders before Dashain, Tihar, anniversaries, and birthdays</div>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle occasion reminders">
+                  <input type="checkbox" checked />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+              <div class="pref-item">
+                <div class="pref-info">
+                  <div class="pref-name">Promotional offers</div>
+                  <div class="pref-desc">Exclusive discounts and gifting season offers</div>
+                </div>
+                <label class="toggle-switch" aria-label="Toggle promotional offers">
+                  <input type="checkbox" />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /profile-panels -->
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="save-toast" id="saveToast" role="status" aria-live="polite">CHANGES SAVED ✓</div>
+
+  <!-- ─── FOOTER ─────────────────────────────────────── -->
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    // ─── EDIT PANEL TOGGLE ────────────────────────────
+    function toggleEdit(panel) {
+      const view = document.getElementById(panel + 'View');
+      const edit = document.getElementById(panel + 'Edit');
+      const btn  = document.getElementById('edit' + panel.charAt(0).toUpperCase() + panel.slice(1) + 'Btn');
+      const editing = edit.classList.contains('visible');
+      if (editing) {
+        edit.classList.remove('visible');
+        view.classList.remove('hidden');
+        btn.textContent = panel === 'password' ? 'CHANGE' : 'EDIT';
+        btn.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        edit.classList.add('visible');
+        view.classList.add('hidden');
+        btn.textContent = 'CANCEL';
+        btn.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function savePanel(panel) {
+      const view = document.getElementById(panel + 'View');
+      const edit = document.getElementById(panel + 'Edit');
+      const btn  = document.getElementById('edit' + panel.charAt(0).toUpperCase() + panel.slice(1) + 'Btn');
+      edit.classList.remove('visible');
+      view.classList.remove('hidden');
+      btn.textContent = panel === 'password' ? 'CHANGE' : 'EDIT';
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+      showToast();
+    }
+
+    function cancelEdit(panel) {
+      const view = document.getElementById(panel + 'View');
+      const edit = document.getElementById(panel + 'Edit');
+      const btn  = document.getElementById('edit' + panel.charAt(0).toUpperCase() + panel.slice(1) + 'Btn');
+      edit.classList.remove('visible');
+      view.classList.remove('hidden');
+      btn.textContent = panel === 'password' ? 'CHANGE' : 'EDIT';
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    document.getElementById('editPersonalBtn').addEventListener('click', () => toggleEdit('personal'));
+    document.getElementById('editPasswordBtn').addEventListener('click', () => toggleEdit('password'));
+
+    // ─── TOAST ────────────────────────────────────────
+    function showToast() {
+      const toast = document.getElementById('saveToast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2800);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1A0E24;
+      --surface:   #271540;
+      --border:    #3A2450;
+      --text:      #F2EDE8;
+      --muted:     #A898B8;
+      --accent:    #C4907A;
+      --accent-dk: #A07060;
+      --success:   #6B8A70;
+      --error:     #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans:  'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+    .d-nav { background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .d-nav-links { display: flex; gap: 28px; list-style: none; }
+    .d-nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; letter-spacing: 0.08em; font-family: var(--font-sans); font-weight: 500; transition: color 0.2s; }
+    .d-nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.2s; }
+    .icon-btn:hover { border-color: var(--accent); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-btn:hover svg { stroke: var(--accent); }
+    .badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; font-size: 9px; color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); border: 1px solid var(--bg); }
+    .icon-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; cursor: pointer; font-family: var(--font-sans); }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    .profile-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 64px - 72px); }
+
+    .profile-sidebar {
+      border-right: 1px solid var(--border); padding: 40px 0; background: var(--surface);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-user { padding: 0 28px 32px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+    .sidebar-avatar {
+      width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--accent); background: var(--bg);
+      display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 20px; color: var(--accent); margin-bottom: 14px;
+    }
+    .sidebar-name { font-family: var(--font-serif); font-size: 18px; color: var(--text); font-weight: 300; margin-bottom: 4px; }
+    .sidebar-email { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+    .sidebar-member-badge {
+      display: inline-block; font-size: 9px; letter-spacing: 0.16em; color: var(--accent);
+      border: 1px solid var(--border); padding: 3px 8px; margin-top: 10px;
+    }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav-label { font-size: 9px; letter-spacing: 0.22em; color: var(--muted); padding: 16px 28px 8px; }
+    .sidebar-nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 28px; text-decoration: none;
+      border-left: 2px solid transparent; transition: background 0.2s;
+    }
+    .sidebar-nav-item:hover { background: rgba(196, 144, 122, 0.06); }
+    .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196, 144, 122, 0.08); }
+    .sidebar-nav-item svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .sidebar-nav-item.active svg { stroke: var(--accent); }
+    .sidebar-nav-item span { font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; }
+    .sidebar-nav-item.active span { color: var(--text); }
+    .sidebar-logout { padding: 20px 28px 0; border-top: 1px solid var(--border); margin-top: auto; }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px; background: transparent; border: none; cursor: pointer;
+      padding: 0; font-size: 13px; color: var(--muted); transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--error); }
+    .logout-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    .profile-main { padding: 48px 52px; }
+
+    .profile-section-header {
+      display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 36px;
+      padding-bottom: 24px; border-bottom: 1px solid var(--border);
+    }
+    .section-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .section-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); }
+    .section-desc { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .order-list { display: flex; flex-direction: column; gap: 20px; }
+    .order-card {
+      background: var(--surface); border: 1px solid var(--border); padding: 24px 28px;
+      display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; align-items: start;
+    }
+    .order-card-top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+    .order-id { font-family: var(--font-serif); font-size: 18px; font-weight: 300; color: var(--text); }
+    .order-date { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+    .status-badge {
+      display: inline-block; font-size: 9px; letter-spacing: 0.14em; padding: 4px 10px; font-weight: 600; border: 1px solid var(--border);
+    }
+    .status-badge.progress { color: var(--accent); border-color: rgba(196, 144, 122, 0.5); background: rgba(196, 144, 122, 0.08); }
+    .status-badge.delivered { color: var(--success); border-color: rgba(107, 138, 112, 0.5); background: rgba(107, 138, 112, 0.1); }
+    .order-total { text-align: right; }
+    .order-total-label { font-size: 10px; letter-spacing: 0.16em; color: var(--muted); margin-bottom: 4px; }
+    .order-total-num { font-family: var(--font-serif); font-size: 22px; color: var(--accent); font-weight: 300; }
+    .order-card-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 4px; }
+    .order-detail-link {
+      font-size: 11px; letter-spacing: 0.14em; color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+    }
+    .order-detail-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .empty-orders {
+      display: none; text-align: center; padding: 64px 24px; border: 1px dashed var(--border); background: var(--surface);
+    }
+    .empty-orders.visible { display: block; }
+    .empty-orders h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 300; margin-bottom: 12px; color: var(--text); }
+    .empty-orders p { font-size: 14px; color: var(--muted); max-width: 360px; margin: 0 auto 24px; line-height: 1.7; }
+    .empty-cta {
+      display: inline-block; background: var(--accent); color: var(--bg); padding: 12px 28px;
+      font-size: 11px; letter-spacing: 0.18em; font-weight: 600; text-decoration: none; transition: background 0.2s;
+    }
+    .empty-cta:hover { background: var(--accent-dk); }
+
+    .order-list-wrap.hidden { display: none; }
+
+    .d-footer { border-top: 1px solid var(--border); padding: 24px 44px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; }
+
+    @media (max-width: 1023px) {
+      .profile-layout { grid-template-columns: 220px 1fr; }
+      .profile-main { padding: 36px 32px; }
+    }
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .profile-layout { grid-template-columns: 1fr; }
+      .profile-sidebar { display: none; }
+      .profile-main { padding: 28px 20px; }
+      .order-card { grid-template-columns: 1fr; }
+      .order-total { text-align: left; }
+      .d-footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <div class="profile-layout">
+
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <main class="profile-main" aria-label="Order history">
+      <div class="profile-section-header">
+        <div>
+          <p class="section-eyebrow">MY ORDERS</p>
+          <h1 class="section-title">Order History</h1>
+          <p class="section-desc">Track every commission from our Kathmandu studio to your door.</p>
+        </div>
+      </div>
+
+      <div id="orderListWrap" class="order-list-wrap">
+        <div class="order-list" role="list" aria-label="Your orders">
+
+          <article class="order-card" role="listitem">
+            <div>
+              <div class="order-card-top">
+                <h2 class="order-id">#H3D-2025-0047</h2>
+                <span class="order-date">May 1, 2025</span>
+                <span class="status-badge progress">IN PROGRESS</span>
+              </div>
+            </div>
+            <div class="order-total">
+              <div class="order-total-label">TOTAL</div>
+              <div class="order-total-num">NPR 8,500</div>
+            </div>
+            <div class="order-card-actions">
+              <a href="OrderDetail.html" class="order-detail-link">View Details</a>
+            </div>
+          </article>
+
+          <article class="order-card" role="listitem">
+            <div>
+              <div class="order-card-top">
+                <h2 class="order-id">#H3D-2025-0038</h2>
+                <span class="order-date">April 18, 2025</span>
+                <span class="status-badge delivered">DELIVERED</span>
+              </div>
+            </div>
+            <div class="order-total">
+              <div class="order-total-label">TOTAL</div>
+              <div class="order-total-num">NPR 4,400</div>
+            </div>
+            <div class="order-card-actions">
+              <a href="OrderDetail.html" class="order-detail-link">View Details</a>
+            </div>
+          </article>
+
+          <article class="order-card" role="listitem">
+            <div>
+              <div class="order-card-top">
+                <h2 class="order-id">#H3D-2025-0029</h2>
+                <span class="order-date">April 2, 2025</span>
+                <span class="status-badge delivered">DELIVERED</span>
+              </div>
+            </div>
+            <div class="order-total">
+              <div class="order-total-label">TOTAL</div>
+              <div class="order-total-num">NPR 1,400</div>
+            </div>
+            <div class="order-card-actions">
+              <a href="OrderDetail.html" class="order-detail-link">View Details</a>
+            </div>
+          </article>
+
+          <article class="order-card" role="listitem">
+            <div>
+              <div class="order-card-top">
+                <h2 class="order-id">#H3D-2025-0015</h2>
+                <span class="order-date">March 15, 2025</span>
+                <span class="status-badge delivered">DELIVERED</span>
+              </div>
+            </div>
+            <div class="order-total">
+              <div class="order-total-label">TOTAL</div>
+              <div class="order-total-num">NPR 850</div>
+            </div>
+            <div class="order-card-actions">
+              <a href="OrderDetail.html" class="order-detail-link">View Details</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <div id="emptyOrders" class="empty-orders" role="status" aria-live="polite" hidden>
+        <h2>No orders yet</h2>
+        <p>Your story is waiting to take shape. Explore custom figurines, lamps, and keepsakes crafted in Nepal.</p>
+        <a href="Products.html" class="empty-cta">EXPLORE PRODUCTS</a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    /* Toggle empty state for demo: append ?empty=1 to URL */
+    if (window.location.search.indexOf('empty=1') !== -1) {
+      document.getElementById('orderListWrap').classList.add('hidden');
+      var e = document.getElementById('emptyOrders');
+      e.classList.add('visible');
+      e.removeAttribute('hidden');
+    }
+  </script>
+</body>
+</html>

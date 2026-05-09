@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1A0E24;
+      --surface:   #271540;
+      --border:    #3A2450;
+      --border-light: #4A3060;
+      --text:      #F2EDE8;
+      --muted:     #A898B8;
+      --accent:    #C4907A;
+      --accent-dk: #A07060;
+      --success:   #6B8A70;
+      --error:     #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans:  'Jost', sans-serif;
+      --cart-max:  1120px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; }
+
+    .d-nav { background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); font-family: var(--font-sans); }
+    .d-nav-links { display: flex; gap: 28px; list-style: none; }
+    .d-nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; letter-spacing: 0.08em; font-family: var(--font-sans); font-weight: 500; transition: color 0.2s; }
+    .d-nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.2s; }
+    .icon-btn:hover { border-color: var(--accent); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-btn:hover svg { stroke: var(--accent); }
+    .badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; font-size: 9px; color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); border: 1px solid var(--bg); }
+    .icon-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; cursor: pointer; font-family: var(--font-sans); }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    /* ─── PROFILE LAYOUT (for sidebar) ─────────────────────────── */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 68px);
+    }
+
+    .cart-page { padding: 40px 52px 64px; }
+
+    .cart-page-header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-family: var(--font-sans); font-weight: 500; margin-bottom: 8px; }
+    .cart-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); margin-bottom: 6px; }
+    .cart-count { font-size: 13px; color: var(--muted); font-family: var(--font-sans); }
+    .cart-count span { color: var(--text); font-weight: 500; }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .cart-items-panel { background: transparent; }
+    .cart-items-list { list-style: none; border: 1px solid var(--border); background: var(--surface); }
+
+    .cart-line {
+      display: grid;
+      grid-template-columns: 88px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-line:last-child { border-bottom: none; }
+
+    .cart-thumb {
+      width: 88px;
+      height: 88px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cart-thumb .ph {
+      background: var(--border);
+      border: 1px solid var(--border-light);
+      opacity: 0.75;
+    }
+    .cart-thumb .ph.fig { width: 36px; height: 52px; }
+    .cart-thumb .ph.lamp { width: 28px; height: 48px; border-radius: 3px 3px 0 0; }
+    .cart-thumb .ph.key { width: 22px; height: 40px; border-radius: 2px 2px 12px 12px; }
+
+    .cart-line-main { min-width: 0; }
+    .cart-line-name {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .cart-line-tag {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .cart-line-meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+
+    .qty-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .qty-controls {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      line-height: 1;
+      transition: color 0.2s, background 0.2s;
+    }
+    .qty-btn:hover { color: var(--accent); background: var(--surface); }
+    .qty-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .qty-val {
+      min-width: 36px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 8px 0;
+    }
+
+    .cart-line-price-block { text-align: right; }
+    .cart-line-unit { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .cart-line-total { font-size: 14px; color: var(--text); font-family: var(--font-sans); font-weight: 500; }
+    .cart-line-remove {
+      margin-top: 10px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .cart-line-remove:hover { color: var(--error); }
+
+    .cart-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .cart-summary-title {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: var(--accent);
+      font-family: var(--font-sans);
+      font-weight: 500;
+      margin-bottom: 22px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .summary-row span:first-child { color: var(--muted); font-family: var(--font-sans); }
+    .summary-row span:last-child { color: var(--text); font-family: var(--font-sans); font-weight: 500; }
+    .summary-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .summary-total-label { font-size: 11px; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 6px; }
+    .summary-total-val {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    .d-btn-primary {
+      display: block;
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 14px 20px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      transition: background 0.2s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .d-btn-primary:hover { background: var(--accent-dk); }
+    .summary-note {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 300;
+      font-family: var(--font-serif);
+      margin-top: 14px;
+      line-height: 1.55;
+    }
+
+    .cart-has-items.hidden { display: none; }
+
+    .cart-empty {
+      display: none;
+      text-align: center;
+      padding: 56px 24px 80px;
+      border: 1px dashed var(--border);
+      background: rgba(39,21,64,0.35);
+    }
+    .cart-empty.visible { display: block; }
+    .cart-empty-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 20px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cart-empty-icon svg { width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 1.3; }
+    .cart-empty h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 300; margin-bottom: 10px; }
+    .cart-empty p { font-size: 14px; color: var(--muted); max-width: 360px; margin: 0 auto 24px; line-height: 1.65; }
+    .cart-empty .d-btn-primary { max-width: 280px; margin: 0 auto; }
+
+    .d-footer { border-top: 1px solid var(--border); padding: 24px 44px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; font-family: var(--font-sans); transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; font-family: var(--font-sans); }
+
+    @media (max-width: 1023px) {
+      .profile-layout { grid-template-columns: 220px 1fr; }
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-summary { position: static; }
+    }
+
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .profile-layout { grid-template-columns: 1fr; }
+      iframe[src="ProfileSideNavbar.html"] { display: none; }
+      .cart-page { padding: 28px 20px 48px; }
+      .cart-line {
+        grid-template-columns: 72px 1fr;
+        grid-template-rows: auto auto;
+      }
+      .cart-thumb { width: 72px; height: 72px; }
+      .cart-line-price-block {
+        grid-column: 1 / -1;
+        text-align: left;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        justify-content: space-between;
+      }
+      .d-footer { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    }
+
+    @media (min-width: 1280px) {
+      .cart-page { padding-left: 52px; padding-right: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <!-- ─── PROFILE LAYOUT (WITH SIDEBAR) ────────────────────────── -->
+  <div class="profile-layout">
+
+    <!-- SIDEBAR -->
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <!-- MAIN CONTENT -->
+    <main class="cart-page" aria-label="Shopping cart">
+
+    <div class="cart-has-items" id="cartHasItems">
+      <header class="cart-page-header">
+        <p class="cart-eyebrow">MY CART</p>
+        <h1 class="cart-title">Your Cart</h1>
+        <p class="cart-count" id="cartHeaderCount"><span>3 items</span> in your cart</p>
+      </header>
+
+      <div class="cart-layout">
+        <div class="cart-items-panel">
+          <ul class="cart-items-list" id="cartList" role="list" aria-label="Cart items">
+            <li class="cart-line" data-cart-line data-unit="8500" role="listitem">
+              <div class="cart-thumb" aria-hidden="true"><div class="ph fig"></div></div>
+              <div class="cart-line-main">
+                <p class="cart-line-name">Custom Human Figurine</p>
+                <p class="cart-line-tag">Custom figurine · Commission</p>
+                <p class="cart-line-meta">Scale: 15 cm · Finish: Standard · Ships from Kathmandu</p>
+                <div class="qty-row">
+                  <div class="qty-controls" role="group" aria-label="Quantity for Custom Human Figurine">
+                    <button type="button" class="qty-btn" data-qty-dec aria-label="Decrease quantity">−</button>
+                    <span class="qty-val" data-qty-display>1</span>
+                    <button type="button" class="qty-btn" data-qty-inc aria-label="Increase quantity">+</button>
+                  </div>
+                  <button type="button" class="cart-line-remove" data-remove aria-label="Remove Custom Human Figurine">
+                    <span aria-hidden="true">×</span> Remove
+                  </button>
+                </div>
+              </div>
+              <div class="cart-line-price-block">
+                <div>
+                  <p class="cart-line-unit">NPR 8,500 each</p>
+                  <p class="cart-line-total" data-line-total>NPR 8,500</p>
+                </div>
+              </div>
+            </li>
+            <li class="cart-line" data-cart-line data-unit="2200" role="listitem">
+              <div class="cart-thumb" aria-hidden="true"><div class="ph lamp"></div></div>
+              <div class="cart-line-main">
+                <p class="cart-line-name">Portrait Litholamp</p>
+                <p class="cart-line-tag">Litholamp · Portrait</p>
+                <div class="qty-row">
+                  <div class="qty-controls" role="group" aria-label="Quantity for Portrait Litholamp">
+                    <button type="button" class="qty-btn" data-qty-dec aria-label="Decrease quantity">−</button>
+                    <span class="qty-val" data-qty-display>2</span>
+                    <button type="button" class="qty-btn" data-qty-inc aria-label="Increase quantity">+</button>
+                  </div>
+                  <button type="button" class="cart-line-remove" data-remove aria-label="Remove Portrait Litholamp">
+                    <span aria-hidden="true">×</span> Remove
+                  </button>
+                </div>
+              </div>
+              <div class="cart-line-price-block">
+                <div>
+                  <p class="cart-line-unit">NPR 2,200 each</p>
+                  <p class="cart-line-total" data-line-total>NPR 4,400</p>
+                </div>
+              </div>
+            </li>
+            <li class="cart-line" data-cart-line data-unit="850" role="listitem">
+              <div class="cart-thumb" aria-hidden="true"><div class="ph key"></div></div>
+              <div class="cart-line-main">
+                <p class="cart-line-name">Photo Keychain</p>
+                <p class="cart-line-tag">Keychain · Everyday carry</p>
+                <div class="qty-row">
+                  <div class="qty-controls" role="group" aria-label="Quantity for Photo Keychain">
+                    <button type="button" class="qty-btn" data-qty-dec aria-label="Decrease quantity">−</button>
+                    <span class="qty-val" data-qty-display>1</span>
+                    <button type="button" class="qty-btn" data-qty-inc aria-label="Increase quantity">+</button>
+                  </div>
+                  <button type="button" class="cart-line-remove" data-remove aria-label="Remove Photo Keychain">
+                    <span aria-hidden="true">×</span> Remove
+                  </button>
+                </div>
+              </div>
+              <div class="cart-line-price-block">
+                <div>
+                  <p class="cart-line-unit">NPR 850 each</p>
+                  <p class="cart-line-total" data-line-total>NPR 850</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="cart-summary" aria-label="Order summary">
+          <h2 class="cart-summary-title">ORDER SUMMARY</h2>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="sumSub">NPR 13,750</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span id="sumShip">NPR 200 <span style="font-weight:400;color:var(--muted);font-size:12px;">(Kathmandu Valley)</span></span>
+          </div>
+          <div class="summary-divider" aria-hidden="true"></div>
+          <p class="summary-total-label">TOTAL</p>
+          <p class="summary-total-val" id="sumTotal">NPR 13,950</p>
+          <a href="Checkout.html" class="d-btn-primary">Proceed to Checkout</a>
+          <p class="summary-note">Gift packaging included with every order.</p>
+        </aside>
+      </div>
+    </div>
+
+    <div class="cart-empty" id="cartEmpty" role="status" aria-live="polite">
+      <div class="cart-empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <h2>Your cart is empty</h2>
+      <p>Find something meaningful to give — a light, a likeness, a name carved in type.</p>
+      <a href="Products.html" class="d-btn-primary">Browse Collection</a>
+    </div>
+  </main>
+
+  </div> <!-- End of profile-layout -->
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    (function () {
+      var list = document.getElementById('cartList');
+      var hasBlock = document.getElementById('cartHasItems');
+      var emptyEl = document.getElementById('cartEmpty');
+      var subEl = document.getElementById('sumSub');
+      var totalEl = document.getElementById('sumTotal');
+      var headerCount = document.getElementById('cartHeaderCount');
+      var cartBadge = document.getElementById('navCartBadge');
+      var SHIPPING = 200;
+
+      function formatNPR(n) {
+        return 'NPR ' + n.toLocaleString('en-IN');
+      }
+
+      function parseUnit(line) {
+        return parseInt(line.getAttribute('data-unit'), 10) || 0;
+      }
+
+      function lineQty(line) {
+        return parseInt(line.querySelector('[data-qty-display]').textContent, 10) || 0;
+      }
+
+      function setLineTotal(line) {
+        var q = lineQty(line);
+        var u = parseUnit(line);
+        var t = q * u;
+        line.querySelector('[data-line-total]').textContent = formatNPR(t);
+      }
+
+      function totalUnits() {
+        var sum = 0;
+        list.querySelectorAll('[data-cart-line]').forEach(function (line) {
+          sum += lineQty(line);
+        });
+        return sum;
+      }
+
+      function lineCount() {
+        return list.querySelectorAll('[data-cart-line]').length;
+      }
+
+      function recalc() {
+        var sub = 0;
+        list.querySelectorAll('[data-cart-line]').forEach(function (line) {
+          sub += lineQty(line) * parseUnit(line);
+          setLineTotal(line);
+        });
+        var lines = lineCount();
+        var ship = lines ? SHIPPING : 0;
+        if (subEl) subEl.textContent = formatNPR(sub);
+        if (totalEl) totalEl.textContent = formatNPR(sub + ship);
+        var shipRow = document.getElementById('sumShip');
+        if (shipRow) {
+          shipRow.innerHTML = sub === 0 ? '—' : 'NPR 200 <span style="font-weight:400;color:var(--muted);font-size:12px;">(Kathmandu Valley)</span>';
+        }
+        var units = totalUnits();
+        if (headerCount) {
+          headerCount.innerHTML =
+            '<span>' +
+            lines +
+            ' ' +
+            (lines === 1 ? 'item' : 'items') +
+            '</span> in your cart';
+        }
+        if (cartBadge) {
+          cartBadge.textContent = String(units);
+          cartBadge.style.display = units === 0 ? 'none' : 'flex';
+        }
+        var cartBtn = document.querySelector('.nav-actions .icon-btn[title="Cart"]');
+        if (cartBtn) cartBtn.setAttribute('aria-label', 'Cart (' + units + (units === 1 ? ' piece)' : ' pieces)'));
+      }
+
+      function syncEmpty() {
+        var lines = list.querySelectorAll('[data-cart-line]').length;
+        if (lines === 0) {
+          hasBlock.classList.add('hidden');
+          emptyEl.classList.add('visible');
+          if (subEl) subEl.textContent = 'NPR 0';
+          if (totalEl) totalEl.textContent = 'NPR 0';
+          if (headerCount) headerCount.innerHTML = '<span>0 items</span> in your cart';
+          if (cartBadge) { cartBadge.textContent = '0'; cartBadge.style.display = 'none'; }
+        } else {
+          hasBlock.classList.remove('hidden');
+          emptyEl.classList.remove('visible');
+          recalc();
+        }
+      }
+
+      list.addEventListener('click', function (e) {
+        var t = e.target;
+        var line = t.closest('[data-cart-line]');
+        if (!line) return;
+
+        if (t.closest('[data-remove]')) {
+          line.remove();
+          syncEmpty();
+          return;
+        }
+
+        var inc = t.closest('[data-qty-inc]');
+        var dec = t.closest('[data-qty-dec]');
+        var disp = line.querySelector('[data-qty-display]');
+        var q = lineQty(line);
+        if (inc) {
+          disp.textContent = String(q + 1);
+          recalc();
+        } else if (dec && q > 1) {
+          disp.textContent = String(q - 1);
+          recalc();
+        } else if (dec && q === 1) {
+          line.remove();
+          syncEmpty();
+        }
+      });
+
+      /** Empty cart preview helper (reload to restore demo data). */
+      window.hamro3dToggleCartEmpty = function () {
+        list.querySelectorAll('[data-cart-line]').forEach(function (n) { n.remove(); });
+        syncEmpty();
+      };
+
+      recalc();
+    })();
+  </script>
+</body>
+</html>

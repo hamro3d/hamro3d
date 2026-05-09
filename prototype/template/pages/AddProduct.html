@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Product — Admin — Hamro3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1A0E24;
+      --surface: #271540;
+      --border: #3A2450;
+      --text: #F2EDE8;
+      --muted: #A898B8;
+      --accent: #C4907A;
+      --accent-dk: #A07060;
+      --success: #6B8A70;
+      --error: #8B2A3A;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans: 'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; overflow-x: hidden; }
+
+    .d-nav {
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 64px; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-box { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-inner { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); opacity: 0.7; }
+    .nav-brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.12em; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); font-weight: 300; }
+    .nav-brand-sub { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); }
+    .d-nav-links { display: flex; gap: 22px; list-style: none; flex-wrap: wrap; }
+    .d-nav-links a { color: var(--muted); font-size: 12px; text-decoration: none; letter-spacing: 0.08em; font-weight: 500; transition: color 0.2s; }
+    .d-nav-links a:hover, .d-nav-links a.active { color: var(--text); }
+    .d-nav-links a.active { color: var(--accent); }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface);
+      display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--accent); font-weight: 600; cursor: pointer;
+    }
+    .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 8px; border: 1px solid var(--border); background: transparent; }
+    .hamburger span { display: block; width: 18px; height: 1px; background: var(--muted); }
+
+    .mobile-nav-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(26, 14, 36, 0.97); padding: 24px; flex-direction: column; }
+    .mobile-nav-overlay.open { display: flex; }
+    .mobile-nav-close { align-self: flex-end; background: transparent; border: none; color: var(--muted); font-size: 12px; letter-spacing: 0.1em; cursor: pointer; padding: 8px 0; }
+    .mobile-nav-overlay .d-nav-links { flex-direction: column; gap: 0; margin-top: 24px; }
+    .mobile-nav-overlay .d-nav-links a { display: block; padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+
+    .admin-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 64px - 72px); }
+
+    .profile-sidebar {
+      border-right: 1px solid var(--border); padding: 40px 0; background: var(--surface);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-user { padding: 0 28px 32px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+    .sidebar-avatar {
+      width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--accent); background: var(--bg);
+      display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 18px; color: var(--accent); margin-bottom: 14px;
+    }
+    .sidebar-name { font-family: var(--font-serif); font-size: 18px; color: var(--text); font-weight: 300; margin-bottom: 4px; }
+    .sidebar-email { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+    .sidebar-member-badge { display: inline-block; font-size: 9px; letter-spacing: 0.16em; color: var(--accent); border: 1px solid var(--border); padding: 3px 8px; margin-top: 10px; }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav-label { font-size: 9px; letter-spacing: 0.22em; color: var(--muted); padding: 16px 28px 8px; }
+    .sidebar-nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 28px; text-decoration: none;
+      border-left: 2px solid transparent; transition: background 0.2s;
+    }
+    .sidebar-nav-item:hover { background: rgba(196, 144, 122, 0.06); }
+    .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196, 144, 122, 0.08); }
+    .sidebar-nav-item svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 1.4; flex-shrink: 0; }
+    .sidebar-nav-item.active svg { stroke: var(--accent); }
+    .sidebar-nav-item span { font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; }
+    .sidebar-nav-item.active span { color: var(--text); }
+    .sidebar-logout { padding: 20px 28px 0; border-top: 1px solid var(--border); margin-top: auto; }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px; background: transparent; border: none; cursor: pointer;
+      padding: 0; font-size: 13px; color: var(--muted); transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--error); }
+    .logout-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+
+    .profile-main { padding: 48px 52px; }
+    .profile-section-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .section-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .section-title { font-family: var(--font-serif); font-size: 28px; font-weight: 300; color: var(--text); }
+    .section-desc { font-size: 13px; color: var(--muted); margin-top: 6px; max-width: 520px; }
+
+    .profile-panel { background: var(--surface); border: 1px solid var(--border); }
+    .panel-body { padding: 28px 24px 32px; }
+    .product-form { display: flex; flex-direction: column; gap: 22px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 11px; letter-spacing: 0.18em; color: var(--accent); font-weight: 500; }
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      font-family: var(--font-sans); font-size: 14px; padding: 12px 16px; outline: none; transition: border-color 0.2s; width: 100%; appearance: none;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); opacity: 0.6; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A898B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+    }
+    .form-select option { background: var(--surface); color: var(--text); }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
+
+    .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; }
+    .check-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .check-row input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+    .check-row span { font-size: 13px; color: var(--muted); font-family: var(--font-sans); }
+    .check-row:hover span { color: var(--text); }
+
+    .radio-group { display: flex; flex-wrap: wrap; gap: 20px; }
+    .radio-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .radio-row input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+    .upload-zone {
+      border: 1px dashed var(--border); background: var(--bg); padding: 28px 20px; text-align: center;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .upload-zone:hover, .upload-zone:focus-within { border-color: var(--accent); }
+    .upload-zone svg { width: 28px; height: 28px; stroke: var(--muted); fill: none; stroke-width: 1.2; margin: 0 auto 12px; display: block; opacity: 0.55; }
+    .upload-zone p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .upload-zone .browse { color: var(--accent); font-weight: 300; }
+    .upload-hint { font-size: 11px; color: var(--muted); opacity: 0.75; margin-top: 8px; letter-spacing: 0.04em; }
+
+    .form-actions { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
+    .d-btn-primary {
+      background: var(--accent); color: var(--bg); padding: 12px 28px; font-size: 11px; letter-spacing: 0.2em;
+      border: none; cursor: pointer; font-weight: 600; transition: background 0.2s;
+    }
+    .d-btn-primary:hover { background: var(--accent-dk); }
+    .d-btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+    .d-btn-ghost {
+      border: 1px solid var(--border); color: var(--muted); padding: 12px 24px; font-size: 11px; letter-spacing: 0.14em;
+      background: transparent; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s; font-family: var(--font-sans);
+    }
+    .d-btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+    .form-success {
+      display: none; padding: 14px 18px; background: rgba(107, 138, 112, 0.18); border: 1px solid var(--success);
+      color: var(--success); font-size: 13px; letter-spacing: 0.06em; margin-bottom: 8px;
+    }
+    .form-success.visible { display: block; }
+
+    .d-footer {
+      border-top: 1px solid var(--border); padding: 24px 44px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+    }
+    .d-footer-brand { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 300; font-family: var(--font-serif); }
+    .d-footer-links { display: flex; gap: 18px; }
+    .d-footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+    .d-footer-links a:hover { color: var(--text); }
+    .d-seal { font-size: 9px; letter-spacing: 0.14em; color: var(--accent); border: 1px solid var(--border); padding: 5px 10px; }
+
+    @media (max-width: 1023px) {
+      .admin-layout { grid-template-columns: 220px 1fr; }
+      .profile-main { padding: 36px 32px; }
+    }
+    @media (max-width: 767px) {
+      .d-nav { padding: 0 20px; }
+      .d-nav-links { display: none; }
+      .hamburger { display: flex; }
+      .admin-layout { grid-template-columns: 1fr; }
+      .profile-sidebar { display: none; }
+      .profile-main { padding: 28px 20px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .checkbox-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR (loaded via iframe) ===================== -->
+<iframe src="Navbar.html" style="border: none; width: 100%; height: 68px; display: block;" title="Main navigation"></iframe>
+
+  <div class="admin-layout">
+    <iframe src="ProfileSideNavbar.html" style="border: none; width: 260px; height: calc(100vh - 68px); display: block;" title="Profile navigation"></iframe>
+
+    <main class="profile-main">
+      <header class="profile-section-header">
+        <div class="section-eyebrow">ADD PRODUCT</div>
+        <h1 class="section-title">Create New Product</h1>
+        <p class="section-desc">Add a new piece to the Hamro3D catalog</p>
+      </header>
+
+      <div class="profile-panel">
+        <div class="panel-body">
+          <div class="form-success" id="addProductSuccess" role="status" aria-live="polite">
+            Product saved successfully. It is now visible in your catalog according to its status.
+          </div>
+          <form id="addProductForm" class="product-form" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="productName">PRODUCT NAME</label>
+              <input class="form-input" type="text" id="productName" name="productName" required autocomplete="off"
+                placeholder="e.g. Custom Human Figurine" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="category">CATEGORY</label>
+                <select class="form-select" id="category" name="category" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option value="figurine">Figurine</option>
+                  <option value="litholamp">Litholamp</option>
+                  <option value="moon">Moon Lamp</option>
+                  <option value="nameplate">Nameplate</option>
+                  <option value="keychain">Keychain</option>
+                  <option value="puzzle">Puzzle</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="basePrice">BASE PRICE IN NPR</label>
+                <input class="form-input" type="number" id="basePrice" name="basePrice" min="0" step="1" required placeholder="8500" />
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="description">DESCRIPTION</label>
+              <textarea class="form-textarea" id="description" name="description" rows="4" required
+                placeholder="Describe the piece, materials, and what makes it special for gift-givers in Kathmandu and beyond."></textarea>
+            </div>
+
+            <fieldset class="form-group full" style="border:none;padding:0;margin:0;">
+              <legend class="form-label" style="margin-bottom:12px;">OCCASION TAGS</legend>
+              <div class="checkbox-grid">
+                <label class="check-row"><input type="checkbox" name="occasion" value="wedding" /> <span>Wedding</span></label>
+                <label class="check-row"><input type="checkbox" name="occasion" value="anniversary" /> <span>Anniversary</span></label>
+                <label class="check-row"><input type="checkbox" name="occasion" value="dashain" /> <span>Dashain &amp; Tihar</span></label>
+                <label class="check-row"><input type="checkbox" name="occasion" value="birthday" /> <span>Birthday</span></label>
+                <label class="check-row"><input type="checkbox" name="occasion" value="remembrance" /> <span>Remembrance</span></label>
+                <label class="check-row"><input type="checkbox" name="occasion" value="graduation" /> <span>Graduation</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group full" style="border:none;padding:0;margin:0;">
+              <legend class="form-label" style="margin-bottom:12px;">CUSTOMISATION OPTIONS</legend>
+              <div class="checkbox-grid">
+                <label class="check-row"><input type="checkbox" name="custom" value="photo" /> <span>Photo Upload</span></label>
+                <label class="check-row"><input type="checkbox" name="custom" value="name" /> <span>Name Engraving</span></label>
+                <label class="check-row"><input type="checkbox" name="custom" value="message" /> <span>Personal Message</span></label>
+                <label class="check-row"><input type="checkbox" name="custom" value="size" /> <span>Size Selection</span></label>
+              </div>
+            </fieldset>
+
+            <div class="form-group full">
+              <span class="form-label" id="uploadLabel">PRODUCT IMAGES</span>
+              <div class="upload-zone" role="button" tabindex="0" aria-labelledby="uploadLabel" onclick="document.getElementById('productImages').click()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+                <p>Drag &amp; drop or <span class="browse">browse</span> to upload</p>
+                <p class="upload-hint">JPG, PNG, WebP up to 10MB each · First image becomes the cover</p>
+              </div>
+              <input type="file" id="productImages" name="productImages" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-label="Upload product images" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="stockQty">STOCK QUANTITY</label>
+                <input class="form-input" type="number" id="stockQty" name="stockQty" min="0" step="1" required placeholder="12" />
+              </div>
+              <div class="form-group">
+                <span class="form-label" id="statusLabel">STATUS</span>
+                <div class="radio-group" role="radiogroup" aria-labelledby="statusLabel">
+                  <label class="radio-row"><input type="radio" name="status" value="active" checked /> <span style="color:var(--muted);font-size:14px;">Active</span></label>
+                  <label class="radio-row"><input type="radio" name="status" value="draft" /> <span style="color:var(--muted);font-size:14px;">Draft</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="d-btn-primary" id="createProductBtn">CREATE PRODUCT</button>
+              <a href="ProductList.html" class="d-btn-ghost">CANCEL</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="d-footer" role="contentinfo">
+    <div class="d-footer-brand">Hamro3D · Kathmandu · Est. 2025</div>
+    <nav class="d-footer-links" aria-label="Footer navigation">
+      <a href="#">Privacy</a>
+      <a href="Contact.html">Contact</a>
+      <a href="#">Instagram</a>
+    </nav>
+    <div class="d-seal">HANDCRAFTED IN NEPAL</div>
+  </footer>
+
+  <script>
+    (function () {
+      var burger = document.getElementById('adminHamburger');
+      var overlay = document.getElementById('adminMobileNav');
+      var closeBtn = document.getElementById('adminMobileClose');
+      burger.addEventListener('click', function () {
+        var open = !overlay.classList.contains('open');
+        overlay.classList.toggle('open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      closeBtn.addEventListener('click', function () {
+        overlay.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      });
+      overlay.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () {
+          overlay.classList.remove('open');
+          burger.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      var zone = document.querySelector('.upload-zone');
+      var fileInput = document.getElementById('productImages');
+      zone.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+      });
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) {
+          e.preventDefault();
+          zone.style.borderColor = '';
+        });
+      });
+      zone.addEventListener('drop', function (e) {
+        if (e.dataTransfer.files.length) fileInput.files = e.dataTransfer.files;
+      });
+
+      document.getElementById('addProductForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = document.getElementById('createProductBtn');
+        var msg = document.getElementById('addProductSuccess');
+        btn.disabled = true;
+        btn.textContent = 'SAVING…';
+        window.setTimeout(function () {
+          msg.classList.add('visible');
+          btn.disabled = false;
+          btn.textContent = 'CREATE PRODUCT';
+          window.scrollTo({ top: msg.offsetTop + document.querySelector('.profile-main').offsetTop - 80, behavior: 'smooth' });
+        }, 600);
+      });
+    })();
+  </script>
+</body>
+</html>
