@@ -1,0 +1,32 @@
+# Nuxt
+.nuxt/
+dist/
+.output/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Build
+.cache/
+coverage/
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride

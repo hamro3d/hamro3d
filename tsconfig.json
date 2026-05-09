@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "~": ["."],
+      "~/*": ["./*"]
+    },
+    "types": ["node", "nuxt"]
+  },
+  "include": [
+    "app.vue",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "app/**/*.vue",
+    "server/**/*.ts",
+    "server/**/*.tsx",
+    "nuxt.config.ts",
+    "tailwind.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    "dist",
+    ".output",
+    "build",
+    ".git"
+  ]
+}
+
