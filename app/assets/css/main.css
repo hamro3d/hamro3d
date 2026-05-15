@@ -3,7 +3,36 @@
 /* Tailwind v4: load legacy theme tokens (h3d-* colors, fonts, etc.) */
 @config "../../../tailwind.config.ts";
 
-/* Custom animations */
+/* ─── Smooth scrolling ─────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─── Page transitions (Nuxt pageTransition: 'page') ─────── */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ─── Layout transitions ──────────────────────────────────── */
+.layout-enter-active,
+.layout-leave-active {
+  transition: opacity 0.3s ease;
+}
+.layout-enter-from,
+.layout-leave-to {
+  opacity: 0;
+}
+
+/* ─── Custom animations ──────────────────────────────────── */
 @layer utilities {
   .h3d-animate-in {
     animation: fadeUp 0.7s ease-out forwards;

@@ -1,3 +1,8 @@
+import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+
 export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: true,
@@ -27,11 +32,14 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
-  // Image — use Vercel's built-in image optimization in production
+  // Image — @nuxt/image auto-detects ipx locally, vercel on Vercel deployment
+  // dir must be an absolute path because srcDir is 'app/' — without it, IPX
+  // resolves images relative to srcDir ("app/public/") instead of the project
+  // root ("public/"), causing IPX_FILE_NOT_FOUND errors.
   image: {
     quality: 80,
     formats: ['webp', 'avif'],
-    provider: 'vercel',
+    dir: resolve(__dirname, 'public'),
   },
 
   // Rendering & caching strategy
@@ -65,6 +73,12 @@ export default defineNuxtConfig({
         ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/.nuxt/**', '**/.output/**'],
       },
     },
+  },
+
+  // Global app config — page & layout transitions
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
   },
 
   // Compatibility

@@ -154,7 +154,7 @@ useSeoMeta({
               v-if="product.images[0]"
               :src="product.images[0]"
               :alt="product.title"
-              class="absolute inset-0 h-full w-full object-cover"
+              class="absolute inset-0 h-full w-full object-contain p-4"
               loading="lazy"
               decoding="async"
               sizes="sm:100vw md:50vw lg:33vw"

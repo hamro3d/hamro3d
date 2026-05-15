@@ -85,7 +85,7 @@
               v-if="product.image"
               :src="product.image"
               :alt="product.name"
-              class="absolute inset-0 h-full w-full object-cover"
+              class="absolute inset-0 h-full w-full object-contain p-4"
               loading="lazy"
               decoding="async"
               sizes="sm:100vw md:50vw lg:33vw"
