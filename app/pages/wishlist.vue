@@ -70,12 +70,13 @@
           class="relative aspect-[4/5] bg-h3d-base border-b border-h3d-border flex items-center justify-center"
           :aria-label="`View ${item.name}`"
         >
-          <img
+          <NuxtImg
             v-if="item.image"
             :src="item.image"
             alt=""
             class="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
+            sizes="sm:50vw md:33vw lg:25vw"
           />
           <div
             v-else

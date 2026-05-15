@@ -27,11 +27,11 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
-  // Image configuration
+  // Image — use Vercel's built-in image optimization in production
   image: {
     quality: 80,
-    formats: ['webp', 'jpg'],
-    provider: 'ipx',
+    formats: ['webp', 'avif'],
+    provider: 'vercel',
   },
 
   // Rendering & caching strategy

@@ -2,7 +2,7 @@
   <nav class="sticky top-0 z-100 h-[68px] bg-h3d-base border-b border-h3d-border flex items-center justify-between px-6 sm:px-10" role="navigation" aria-label="Main navigation">
     <!-- Logo & Brand -->
     <NuxtLink to="/" class="flex items-center gap-3 text-decoration-none">
-      <img :src="logoImage" alt="Hamro3D Logo" class="h-9 w-auto object-contain" />
+      <NuxtImg src="/logo/C4907A-H3D-logo.png" alt="Hamro3D Logo" class="h-9 w-auto object-contain" width="36" height="36" preload />
       <div>
         <div class="font-h3d-display text-xs tracking-widest text-h3d-text leading-tight">
           HAMRO<span class="text-h3d-accent font-light">3D</span>
@@ -68,7 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import logoImage from '@/assets/logo/C4907A-H3D-logo.png'
 import { useCartStore } from '~/stores/cart'
 import { useWishlistStore } from '~/stores/wishlist'
 import { useAuthStore } from '~/stores/auth'

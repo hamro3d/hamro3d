@@ -171,13 +171,14 @@ useSeoMeta({
             >
               <span class="bg-h3d-accent px-h3d-sm py-1">Signature piece</span>
             </span>
-            <img
+            <NuxtImg
               v-if="product.images[activeThumb]"
               :src="product.images[activeThumb]"
               :alt="`${product.title} — view ${activeThumb + 1}`"
               class="max-h-full max-w-full object-contain"
               loading="lazy"
               decoding="async"
+              sizes="sm:100vw md:60vw lg:50vw"
             />
             <p
               v-else
@@ -211,7 +212,7 @@ useSeoMeta({
               :aria-label="`View image ${i + 1}`"
               @click="activeThumb = i"
             >
-              <img :src="src" alt="" class="h-full w-full object-cover" loading="lazy" />
+              <NuxtImg :src="src" alt="" class="h-full w-full object-cover" loading="lazy" sizes="72px" />
             </button>
           </div>
         </div>
@@ -461,12 +462,13 @@ useSeoMeta({
             class="group border border-h3d-border bg-h3d-surface transition-colors duration-300 hover:border-h3d-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
           >
             <div class="aspect-h3d-product relative overflow-hidden border-b border-h3d-border bg-h3d-base">
-              <img
+              <NuxtImg
                 v-if="p.images[0]"
                 :src="p.images[0]"
                 :alt="p.title"
                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 loading="lazy"
+                sizes="sm:50vw md:33vw lg:25vw"
               />
               <span
                 v-else

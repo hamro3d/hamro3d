@@ -150,13 +150,14 @@ useSeoMeta({
               viewMode === 'list' ? 'sm:aspect-auto sm:w-52 sm:min-h-[200px] md:w-60' : '',
             ]"
           >
-            <img
+            <NuxtImg
               v-if="product.images[0]"
               :src="product.images[0]"
               :alt="product.title"
               class="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
               decoding="async"
+              sizes="sm:100vw md:50vw lg:33vw"
             />
             <div
               v-else

@@ -81,13 +81,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <NuxtLink v-for="product in products" :key="product.id" :to="`/products/${product.id}`" class="block bg-h3d-surface border border-h3d-border transition-all hover:border-h3d-accent hover:-translate-y-0.5 text-decoration-none">
           <div class="aspect-square bg-h3d-base flex items-center justify-center border-b border-h3d-border relative overflow-hidden">
-            <img
+            <NuxtImg
               v-if="product.image"
               :src="product.image"
               :alt="product.name"
               class="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
               decoding="async"
+              sizes="sm:100vw md:50vw lg:33vw"
             />
             <div
               v-else
