@@ -2,7 +2,16 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: true,
 
-  // CSS
+  // Pages, layouts, and components live under app/
+  srcDir: 'app/',
+
+  // Use H3dNavbar / H3dFooter (not LayoutH3dNavbar) for files in components/layout/
+  components: [
+    { path: '~/components', ignore: ['**/layout/**'] },
+    { path: '~/components/layout', pathPrefix: false },
+  ],
+
+  // CSS (relative to project root)
   css: ['./app/assets/css/main.css'],
 
   // PostCSS for Tailwind v4
@@ -14,6 +23,7 @@ export default defineNuxtConfig({
 
   // Modules
   modules: [
+    '@pinia/nuxt',
     '@nuxt/image',
   ],
 
@@ -26,9 +36,15 @@ export default defineNuxtConfig({
 
   // Rendering & caching strategy
   routeRules: {
+    // Legacy prototype URLs → file-based routes
+    '/orders': { redirect: '/profile/orders' },
+    '/admin/dashboard': { redirect: '/admin' },
+    '/admin/add-product': { redirect: '/admin/products' },
+    '/collections': { redirect: '/products' },
+    '/collections/**': { redirect: '/products/**' },
+    '/piece/**': { redirect: '/products/**' },
     '/': { isr: 3600 },
-    '/collections/**': { isr: 3600 },
-    '/piece/**': { isr: 600 },
+    '/products/**': { isr: 600 },
     '/commission': { ssr: true },
     '/our-story': { prerender: true },
     '/contact': { prerender: true },

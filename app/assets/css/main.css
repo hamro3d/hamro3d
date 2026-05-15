@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Tailwind v4: load legacy theme tokens (h3d-* colors, fonts, etc.) */
+@config "../../../tailwind.config.ts";
+
 /* Custom animations */
 @layer utilities {
   .h3d-animate-in {

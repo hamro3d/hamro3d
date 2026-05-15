@@ -27,13 +27,12 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "~": ["."],
-      "~/*": ["./*"]
+      "~": ["app"],
+      "~/*": ["app/*"]
     },
     "types": ["node", "nuxt"]
   },
   "include": [
-    "app.vue",
     "app/**/*.ts",
     "app/**/*.tsx",
     "app/**/*.vue",

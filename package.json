@@ -12,18 +12,19 @@
     "type-check": "nuxt typecheck"
   },
   "dependencies": {
-    "nuxt": "^3.12.0",
-    "vue": "^3.4.0",
     "@nuxt/image": "^1.4.0",
     "@nuxtjs/i18n": "^8.0.0",
+    "@pinia/nuxt": "^0.9.0",
+    "nuxt": "^3.12.0",
     "pinia": "^2.1.7",
+    "vue": "^3.4.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "typescript": "^5.3.3",
     "@nuxt/devtools": "latest",
-    "tailwindcss": "^4.0.0",
     "@tailwindcss/postcss": "^4.0.0",
-    "postcss": "^8.4.31"
+    "postcss": "^8.4.31",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.3.3"
   }
 }

@@ -6,7 +6,7 @@ export default {
     './app/layouts/**/*.{vue,js,ts}',
     './app/pages/**/*.{vue,js,ts}',
     './plugins/**/*.{js,ts}',
-    './app.vue',
+    './app/app.vue',
   ],
   theme: {
     extend: {
@@ -25,11 +25,14 @@ export default {
       },
       fontFamily: {
         'h3d-display': ['EB Garamond', 'Georgia', 'serif'],
+        /** Alias used in templates (same stack as display) */
+        'h3d-serif': ['EB Garamond', 'Georgia', 'serif'],
         'h3d-body': ['Jost', 'system-ui', 'sans-serif'],
         'h3d-devanagari': ['Rozha One', 'serif'],
         'h3d-devanagari-body': ['Noto Sans Devanagari', 'sans-serif'],
       },
       fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '1rem' }],
         'h3d-hero': ['clamp(2.4rem, 6vw, 4rem)', { lineHeight: '1.18' }],
         'h3d-h2': ['clamp(1.8rem, 4vw, 2.8rem)', { lineHeight: '1.25' }],
         'h3d-h3': ['clamp(1.2rem, 3vw, 1.8rem)', { lineHeight: '1.4' }],
@@ -42,6 +45,8 @@ export default {
         'h3d-nav': ['0.938rem', { lineHeight: '1.5' }],
       },
       spacing: {
+        /** Navbar action buttons (matches prototype ~38px) */
+        'h3d-icon': '2.375rem',
         'h3d-xs': '0.5rem',
         'h3d-sm': '1rem',
         'h3d-md': '1.5rem',
@@ -60,6 +65,24 @@ export default {
       },
       aspectRatio: {
         'h3d-product': '4 / 5',
+      },
+      zIndex: {
+        '100': '100',
+      },
+      keyframes: {
+        'scroll-pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.4' },
+        },
+        'scroll-line': {
+          '0%': { scaleY: '0.5', opacity: '0.5' },
+          '50%': { scaleY: '1', opacity: '1' },
+          '100%': { scaleY: '0.5', opacity: '0.5' },
+        },
+      },
+      animation: {
+        'scroll-pulse': 'scroll-pulse 2s ease-in-out infinite',
+        'scroll-line': 'scroll-line 2s ease-in-out infinite',
       },
     },
   },

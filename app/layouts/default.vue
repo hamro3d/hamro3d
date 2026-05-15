@@ -1,13 +1,15 @@
 <template>
-  <div class="flex flex-col min-h-screen">
-    <!-- Header/Navigation would go here -->
+  <div class="flex flex-col min-h-screen bg-h3d-base text-h3d-text">
+    <!-- Navbar -->
+    <H3dNavbar />
 
-    <!-- Main content -->
+    <!-- Main Content -->
     <main class="flex-grow">
       <slot />
     </main>
 
-    <!-- Footer would go here -->
+    <!-- Footer -->
+    <H3dFooter />
   </div>
 </template>
 

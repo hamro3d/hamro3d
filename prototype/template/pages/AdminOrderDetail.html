@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order #H3D-24089 — Admin · Hamro3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --base:        #1A0E24;
+    --surface:     #271540;
+    --surface-alt: #1F1030;
+    --border:      #3A2450;
+    --border-light:#4A3060;
+    --text-primary:#F2EDE8;
+    --text-second: #A898B8;
+    --accent:      #C4907A;
+    --accent-deep: #A07060;
+    --success:     #6B8A70;
+    --error:       #8B2A3A;
+    --warning:     #A08040;
+    --font-serif:  'EB Garamond', Georgia, serif;
+    --font-sans:   'Jost', sans-serif;
+    --transition:  0.24s ease;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-sans); background: var(--base); color: var(--text-primary); min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+  /* NAVBAR */
+  .h3d-nav { background: var(--base); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 68px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-mark { width: 38px; height: 38px; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; background: var(--surface); flex-shrink: 0; }
+  .nav-logo-mark svg { width: 22px; height: 22px; }
+  .nav-brand-text .brand-name { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0.14em; color: var(--text-primary); line-height: 1.2; }
+  .nav-brand-text .brand-name span { color: var(--accent); font-style: italic; }
+  .nav-brand-text .brand-sub { font-size: 9px; letter-spacing: 0.18em; color: var(--text-second); line-height: 1; }
+  .admin-pill { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(196,144,122,0.4); padding: 3px 10px; background: rgba(196,144,122,0.07); }
+  .nav-center-links { display: flex; gap: 32px; list-style: none; }
+  .nav-center-links a { font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.1em; color: var(--text-second); text-decoration: none; transition: color var(--transition); }
+  .nav-center-links a:hover, .nav-center-links a.active { color: var(--accent); }
+  .nav-actions { display: flex; align-items: center; gap: 6px; }
+  .icon-btn { width: 38px; height: 38px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color var(--transition); }
+  .icon-btn:hover { border-color: var(--accent); }
+  .icon-btn svg { width: 16px; height: 16px; stroke: var(--text-second); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-btn:hover svg { stroke: var(--accent); }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--accent); cursor: pointer; }
+
+  /* PAGE SHELL */
+  .page-shell { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 68px); }
+
+  /* SIDEBAR */
+  .sidebar { border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; }
+  .sidebar-user { padding: 28px 24px; border-bottom: 1px solid var(--border); }
+  .sidebar-avatar { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--accent); background: var(--base); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 18px; font-style: italic; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-name { font-family: var(--font-serif); font-size: 16px; color: var(--text-primary); margin-bottom: 2px; }
+  .sidebar-role { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-top: 6px; display: block; }
+  .sidebar-nav { flex: 1; padding: 8px 0; }
+  .sidebar-nav-group-label { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-second); padding: 16px 24px 8px; display: block; }
+  .sidebar-nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 24px; text-decoration: none; border-left: 2px solid transparent; transition: background var(--transition), border-color var(--transition); }
+  .sidebar-nav-item:hover { background: rgba(196,144,122,0.05); }
+  .sidebar-nav-item.active { border-left-color: var(--accent); background: rgba(196,144,122,0.08); }
+  .sidebar-nav-item svg { width: 15px; height: 15px; stroke: var(--text-second); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; transition: stroke var(--transition); }
+  .sidebar-nav-item.active svg, .sidebar-nav-item:hover svg { stroke: var(--accent); }
+  .sidebar-nav-item span { font-size: 13px; color: var(--text-second); font-weight: 500; letter-spacing: 0.04em; transition: color var(--transition); }
+  .sidebar-nav-item.active span, .sidebar-nav-item:hover span { color: var(--text-primary); }
+  .sidebar-nav-badge { margin-left: auto; background: var(--accent); color: var(--base); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .sidebar-footer { padding: 20px 24px; border-top: 1px solid var(--border); margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+  .sidebar-footer-link { display: flex; align-items: center; gap: 10px; font-family: var(--font-sans); font-size: 12px; color: var(--text-second); text-decoration: none; transition: color var(--transition); background: none; border: none; cursor: pointer; }
+  .sidebar-footer-link:hover { color: var(--accent); }
+  .sidebar-footer-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* MAIN */
+  .page-main { padding: 40px 48px; }
+
+  /* Back + breadcrumb */
+  .back-link { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.1em; color: var(--text-second); text-decoration: none; margin-bottom: 28px; transition: color var(--transition); }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Order header */
+  .order-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+  .order-header-left .eyebrow { font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: block; }
+  .order-header h1 { font-family: var(--font-serif); font-size: 28px; font-weight: 400; font-style: italic; color: var(--text-primary); margin-bottom: 10px; }
+  .order-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font-size: 13px; color: var(--text-second); }
+  .order-meta-sep { color: var(--border-light); }
+  .order-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  /* Status badge */
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; padding: 5px 12px; border: 1px solid; }
+  .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .status-badge.in-craft { color: var(--accent); border-color: rgba(196,144,122,0.4); background: rgba(196,144,122,0.08); }
+  .status-badge.awaiting { color: var(--warning); border-color: rgba(160,128,64,0.4); background: rgba(160,128,64,0.08); }
+  .status-badge.shipped { color: #7AACCC; border-color: rgba(122,172,204,0.4); background: rgba(122,172,204,0.08); }
+  .status-badge.delivered { color: var(--success); border-color: rgba(107,138,112,0.4); background: rgba(107,138,112,0.1); }
+
+  /* Buttons */
+  .btn-primary { display: inline-block; background: var(--accent); color: var(--base); padding: 10px 22px; font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; border: none; cursor: pointer; transition: background var(--transition); text-decoration: none; }
+  .btn-primary:hover { background: var(--accent-deep); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); color: var(--text-second); padding: 9px 18px; font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; background: transparent; cursor: pointer; transition: border-color var(--transition), color var(--transition); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-ghost svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+  .btn-danger { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(139,42,58,0.4); color: #C06070; padding: 9px 18px; font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(139,42,58,0.06); cursor: pointer; transition: border-color var(--transition), color var(--transition); }
+  .btn-danger:hover { border-color: #C06070; }
+
+  /* Detail grid */
+  .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+  .detail-col { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Panel */
+  .panel { background: var(--surface); border: 1px solid var(--border); }
+  .panel-head { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+  .panel-body { padding: 22px; }
+
+  /* Timeline */
+  .timeline { list-style: none; position: relative; padding-left: 28px; }
+  .timeline::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+  .tl-item { position: relative; padding-bottom: 22px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot { position: absolute; left: -28px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--base); z-index: 1; }
+  .tl-item.done .tl-dot { border-color: var(--accent); background: var(--accent); }
+  .tl-item.done .tl-dot::after { content: ''; position: absolute; left: 2px; top: 3px; width: 4px; height: 7px; border: solid var(--base); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .tl-item.active .tl-dot { border-color: var(--accent); background: var(--accent); animation: pulse 1.8s ease-in-out infinite; }
+  .tl-item.pending .tl-dot { background: var(--surface); }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,144,122,0.45); } 50% { box-shadow: 0 0 0 8px rgba(196,144,122,0); } }
+  .tl-title { font-size: 14px; color: var(--text-primary); font-weight: 500; margin-bottom: 3px; }
+  .tl-item.active .tl-title { color: var(--accent); }
+  .tl-item.pending .tl-title { color: var(--text-second); font-weight: 400; }
+  .tl-date { font-size: 12px; color: var(--text-second); }
+  .tl-item.pending .tl-date { opacity: 0.5; }
+
+  /* Admin status updater */
+  .status-updater { background: var(--surface-alt); border: 1px solid var(--border); padding: 18px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .status-updater-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-second); flex-shrink: 0; }
+  .status-select { background: var(--surface); border: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; padding: 9px 14px; outline: none; cursor: pointer; flex: 1; min-width: 160px; transition: border-color var(--transition); appearance: none; }
+  .status-select:focus { border-color: var(--accent); }
+
+  /* Item row */
+  .item-row { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+  .item-row:last-child { padding-bottom: 0; border-bottom: none; margin-bottom: 0; }
+  .item-thumb { width: 60px; height: 60px; background: var(--base); border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .item-thumb svg { width: 22px; height: 22px; stroke: var(--border-light); fill: none; stroke-width: 1; }
+  .item-body { flex: 1; }
+  .item-name { font-family: var(--font-serif); font-size: 16px; font-style: italic; color: var(--text-primary); margin-bottom: 4px; }
+  .item-meta { font-size: 12px; color: var(--text-second); line-height: 1.6; margin-bottom: 4px; }
+  .item-qty { font-size: 11px; color: var(--text-second); }
+  .item-price { font-family: var(--font-serif); font-size: 16px; color: var(--accent); white-space: nowrap; }
+
+  /* Customer & delivery info */
+  .info-row { display: flex; flex-direction: column; gap: 3px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .info-row:first-child { padding-top: 0; }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-label { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-second); }
+  .info-value { font-family: var(--font-serif); font-size: 15px; color: var(--text-primary); }
+  .info-sub { font-size: 12px; color: var(--text-second); }
+
+  /* Payment summary */
+  .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; color: var(--text-second); border-top: 1px solid var(--border); }
+  .pay-row:first-child { border-top: none; }
+  .pay-row strong { color: var(--text-primary); font-weight: 500; }
+  .pay-grand { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; margin-top: 6px; border-top: 2px solid var(--border); font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .pay-grand span:last-child { font-family: var(--font-serif); font-size: 22px; color: var(--accent); font-weight: 400; }
+
+  /* Admin note field */
+  .admin-note-area { width: 100%; background: var(--base); border: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; padding: 12px 14px; outline: none; resize: vertical; min-height: 80px; transition: border-color var(--transition); }
+  .admin-note-area:focus { border-color: var(--accent); }
+  .admin-note-area::placeholder { color: var(--border-light); }
+
+  /* Action buttons */
+  .action-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-second); transition: border-color var(--transition), color var(--transition); margin-bottom: 8px; }
+  .action-btn:last-child { margin-bottom: 0; }
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .action-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+  .action-btn.danger { border-color: rgba(139,42,58,0.4); color: #C06070; background: rgba(139,42,58,0.05); }
+  .action-btn.danger:hover { border-color: #C06070; }
+
+  /* FOOTER */
+  .h3d-footer { border-top: 1px solid var(--border); padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-brand { font-family: var(--font-serif); font-size: 13px; font-style: italic; color: var(--text-second); }
+  .footer-links { display: flex; gap: 20px; list-style: none; }
+  .footer-links a { font-size: 11px; color: var(--text-second); text-decoration: none; letter-spacing: 0.08em; transition: color var(--transition); }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-seal { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--border-light); padding: 6px 12px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1023px) {
+    .page-shell { grid-template-columns: 200px 1fr; }
+    .page-main { padding: 32px 28px; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 767px) {
+    .h3d-nav { padding: 0 20px; }
+    .nav-center-links { display: none; }
+    .page-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .page-main { padding: 24px 20px; }
+    .h3d-footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR — ADMIN -->
+<nav class="h3d-nav" role="navigation" aria-label="Admin navigation">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="Home.html" class="nav-brand" aria-label="Hamro3D Home">
+      <div class="nav-logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <polygon points="12,3 21,8 21,16 12,21 3,16 3,8" stroke="#C4907A" stroke-width="1.2" fill="none"/>
+          <polygon points="12,7 17,9.5 17,14.5 12,17 7,14.5 7,9.5" stroke="#A898B8" stroke-width="0.8" fill="none"/>
+          <circle cx="12" cy="12" r="1.5" fill="#C4907A"/>
+        </svg>
+      </div>
+      <div class="nav-brand-text">
+        <div class="brand-name">HAMRO<span>3D</span></div>
+        <div class="brand-sub">हाम्रो 3D · Kathmandu</div>
+      </div>
+    </a>
+    <span class="admin-pill">Admin</span>
+  </div>
+  <ul class="nav-center-links">
+    <li><a href="Products.html">Marketplace</a></li>
+    <li><a href="AdminDashboard.html">Dashboard</a></li>
+    <li><a href="AdminOrderList.html" class="active">Orders</a></li>
+    <li><a href="UserList.html">Users</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+    <div class="nav-avatar">AS</div>
+  </div>
+</nav>
+
+<!-- PAGE SHELL -->
+<div class="page-shell">
+
+  <!-- ADMIN SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" aria-hidden="true">AS</div>
+      <div class="sidebar-name">Aarav Sharma</div>
+      <div style="font-size:11px;color:var(--text-second);">aarav@example.com</div>
+      <span class="sidebar-role">Studio Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="sidebar-nav-group-label">Account</span>
+      <a href="Profile.html" class="sidebar-nav-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>My Profile</span>
+      </a>
+      <a href="OrderList.html" class="sidebar-nav-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>My Orders</span>
+      </a>
+      <span class="sidebar-nav-group-label">Admin</span>
+      <a href="AdminDashboard.html" class="sidebar-nav-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="ProductList.html" class="sidebar-nav-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span>Products</span>
+      </a>
+      <a href="AdminOrderList.html" class="sidebar-nav-item active" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Orders</span>
+        <span class="sidebar-nav-badge">6</span>
+      </a>
+      <a href="UserList.html" class="sidebar-nav-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Users</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="Home.html" class="sidebar-footer-link">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        View Storefront
+      </a>
+      <button class="sidebar-footer-link" onclick="window.location.href='Login.html'">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="page-main" aria-label="Admin order detail">
+
+    <a href="AdminOrderList.html" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Orders
+    </a>
+
+    <!-- Order header -->
+    <div class="order-header">
+      <div class="order-header-left">
+        <span class="eyebrow">Admin · Order Detail</span>
+        <h1>#H3D-24089</h1>
+        <div class="order-meta-row">
+          <time datetime="2026-05-06">6 May 2026</time>
+          <span class="order-meta-sep" aria-hidden="true">·</span>
+          <span>Customer: <strong style="color:var(--text-primary);">Priya K.</strong></span>
+          <span class="order-meta-sep" aria-hidden="true">·</span>
+          <span>2 pieces</span>
+        </div>
+      </div>
+      <div class="order-header-right">
+        <span class="status-badge in-craft">In Craft</span>
+        <button class="btn-ghost">
+          <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          Invoice
+        </button>
+        <button class="btn-primary">Update Status</button>
+      </div>
+    </div>
+
+    <!-- Status updater bar -->
+    <div class="status-updater" aria-label="Update order status">
+      <span class="status-updater-label">Update Status</span>
+      <select class="status-select" id="statusSelect" aria-label="Select new order status">
+        <option value="in-craft" selected>In Craft</option>
+        <option value="awaiting">Awaiting Review</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn-primary" onclick="applyStatus()" style="white-space:nowrap;">Apply</button>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid" style="margin-top:20px;">
+
+      <!-- LEFT -->
+      <div class="detail-col">
+
+        <!-- Timeline -->
+        <section class="panel" aria-labelledby="admin-timeline-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-timeline-heading">Order Timeline</h2>
+            <span style="font-size:10px;color:var(--text-second);letter-spacing:0.06em;">Auto-updated on status change</span>
+          </div>
+          <div class="panel-body">
+            <ol class="timeline" aria-label="Order progress">
+              <li class="tl-item done">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Order Placed</div>
+                <div class="tl-date">6 May 2026 · 09:14 AM</div>
+              </li>
+              <li class="tl-item done">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Payment Received</div>
+                <div class="tl-date">6 May 2026 · 09:16 AM · eSewa</div>
+              </li>
+              <li class="tl-item done">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Artisan Assigned</div>
+                <div class="tl-date">6 May 2026 · Assigned to Studio Unit 1</div>
+              </li>
+              <li class="tl-item active" aria-current="step">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Crafting in Progress</div>
+                <div class="tl-date">In production · Est. completion 10 May 2026</div>
+              </li>
+              <li class="tl-item pending">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Quality Review</div>
+                <div class="tl-date">Pending</div>
+              </li>
+              <li class="tl-item pending">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Shipped</div>
+                <div class="tl-date">Pending</div>
+              </li>
+              <li class="tl-item pending">
+                <span class="tl-dot" aria-hidden="true"></span>
+                <div class="tl-title">Delivered</div>
+                <div class="tl-date">Pending</div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- Order items -->
+        <section class="panel" aria-labelledby="admin-items-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-items-heading">Order Items</h2>
+          </div>
+          <div class="panel-body">
+            <div class="item-row">
+              <div class="item-thumb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a6 6 0 0112 0v2"/></svg>
+              </div>
+              <div class="item-body">
+                <div class="item-name">Custom Human Figurine</div>
+                <div class="item-meta">15 cm · FDM · Hand-painted · Photo uploaded · Care card included</div>
+                <div class="item-qty">Qty: 1 · Photo: priya_ref.jpg</div>
+              </div>
+              <div class="item-price">NPR 8,500</div>
+            </div>
+            <div class="item-row">
+              <div class="item-thumb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M2 17l10-5 10 5"/><path d="M12 12v9"/></svg>
+              </div>
+              <div class="item-body">
+                <div class="item-name">Memory Keychain</div>
+                <div class="item-meta">Photo keychain · Gold ring · Set of 2</div>
+                <div class="item-qty">Qty: 2 · Photo: priya_ref.jpg</div>
+              </div>
+              <div class="item-price">NPR 1,700</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Admin note -->
+        <section class="panel" aria-labelledby="admin-note-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-note-heading">Artisan Note to Customer</h2>
+          </div>
+          <div class="panel-body">
+            <textarea class="admin-note-area" placeholder="Write a note visible to the customer in their order detail view…" aria-label="Note to customer">Your figurine is printing well. We noticed the hair detail in your reference photo — we will give it extra care during the finishing stage.</textarea>
+            <button class="btn-primary" style="margin-top:12px;">Save Note</button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="detail-col">
+
+        <!-- Customer info -->
+        <section class="panel" aria-labelledby="admin-customer-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-customer-heading">Customer</h2>
+          </div>
+          <div class="panel-body">
+            <div class="info-row">
+              <span class="info-label">Name</span>
+              <span class="info-value">Priya K.</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-value" style="font-size:13px;font-family:var(--font-sans);">priya@example.com</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone</span>
+              <span class="info-value">+977 98XXXXXXXX</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Member since</span>
+              <span class="info-value">March 2025</span>
+              <span class="info-sub">2 previous orders</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Delivery info -->
+        <section class="panel" aria-labelledby="admin-delivery-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-delivery-heading">Delivery Address</h2>
+          </div>
+          <div class="panel-body">
+            <div class="info-row">
+              <span class="info-label">Address</span>
+              <span class="info-value">Baneshwor, Ward 10</span>
+              <span class="info-sub">Kathmandu, Bagmati Province</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Delivery type</span>
+              <span class="info-value">Standard · Kathmandu Valley</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Est. delivery</span>
+              <span class="info-value">13–16 May 2026</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Payment -->
+        <section class="panel" aria-labelledby="admin-payment-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-payment-heading">Payment</h2>
+          </div>
+          <div class="panel-body">
+            <div class="pay-row"><span>Custom Figurine × 1</span><strong>NPR 8,500</strong></div>
+            <div class="pay-row"><span>Memory Keychain × 2</span><strong>NPR 1,700</strong></div>
+            <div class="pay-row"><span>Packaging</span><strong>Included</strong></div>
+            <div class="pay-row"><span>Delivery</span><strong>NPR 150</strong></div>
+            <div class="pay-row"><span>Method</span><strong>eSewa · Confirmed</strong></div>
+            <div class="pay-grand">
+              <span>Total</span>
+              <span>NPR 10,350</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Admin actions -->
+        <section class="panel" aria-labelledby="admin-actions-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="admin-actions-heading">Admin Actions</h2>
+          </div>
+          <div class="panel-body">
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+              Download Invoice PDF
+            </button>
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              Message Customer
+            </button>
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print Packing Slip
+            </button>
+            <button class="action-btn danger">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              Cancel Order
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="h3d-footer" role="contentinfo">
+  <div class="footer-brand">Hamro3D · Admin Panel · Est. 2025</div>
+  <ul class="footer-links">
+    <li><a href="Home.html">Storefront</a></li>
+    <li><a href="Contact.html">Support</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+  <div class="footer-seal">Handcrafted in Nepal</div>
+</footer>
+
+<script>
+  function applyStatus() {
+    const val = document.getElementById('statusSelect').value;
+    const labels = { 'in-craft': 'In Craft', 'awaiting': 'Awaiting Review', 'shipped': 'Shipped', 'delivered': 'Delivered', 'cancelled': 'Cancelled' };
+    const badge = document.querySelector('.order-header .status-badge');
+    badge.textContent = labels[val];
+    badge.className = 'status-badge ' + val;
+    // Feedback
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Saved ✓';
+    btn.style.background = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1800);
+  }
+</script>
+
+</body>
+</html>
