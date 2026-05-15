@@ -10,6 +10,14 @@ export default defineNuxtConfig({
   // Pages, layouts, and components live under app/
   srcDir: 'app/',
 
+  // Nuxt resolves dir.* relative to srcDir, so the default dir.public = 'public'
+  // becomes 'app/public/' which doesn't exist. Setting an absolute path here fixes:
+  //   1. Static file deployment on Vercel (Nitro copies from the right directory)
+  //   2. @nuxt/image IPX provider (image.dir defaults to this value)
+  dir: {
+    public: resolve(__dirname, 'public'),
+  },
+
   // Use H3dNavbar / H3dFooter (not LayoutH3dNavbar) for files in components/layout/
   components: [
     { path: '~/components', ignore: ['**/layout/**'] },
@@ -32,14 +40,12 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
-  // Image — @nuxt/image auto-detects ipx locally, vercel on Vercel deployment
-  // dir must be an absolute path because srcDir is 'app/' — without it, IPX
-  // resolves images relative to srcDir ("app/public/") instead of the project
-  // root ("public/"), causing IPX_FILE_NOT_FOUND errors.
+  // Image — @nuxt/image auto-detects ipx locally, vercel on Vercel deployment.
+  // image.dir defaults to nuxt.options.dir.public, which is now the correct
+  // absolute path set above, so no override is needed here.
   image: {
     quality: 80,
     formats: ['webp', 'avif'],
-    dir: resolve(__dirname, 'public'),
   },
 
   // Rendering & caching strategy
