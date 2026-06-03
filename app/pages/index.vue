@@ -81,14 +81,13 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <NuxtLink v-for="product in products" :key="product.id" :to="`/products/${product.id}`" class="block bg-h3d-surface border border-h3d-border transition-all hover:border-h3d-accent hover:-translate-y-0.5 text-decoration-none">
           <div class="aspect-square bg-h3d-base flex items-center justify-center border-b border-h3d-border relative overflow-hidden">
-            <NuxtImg
+            <img
               v-if="product.image"
               :src="product.image"
               :alt="product.name"
               class="absolute inset-0 h-full w-full object-contain p-4"
               loading="lazy"
               decoding="async"
-              sizes="sm:100vw md:50vw lg:33vw"
             />
             <div
               v-else
@@ -100,7 +99,7 @@
           </div>
           <div class="h-0.5 bg-h3d-accent opacity-30"></div>
           <div class="p-4">
-            <div class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase mb-1.5">{{ product.collection }}</div>
+            <div class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase mb-1.5">{{ product.category }}</div>
             <h3 class="font-h3d-display text-sm text-h3d-text mb-1 italic">{{ product.name }}</h3>
             <div class="font-h3d-body text-xs text-h3d-muted">From NPR {{ product.price }}</div>
           </div>
@@ -214,7 +213,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from 'nuxt/app'
 import { computed } from 'vue'
-import { formatNprPrice, getTopRankedMockProducts } from '~/data/mock-products'
 
 useSeoMeta({
   title: 'Hamro3D — Crafted with Care',
@@ -223,22 +221,32 @@ useSeoMeta({
   ogType: 'website',
 })
 
-/** First phrase before · in `head`, sentence-cased for the home grid label */
-function homepageCollectionLabel(head: string): string {
-  const raw = head.split('·')[0]?.trim() ?? head
-  const lower = raw.toLowerCase()
-  return lower.charAt(0).toUpperCase() + lower.slice(1)
+function formatNprPrice(amount: number): string {
+  return Number(amount).toLocaleString('en-IN')
 }
 
-const products = computed(() =>
-  getTopRankedMockProducts(3).map((p) => ({
-    id: p.id,
-    collection: homepageCollectionLabel(p.head),
-    name: p.title,
-    price: formatNprPrice(p.price),
-    image: p.images[0] ?? '',
-  })),
-)
+const { data: productsData } = await useFetch('/api/products?limit=3&status=Active')
+
+const products = computed(() => {
+  const list = (productsData.value as any[]) ?? []
+  return list.map((p) => {
+    let imgs: string[] = []
+    if (p.images) {
+      if (typeof p.images === 'string') {
+        try { imgs = JSON.parse(p.images) } catch { imgs = [] }
+      } else {
+        imgs = p.images
+      }
+    }
+    return {
+      id: p.id,
+      category: p.category_name ?? 'Personalized Piece',
+      name: p.title,
+      price: formatNprPrice(p.price),
+      image: imgs[0] ?? '',
+    }
+  })
+})
 
 const scrollToMarquee = () => {
   const marqueeSection = document.getElementById('marquee-section')

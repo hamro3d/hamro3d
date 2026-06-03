@@ -12,9 +12,14 @@
       </p>
     </header>
 
+    <!-- Loading state -->
+    <div v-if="pending" class="space-y-4">
+      <div v-for="i in 3" :key="i" class="h-28 animate-pulse bg-h3d-surface border border-h3d-border" />
+    </div>
+
     <!-- Empty state -->
     <div
-      v-if="orders.length === 0"
+      v-else-if="orders.length === 0"
       class="flex flex-col items-center justify-center border border-dashed border-h3d-border bg-h3d-surface px-8 py-16 text-center sm:py-24"
     >
       <h2 class="mb-3 font-h3d-display text-xl font-light text-h3d-text sm:text-2xl">
@@ -85,30 +90,46 @@
 </template>
 
 <script setup lang="ts">
-import type { MockUserOrderStatus } from '~/data/mock-user-orders'
-import { mockUserOrders } from '~/data/mock-user-orders'
-import { formatNprPrice } from '~/data/mock-products'
-
 definePageMeta({ layout: 'profile' })
 
-const orders = computed(() =>
-  mockUserOrders.map((o) => ({
-    id: o.id,
-    date: o.date,
-    status: o.status,
-    items: o.lines.map((l) => l.name),
-    total: formatNprPrice(o.total),
-  })),
-)
+const { data: rawOrders, pending } = await useFetch('/api/profile/orders')
 
-function statusBadgeClass(status: MockUserOrderStatus): string {
+const orders = computed(() => {
+  const list = (rawOrders.value as any[]) ?? []
+  return list.map((o) => {
+    let parsedLines = []
+    if (o.lines) {
+      if (typeof o.lines === 'string') {
+        try { parsedLines = JSON.parse(o.lines) } catch { parsedLines = [] }
+      } else {
+        parsedLines = o.lines
+      }
+    }
+    return {
+      id: o.id,
+      date: formatDate(o.created_at),
+      status: o.status,
+      items: parsedLines.map((l: any) => l.name),
+      total: Number(o.total).toLocaleString('en-IN'),
+    }
+  })
+})
+
+function formatDate(ts: string) {
+  if (!ts) return '—'
+  return new Date(ts).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function statusBadgeClass(status: string): string {
   switch (status) {
     case 'Delivered':
       return 'border-h3d-success/50 bg-h3d-success/10 text-h3d-success'
+    case 'Shipped':
     case 'In Progress':
+    case 'In craft':
       return 'border-h3d-accent/50 bg-h3d-accent/10 text-h3d-accent'
+    case 'Awaiting review':
     case 'Processing':
-      return 'border-h3d-border bg-h3d-base text-h3d-muted'
     default:
       return 'border-h3d-border bg-h3d-base text-h3d-muted'
   }

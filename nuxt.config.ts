@@ -7,8 +7,21 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: true,
 
+  runtimeConfig: {
+    dbHost: process.env.NUXT_DB_HOST || '127.0.0.1',
+    dbPort: process.env.NUXT_DB_PORT || '3306',
+    dbUser: process.env.NUXT_DB_USER || 'root',
+    dbPassword: process.env.NUXT_DB_PASSWORD || '',
+    dbName: process.env.NUXT_DB_NAME || 'hamro3d',
+    sessionSecret:
+      process.env.NUXT_SESSION_SECRET || 'hamro3d-dev-session-secret-change-in-production',
+  },
+
   // Pages, layouts, and components live under app/
   srcDir: 'app/',
+
+  // Server-side code (API routes, middleware, utils) lives in root server/
+  serverDir: resolve(__dirname, 'server'),
 
   // Nuxt resolves dir.* relative to srcDir, so the default dir.public = 'public'
   // becomes 'app/public/' which doesn't exist. Setting an absolute path here fixes:
@@ -44,8 +57,10 @@ export default defineNuxtConfig({
   // image.dir defaults to nuxt.options.dir.public, which is now the correct
   // absolute path set above, so no override is needed here.
   image: {
+    provider: 'ipx',
+    dir: resolve(__dirname, 'public'),
     quality: 80,
-    formats: ['webp', 'avif'],
+    formats: ['webp', 'avif']
   },
 
   // Rendering & caching strategy
@@ -63,6 +78,7 @@ export default defineNuxtConfig({
     '/our-story': { prerender: true },
     '/contact': { prerender: true },
     '/api/**': { cors: true },
+    '/admin/**': { ssr: true },
   },
 
   // TypeScript

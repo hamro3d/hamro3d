@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import {
-  formatNprPrice,
-  getMockProductById,
-  getRelatedMockProducts,
-} from '~/data/mock-products'
 import { useCartStore } from '~/stores/cart'
 import { useWishlistStore } from '~/stores/wishlist'
 
 definePageMeta({
   validate(route) {
     const id = String(route.params.id)
-    if (!/^\d+$/.test(id)) return false
-    return getMockProductById(id) !== undefined
+    return /^\d+$/.test(id)
   },
 })
 
@@ -19,24 +13,88 @@ const route = useRoute()
 const cart = useCartStore()
 const wishlist = useWishlistStore()
 
-const product = computed(() => getMockProductById(String(route.params.id))!)
-const isInWishlist = computed(() => wishlist.isSaved(product.value.id))
+const productId = computed(() => route.params.id as string)
 
-const relatedPieces = computed(() => getRelatedMockProducts(product.value))
+const { data: rawProduct, pending } = await useFetch(() => `/api/products/${productId.value}`)
+const { data: allProductsData } = await useFetch('/api/products?status=Active')
+
+function formatNprPrice(amount: number): string {
+  return Number(amount).toLocaleString('en-IN')
+}
+
+const product = computed(() => {
+  const p = rawProduct.value as any
+  if (!p) return null
+
+  const parseJson = (val: any) => {
+    if (!val) return []
+    if (typeof val === 'string') {
+      try { return JSON.parse(val) } catch { return [] }
+    }
+    return val
+  }
+  const parseJsonObj = (val: any) => {
+    if (!val) return {}
+    if (typeof val === 'string') {
+      try { return JSON.parse(val) } catch { return {} }
+    }
+    return val
+  }
+
+  return {
+    ...p,
+    images: parseJson(p.images),
+    material: parseJson(p.material),
+    size: parseJsonObj(p.size),
+    related_product_ids: parseJson(p.related_product_ids),
+    descriptions: parseJson(p.descriptions),
+    processes: parseJson(p.processes),
+    care: parseJson(p.care),
+  }
+})
+
+const isInWishlist = computed(() => {
+  if (!product.value) return false
+  return wishlist.isSaved(product.value.id)
+})
+
+const relatedPieces = computed(() => {
+  if (!product.value) return []
+  const ids = product.value.related_product_ids ?? []
+  const list = (allProductsData.value as any[]) ?? []
+  
+  const parseJson = (val: any) => {
+    if (!val) return []
+    if (typeof val === 'string') {
+      try { return JSON.parse(val) } catch { return [] }
+    }
+    return val
+  }
+
+  return ids
+    .map((rid: any) => list.find((p) => p.id === Number(rid)))
+    .filter((p: any) => p !== undefined)
+    .map((p: any) => ({
+      ...p,
+      images: parseJson(p.images)
+    }))
+})
 
 const activeThumb = ref(0)
 const quantity = ref(1)
 
-const materialOptions = computed(() =>
-  product.value.material.map((label, i) => ({
+const materialOptions = computed(() => {
+  if (!product.value) return []
+  return product.value.material.map((label: string, i: number) => ({
     id: `${i}-${label}`,
     label,
-  })),
-)
+  }))
+})
 
-const sizeOptions = computed(() =>
-  product.value.size.value.map((v) => `${v}${product.value.size.unit}`),
-)
+const sizeOptions = computed(() => {
+  if (!product.value?.size?.value) return []
+  return product.value.size.value.map((v: number) => `${v}${product.value.size.unit}`)
+})
 
 const selectedMaterial = ref('')
 const selectedSize = ref('')
@@ -65,10 +123,11 @@ watch(
 watch(product, syncSelectors, { immediate: true })
 
 const craftLeadLine = computed(() => {
-  const step = product.value.processes.find((s) =>
+  if (!product.value) return ''
+  const step = product.value.processes?.find((s: any) =>
     /craft|etch|print|cast|finish/i.test(s.title),
   )
-  return step?.description ?? product.value.descriptions[0] ?? ''
+  return step?.description ?? product.value.descriptions?.[0] ?? ''
 })
 
 const showToast = ref(false)
@@ -94,15 +153,23 @@ function showAddedToast() {
 }
 
 function handleCommission() {
+  if (!product.value) return
   const mat = materialOptions.value.find((m) => m.id === selectedMaterial.value)
   const variantLabel = [selectedSize.value, mat?.label].filter(Boolean).join(' · ')
   for (let i = 0; i < quantity.value; i++) {
-    cart.addItem(product.value.id, variantLabel)
+    cart.addItem({
+      id: product.value.id,
+      title: product.value.title,
+      head: product.value.head,
+      price: product.value.price,
+      images: product.value.images,
+    }, variantLabel)
   }
   showAddedToast()
 }
 
 function handleWishlistToggle() {
+  if (!product.value) return
   wishlist.toggle(product.value.id)
 }
 
@@ -111,22 +178,29 @@ onUnmounted(() => {
 })
 
 useSeoMeta({
-  title: computed(() => `${product.value.title} — Hamro3D`),
+  title: computed(() => product.value ? `${product.value.title} — Hamro3D` : 'Product Details — Hamro3D'),
   description: computed(
     () =>
-      product.value.descriptions[0] ??
+      product.value?.descriptions?.[0] ??
       `Piece ${String(route.params.id)}. Crafted in Kathmandu.`,
   ),
-  ogTitle: computed(() => `${product.value.title} — Hamro3D`),
-  ogDescription: computed(() => product.value.subtitle),
-  ogImage: computed(() => product.value.images[0] ?? '/og/piece.jpg'),
+  ogTitle: computed(() => product.value ? `${product.value.title} — Hamro3D` : 'Product Details — Hamro3D'),
+  ogDescription: computed(() => product.value?.subtitle ?? ''),
+  ogImage: computed(() => product.value?.images?.[0] ?? '/og/piece.jpg'),
   ogLocale: 'en_NP',
 })
 </script>
 
 <template>
   <div class="bg-h3d-base min-h-screen font-h3d-body text-h3d-text">
-    <div class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg">
+    <div v-if="pending" class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg flex items-center justify-center min-h-[400px]">
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-h3d-accent border-t-transparent" />
+    </div>
+    <div v-else-if="!product" class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg text-center py-20">
+      <h1 class="font-h3d-display text-2xl font-light mb-4 text-h3d-text">Product not found</h1>
+      <NuxtLink to="/products" class="text-h3d-accent underline">Back to Products</NuxtLink>
+    </div>
+    <div v-else class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg">
       <!-- Breadcrumb -->
       <nav
         class="font-h3d-body text-h3d-body-sm text-h3d-muted mb-h3d-md"
@@ -171,14 +245,13 @@ useSeoMeta({
             >
               <span class="bg-h3d-accent px-h3d-sm py-1">Signature piece</span>
             </span>
-            <NuxtImg
+            <img
               v-if="product.images[activeThumb]"
               :src="product.images[activeThumb]"
               :alt="`${product.title} — view ${activeThumb + 1}`"
               class="max-h-full max-w-full object-contain"
               loading="lazy"
               decoding="async"
-              sizes="sm:100vw md:60vw lg:50vw"
             />
             <p
               v-else
@@ -212,7 +285,7 @@ useSeoMeta({
               :aria-label="`View image ${i + 1}`"
               @click="activeThumb = i"
             >
-              <NuxtImg :src="src" alt="" class="h-full w-full object-cover" loading="lazy" sizes="72px" />
+              <img :src="src" alt="" class="h-full w-full object-cover" loading="lazy" />
             </button>
           </div>
         </div>
@@ -462,13 +535,12 @@ useSeoMeta({
             class="group border border-h3d-border bg-h3d-surface transition-colors duration-300 hover:border-h3d-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
           >
             <div class="aspect-h3d-product relative overflow-hidden border-b border-h3d-border bg-h3d-base">
-              <NuxtImg
+              <img
                 v-if="p.images[0]"
                 :src="p.images[0]"
                 :alt="p.title"
                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 loading="lazy"
-                sizes="sm:50vw md:33vw lg:25vw"
               />
               <span
                 v-else

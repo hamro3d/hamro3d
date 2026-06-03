@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { mockProducts, formatNprPrice } from '~/data/mock-products'
 import { useWishlistStore } from '~/stores/wishlist'
 
 const wishlist = useWishlistStore()
@@ -7,8 +6,38 @@ const wishlist = useWishlistStore()
 const viewMode = ref<'grid' | 'list'>('grid')
 const sortBy = ref('featured')
 
+const { data, pending } = await useFetch('/api/products?status=Active')
+
+function formatNprPrice(amount: number): string {
+  return Number(amount).toLocaleString('en-IN')
+}
+
+const products = computed(() => {
+  const list = (data.value as any[]) ?? []
+  return list.map((p) => {
+    let imagesArr: string[] = []
+    if (p.images) {
+      if (Array.isArray(p.images)) {
+        imagesArr = p.images
+      } else if (typeof p.images === 'string') {
+        // Try parsing JSON array; if fails, treat as single URL string
+        try {
+          const parsed = JSON.parse(p.images)
+          imagesArr = Array.isArray(parsed) ? parsed : [p.images]
+        } catch {
+          imagesArr = [p.images]
+        }
+      }
+    }
+    return {
+      ...p,
+      images: imagesArr,
+    }
+  })
+})
+
 const sortedProducts = computed(() => {
-  const list = [...mockProducts]
+  const list = [...products.value]
   switch (sortBy.value) {
     case 'featured':
       return list.sort((a, b) => a.rank - b.rank)
@@ -150,14 +179,13 @@ useSeoMeta({
               viewMode === 'list' ? 'sm:aspect-auto sm:w-52 sm:min-h-[200px] md:w-60' : '',
             ]"
           >
-            <NuxtImg
+            <img
               v-if="product.images[0]"
               :src="product.images[0]"
               :alt="product.title"
               class="absolute inset-0 h-full w-full object-contain p-4"
               loading="lazy"
               decoding="async"
-              sizes="sm:100vw md:50vw lg:33vw"
             />
             <div
               v-else

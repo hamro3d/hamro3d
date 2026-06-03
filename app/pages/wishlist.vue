@@ -70,13 +70,12 @@
           class="relative aspect-[4/5] bg-h3d-base border-b border-h3d-border flex items-center justify-center"
           :aria-label="`View ${item.name}`"
         >
-          <NuxtImg
+          <img
             v-if="item.image"
             :src="item.image"
             alt=""
             class="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
-            sizes="sm:50vw md:33vw lg:25vw"
           />
           <div
             v-else
@@ -128,7 +127,37 @@ definePageMeta({
 
 const wishlist = useWishlistStore()
 
-const wishlistItems = computed(() => wishlist.items)
+const { data: allProducts } = await useFetch('/api/products?status=Active')
+
+function formatNprPrice(amount: number): string {
+  return Number(amount).toLocaleString('en-IN')
+}
+
+const wishlistItems = computed(() => {
+  const products = (allProducts.value as any[]) ?? []
+  return wishlist.savedIds
+    .map((pid) => {
+      const p = products.find((pr: any) => pr.id === pid)
+      if (!p) return null
+      let imgs: string[] = []
+      if (p.images) {
+        if (typeof p.images === 'string') {
+          try { imgs = JSON.parse(p.images) } catch { imgs = [] }
+        } else {
+          imgs = p.images
+        }
+      }
+      const tag = p.head?.split('·').pop()?.trim() ?? p.head ?? ''
+      return {
+        id: p.id,
+        tag,
+        name: p.title,
+        price: formatNprPrice(p.price),
+        image: imgs[0] ?? '',
+      }
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null)
+})
 
 function removeFromWishlist(id: number): void {
   wishlist.remove(id)
@@ -143,3 +172,4 @@ useSeoMeta({
     'Pieces you have saved until the right moment to commission.',
 })
 </script>
+

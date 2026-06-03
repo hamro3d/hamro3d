@@ -6,6 +6,14 @@
         class="flex flex-col justify-center px-6 py-14 sm:px-10 lg:px-14 xl:px-20"
       >
         <div class="mx-auto w-full max-w-md">
+          <p
+            v-if="authError"
+            class="font-h3d-body mb-6 border border-h3d-error/40 bg-h3d-error/10 px-4 py-3 text-sm text-h3d-error"
+            role="alert"
+          >
+            {{ authError }}
+          </p>
+
           <!-- Mode tabs -->
           <div
             class="flex gap-0 mb-10 border-b border-h3d-border"
@@ -86,9 +94,10 @@
             </div>
             <button
               type="submit"
-              class="font-h3d-body w-full bg-h3d-accent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-base transition-colors hover:bg-h3d-accent-hover"
+              :disabled="submitting"
+              class="font-h3d-body w-full bg-h3d-accent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-base transition-colors hover:bg-h3d-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              LOGIN
+              {{ submitting ? 'Signing in…' : 'LOGIN' }}
             </button>
 
             <div class="relative flex items-center gap-4 py-2">
@@ -240,9 +249,10 @@
             </div>
             <button
               type="submit"
-              class="font-h3d-body w-full bg-h3d-accent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-base transition-colors hover:bg-h3d-accent-hover"
+              :disabled="submitting"
+              class="font-h3d-body w-full bg-h3d-accent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-base transition-colors hover:bg-h3d-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Create account
+              {{ submitting ? 'Creating account…' : 'Create account' }}
             </button>
 
             <div class="relative flex items-center gap-4 py-2">
@@ -408,6 +418,9 @@
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from '~/utils/apiFetch'
+import type { AuthUser } from '~/stores/auth'
+
 type AuthMode = 'login' | 'signup'
 
 useSeoMeta({
@@ -416,7 +429,12 @@ useSeoMeta({
     'Sign in or join Hamro3D to save memories, track commissions, and gift tangible stories crafted in Kathmandu.',
 })
 
+const route = useRoute()
+const auth = useAuthStore()
+
 const authMode = ref<AuthMode>('login')
+const authError = ref('')
+const submitting = ref(false)
 
 const loginForm = reactive({
   email: '',
@@ -431,11 +449,75 @@ const signupForm = reactive({
   password: '',
 })
 
-function handleLogin() {
-  // Placeholder — wire to auth provider or Nitro route
+function apiErrorMessage(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message
+  const e = err as { data?: { message?: string }; statusMessage?: string; message?: string }
+  return e?.data?.message || e?.statusMessage || e?.message || 'Something went wrong. Please try again.'
 }
 
-function handleSignup() {
-  // Placeholder — wire to registration API
+async function redirectAfterAuth(user: AuthUser) {
+  const raw = route.query.redirect
+  const redirect = typeof raw === 'string' ? raw : ''
+
+  if (redirect.startsWith('/') && !redirect.startsWith('//')) {
+    if (redirect.startsWith('/admin') && user.role !== 'admin') {
+      return navigateTo('/profile')
+    }
+    return navigateTo(redirect)
+  }
+
+  if (user.role === 'admin') {
+    return navigateTo('/admin')
+  }
+  return navigateTo('/profile')
+}
+
+onMounted(async () => {
+  if (!auth.sessionLoaded) {
+    await fetchAuthSession()
+  }
+  if (auth.isLoggedIn && auth.user) {
+    await redirectAfterAuth(auth.user)
+  }
+})
+
+async function handleLogin() {
+  authError.value = ''
+  submitting.value = true
+  try {
+    const res = await apiFetch<{ user: AuthUser }>('/api/auth/login', {
+      method: 'POST',
+      body: { email: loginForm.email, password: loginForm.password },
+    })
+    auth.setUser(res.user)
+    auth.sessionLoaded = true
+    await redirectAfterAuth(res.user)
+  } catch (err) {
+    authError.value = apiErrorMessage(err)
+  } finally {
+    submitting.value = false
+  }
+}
+
+async function handleSignup() {
+  authError.value = ''
+  if (signupForm.password.length < 8) {
+    authError.value = 'Password must be at least 8 characters.'
+    return
+  }
+  submitting.value = true
+  try {
+    const res = await apiFetch<{ user: AuthUser }>('/api/auth/register', {
+      method: 'POST',
+      body: { ...signupForm },
+    })
+    auth.setUser(res.user)
+    auth.sessionLoaded = true
+    await redirectAfterAuth(res.user)
+  } catch (err) {
+    authError.value = apiErrorMessage(err)
+  } finally {
+    submitting.value = false
+  }
 }
 </script>

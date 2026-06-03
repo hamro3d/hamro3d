@@ -214,6 +214,9 @@
         <p class="mt-6 font-h3d-body text-xs text-h3d-muted leading-relaxed border border-h3d-border border-dashed bg-h3d-base/50 px-4 py-3">
           We will confirm your commission by message before anything is prepared. If you choose bank transfer or eSewa, details are sent after you place the gift.
         </p>
+        <p v-if="orderError" class="mt-4 font-h3d-body text-sm text-h3d-error border border-h3d-error/30 bg-h3d-error/5 px-4 py-3">
+          {{ orderError }}
+        </p>
       </section>
 
       <!-- Step 3: Confirmation -->
@@ -333,10 +336,12 @@
           <button
             v-if="currentStep === 2"
             type="button"
-            class="inline-flex items-center justify-center bg-h3d-accent px-8 py-3.5 font-h3d-body text-2xs font-semibold uppercase tracking-widest text-h3d-base transition-colors hover:bg-h3d-accent-hover"
+            class="inline-flex items-center justify-center bg-h3d-accent px-8 py-3.5 font-h3d-body text-2xs font-semibold uppercase tracking-widest text-h3d-base transition-colors hover:bg-h3d-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="orderSubmitting"
             @click="placeOrder"
           >
-            Place Order
+            <span v-if="orderSubmitting" class="inline-block h-4 w-4 mr-2 animate-spin rounded-full border-2 border-h3d-base border-t-transparent" />
+            {{ orderSubmitting ? 'Placing Order…' : 'Place Order' }}
           </button>
           <NuxtLink
             v-if="currentStep === 3"
@@ -352,18 +357,13 @@
 </template>
 
 <script setup lang="ts">
+import { useCartStore } from '~/stores/cart'
+
 definePageMeta({
   layout: 'checkout',
 })
 
-type CartLine = {
-  id: number
-  name: string
-  tag: string
-  meta: string
-  unitPrice: number
-  quantity: number
-}
+const cart = useCartStore()
 
 const stepLabels = ['Shipping', 'Payment', 'Confirmation'] as const
 
@@ -408,56 +408,61 @@ const paymentOptions = [
   },
 ]
 
-const shippingNpr = 200
-
-const cartItems = ref<CartLine[]>([
-  {
-    id: 1,
-    name: 'Custom Human Figurine',
-    tag: 'Custom figurine · Commission',
-    meta: 'Scale: 15 cm · Finish: Standard',
-    unitPrice: 8500,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: 'Portrait Litholamp',
-    tag: 'Litholamp · Portrait',
-    meta: '',
-    unitPrice: 2200,
-    quantity: 2,
-  },
-  {
-    id: 3,
-    name: 'Photo Keychain',
-    tag: 'Keychain · Everyday carry',
-    meta: '',
-    unitPrice: 850,
-    quantity: 1,
-  },
-])
+const cartItems = computed(() => cart.items)
+const subtotal = computed(() => cart.subtotal)
+const shippingNpr = cart.shippingNpr
+const total = computed(() => cart.total)
 
 function formatPrice(value: number): string {
   return value.toLocaleString('en-IN')
 }
 
-function lineTotal(item: CartLine): number {
-  return item.unitPrice * item.quantity
+function lineTotal(item: (typeof cart.items)[number]): number {
+  return cart.lineTotal(item)
 }
-
-const subtotal = computed(() =>
-  cartItems.value.reduce((sum, item) => sum + lineTotal(item), 0),
-)
-
-const total = computed(() => subtotal.value + shippingNpr)
 
 function goBack(): void {
   if (currentStep.value <= 1) return
   currentStep.value -= 1
 }
 
-function placeOrder(): void {
-  currentStep.value = 3
+const orderError = ref('')
+const orderSubmitting = ref(false)
+
+async function placeOrder(): Promise<void> {
+  orderError.value = ''
+  orderSubmitting.value = true
+
+  try {
+    const orderPayload = {
+      customer_name: `${shippingForm.firstName} ${shippingForm.lastName}`.trim(),
+      customer_email: shippingForm.email,
+      customer_phone: shippingForm.phone,
+      shipping_address: `${shippingForm.address}, ${shippingForm.city}`,
+      payment_method: paymentMethod.value,
+      gift_message: giftMessage.value,
+      total: total.value,
+      lines: cartItems.value.map((item) => ({
+        product_id: item.productId,
+        name: item.name,
+        variant: item.meta,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+    }
+
+    await $fetch('/api/orders', {
+      method: 'POST',
+      body: orderPayload,
+    })
+
+    cart.clear()
+    currentStep.value = 3
+  } catch (err: any) {
+    orderError.value = err?.data?.message ?? err?.message ?? 'Failed to place order. Please try again.'
+  } finally {
+    orderSubmitting.value = false
+  }
 }
 
 useSeoMeta({
@@ -469,3 +474,4 @@ useSeoMeta({
     'Finish delivery details and choose how you would like to complete your commission.',
 })
 </script>
+
