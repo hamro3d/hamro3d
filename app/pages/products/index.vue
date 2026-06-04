@@ -437,8 +437,7 @@ useSeoMeta({
                 </div>
               </div>
 
-
-
+            </div>
           </div>
 
           <!-- Filter footer -->
