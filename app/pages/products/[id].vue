@@ -170,7 +170,7 @@ const platformMeta: Record<MockProductSocialVideo['platform'], { label: string; 
 }
 
 useSeoMeta({
-  title: computed(() => `${product.value.title} — Hamro3D`),
+  title: computed(() => product.value.title),
   description: computed(
     () =>
       product.value.descriptions[0] ??
@@ -250,9 +250,9 @@ useSeoMeta({
               aria-hidden="true"
             />
 
-            <!-- Signature badge -->
+            <!-- Signature badge — driven by isSignaturePiece flag in mock data -->
             <span
-              v-if="product.id === 0"
+              v-if="product.isSignaturePiece"
               class="absolute left-h3d-sm top-h3d-sm font-h3d-body text-h3d-body-sm uppercase text-h3d-base z-30"
               style="letter-spacing: 0.18em"
             >
@@ -335,7 +335,7 @@ useSeoMeta({
                     activeThumb === i ? 'w-4 h-1.5 bg-h3d-accent' : 'w-1.5 h-1.5 bg-h3d-border hover:bg-h3d-muted',
                     item.isGif ? 'ring-1 ring-h3d-accent/40' : '',
                   ]"
-                  :aria-label="`Go to ${item.isGif ? 'animated view' : `image ${i}`}`"
+                  :aria-label="`Go to ${item.isGif ? 'animated view' : `image ${i + 1}`}`"
                   :aria-current="activeThumb === i ? 'true' : undefined"
                   @click.stop="galleryGo(i)"
                 />
@@ -374,7 +374,7 @@ useSeoMeta({
                   : 'border-h3d-border bg-h3d-base hover:border-h3d-accent opacity-70 hover:opacity-100'
               "
               :aria-pressed="activeThumb === i"
-              :aria-label="`View ${item.isGif ? 'animated' : `image ${i}`}`"
+              :aria-label="`View ${item.isGif ? 'animated preview' : `image ${i + 1}`}`"
               @click="galleryGo(i)"
             >
               <!-- GIF thumbnail -->
@@ -419,7 +419,7 @@ useSeoMeta({
             <div class="flex items-center gap-2">
               <span class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-muted" style="letter-spacing: 0.14em">Collection</span>
               <NuxtLink
-                to="/products"
+                :to="{ path: '/products', query: { category: product.category } }"
                 class="inline-flex items-center gap-1.5 rounded-full border border-h3d-accent/40 bg-h3d-surface px-3 py-1 font-h3d-body text-2xs text-h3d-accent transition-colors hover:border-h3d-accent hover:bg-h3d-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
               >
                 <svg class="h-2.5 w-2.5 shrink-0" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
@@ -559,7 +559,7 @@ useSeoMeta({
                 :aria-selected="activeTab === tab.key"
                 :aria-controls="`panel-${tab.key}`"
                 class="relative flex-1 rounded-t-md px-3 py-2 font-h3d-body text-h3d-body-sm transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-                :class="activeTab === tab.key ? 'text-h3d-muted' : 'text-h3d-muted hover:text-h3d-text'"
+                :class="activeTab === tab.key ? 'text-h3d-text' : 'text-h3d-muted hover:text-h3d-text'"
                 @click="activeTab = tab.key"
               >
                 <span

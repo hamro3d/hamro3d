@@ -55,6 +55,8 @@ export interface MockProduct {
   tags: string[]
   /** Social media video links featuring this piece */
   socialVideos?: MockProductSocialVideo[]
+  /** Marks this as a hero/signature piece — shown with a special badge in the gallery */
+  isSignaturePiece?: boolean
 }
 
 // ─── Shared social video links (mock — point to real reels when available) ───
@@ -110,6 +112,7 @@ export const mockProducts: MockProduct[] = [
   {
     id: 0,
     rank: 2,
+    isSignaturePiece: true,
     head: 'FOR YOUR LOVE · PERSONALIZED PIECE',
     title: 'Custom Human Figurine',
     subtitle: 'A moment made permanent.',
@@ -142,6 +145,7 @@ export const mockProducts: MockProduct[] = [
   {
     id: 20,
     rank: 5,
+    isSignaturePiece: true,
     head: 'TOGETHER · COUPLE KEEPSAKE',
     title: 'Couple Figurine Set',
     subtitle: 'Two people. One piece.',
@@ -419,6 +423,7 @@ export const mockProducts: MockProduct[] = [
   {
     id: 1,
     rank: 11,
+    isSignaturePiece: true,
     head: 'LET THEM GLOW · AMBIENT MEMORY',
     title: 'Portrait Litholamp',
     subtitle: 'A face in soft light.',
@@ -513,6 +518,7 @@ export const mockProducts: MockProduct[] = [
   {
     id: 8,
     rank: 1,
+    isSignaturePiece: true,
     head: 'MILESTONE MARKED · TIME IN PHYSICAL FORM',
     title: 'Anniversary Sculpture',
     subtitle: 'Years together, made tangible.',

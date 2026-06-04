@@ -96,6 +96,14 @@ onUnmounted(() => {
         />
       </Transition>
 
+      <!-- Signature piece badge -->
+      <span
+        v-if="product.isSignaturePiece && variant === 'collection'"
+        class="absolute left-3 top-3 z-30 font-h3d-body text-2xs uppercase text-h3d-base bg-h3d-accent px-2.5 py-1 pointer-events-none"
+        style="letter-spacing: 0.16em"
+        aria-label="Signature piece"
+      >Signature</span>
+
       <!-- Logo watermark -->
       <div
         class="absolute z-30 opacity-50 group-hover:opacity-80 transition-opacity duration-300"

@@ -54,23 +54,55 @@ html {
 /* ─── Product gallery crossfade ──────────────────────────── */
 /* Images are absolutely positioned inside a fixed-height slot,
    so both the entering and leaving image coexist during the fade.
-   No layout shift, no collapse. */
-.gallery-fade-enter-active,
+   No layout shift, no collapse. Cubic-bezier gives a premium
+   decelerate-in / accelerate-out feel. */
+.gallery-fade-enter-active {
+  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .gallery-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.22s cubic-bezier(0.55, 0, 1, 0.45),
+              transform 0.22s cubic-bezier(0.55, 0, 1, 0.45);
 }
 .gallery-fade-enter-from {
   opacity: 0;
-  transform: scale(0.97);
+  transform: scale(0.96) translateY(4px);
 }
 .gallery-fade-leave-to {
   opacity: 0;
-  transform: scale(1.02);
+  transform: scale(1.03) translateY(-4px);
 }
 .gallery-fade-enter-to,
 .gallery-fade-leave-from {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) translateY(0);
+}
+
+/* ─── Product card grid transition (sort / filter changes) ── */
+/* Cards fade + lift in on enter; fade down on leave.
+   The FLIP move animation runs automatically via Vue's
+   TransitionGroup when cards reorder. */
+.h3d-card-enter-active {
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.h3d-card-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.55, 0, 1, 0.45),
+              transform 0.2s cubic-bezier(0.55, 0, 1, 0.45);
+  /* Keep leaving card in flow so FLIP siblings don't jump */
+  position: absolute;
+  width: 100%;
+}
+.h3d-card-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.h3d-card-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.h3d-card-move {
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ─── Custom animations ──────────────────────────────────── */

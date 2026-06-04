@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { mockProducts, type MockProductCategory } from '~/data/mock-products'
 
+const route = useRoute()
+
 // ── Derive unique filter options from catalogue ─────────────────────────────
 const allCategories = computed<MockProductCategory[]>(() => {
   const set = new Set(mockProducts.map((p) => p.category))
@@ -22,11 +24,12 @@ const priceMax = computed(() => Math.max(...mockProducts.map((p) => p.price)))
 
 // ── State ───────────────────────────────────────────────────────────────────
 const viewMode   = ref<'grid' | 'list'>('grid')
-const sortBy     = ref('featured')
+const sortBy     = ref('signature')
 const filtersOpen = ref(false)
 
-// Active (applied) filters
-const selectedCategories = ref<string[]>([])
+// Active (applied) filters — pre-populate from URL query if present
+const initialCategory = route.query.category ? [String(route.query.category)] : []
+const selectedCategories = ref<string[]>(initialCategory)
 const selectedMaterials  = ref<string[]>([])
 const selectedTags       = ref<string[]>([])
 const priceRange         = ref<[number, number]>([priceMin.value, priceMax.value])
@@ -148,7 +151,14 @@ const filteredProducts = computed(() => {
   )
 
   switch (sortBy.value) {
-    case 'featured':      list.sort((a, b) => a.rank - b.rank); break
+    // Signature-first: signature pieces float to top by rank, then remaining by rank
+    case 'signature':
+      list.sort((a, b) => {
+        const aSig = a.isSignaturePiece ? 0 : 1
+        const bSig = b.isSignaturePiece ? 0 : 1
+        return aSig !== bSig ? aSig - bSig : a.rank - b.rank
+      })
+      break
     case 'rank-low':      list.sort((a, b) => a.rank - b.rank); break
     case 'rank-high':     list.sort((a, b) => b.rank - a.rank); break
     case 'name-asc':      list.sort((a, b) => a.title.localeCompare(b.title)); break
@@ -165,7 +175,7 @@ function formatPrice(n: number) {
 }
 
 useSeoMeta({
-  title: 'Products — Hamro3D',
+  title: 'Our Collection',
   description: 'Browse Hamro3D keepsakes — figurines, litholamps, nameplates, and gifts made to be kept.',
 })
 </script>
@@ -312,7 +322,7 @@ useSeoMeta({
             class="font-h3d-body text-2xs tracking-widest uppercase bg-h3d-surface text-h3d-text border border-h3d-border px-3 py-2 pr-8 cursor-pointer focus:outline-none focus:ring-1 focus:ring-h3d-accent appearance-none"
           >
             <optgroup label="Relevance">
-              <option value="featured">Featured</option>
+              <option value="signature">Signature first</option>
               <option value="rank-low">Rank · Best first</option>
               <option value="rank-high">Rank · Last first</option>
             </optgroup>
@@ -559,8 +569,10 @@ useSeoMeta({
       </div>
 
       <!-- ── Product grid / list ─────────────────────────────────────────── -->
-      <div
+      <TransitionGroup
         v-else
+        name="h3d-card"
+        tag="div"
         :class="viewMode === 'grid'
           ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6'
           : 'flex flex-col gap-5'"
@@ -572,15 +584,21 @@ useSeoMeta({
           variant="collection"
           :list-mode="viewMode === 'list'"
         />
-      </div>
+      </TransitionGroup>
 
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Styled range input — accent thumb, transparent track (track drawn manually above) */
+/*
+  Range input pseudo-elements cannot use Tailwind utility classes.
+  We define local CSS vars mirroring the h3d design token values so the
+  design system intent is preserved in a single place.
+*/
 .h3d-range {
+  --h3d-accent-val: #c4907a;
+  --h3d-base-val: #1a0e24;
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
@@ -591,8 +609,8 @@ useSeoMeta({
   height: 14px;
   width: 14px;
   border-radius: 50%;
-  background: #c4907a;
-  border: 2px solid #10081a;
+  background: var(--h3d-accent-val);
+  border: 2px solid var(--h3d-base-val);
   cursor: pointer;
   margin-top: -6px;
 }
@@ -604,12 +622,12 @@ useSeoMeta({
   height: 14px;
   width: 14px;
   border-radius: 50%;
-  background: #c4907a;
-  border: 2px solid #10081a;
+  background: var(--h3d-accent-val);
+  border: 2px solid var(--h3d-base-val);
   cursor: pointer;
 }
 .h3d-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #c4907a;
+  outline: 2px solid var(--h3d-accent-val);
   outline-offset: 2px;
 }
 </style>
