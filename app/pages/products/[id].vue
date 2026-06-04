@@ -3,6 +3,7 @@ import {
   formatNprPrice,
   getMockProductById,
   getRelatedMockProducts,
+  type MockProductSocialVideo,
 } from '~/data/mock-products'
 import { useCartStore } from '~/stores/cart'
 import { useWishlistStore } from '~/stores/wishlist'
@@ -160,6 +161,13 @@ function handleWishlistToggle() {
 onUnmounted(() => {
   if (toastTimer) clearTimeout(toastTimer)
 })
+
+const platformMeta: Record<MockProductSocialVideo['platform'], { label: string; color: string }> = {
+  instagram: { label: 'Instagram', color: '#E1306C' },
+  tiktok:    { label: 'TikTok',    color: '#ffffff' },
+  youtube:   { label: 'YouTube',   color: '#FF0000' },
+  facebook:  { label: 'Facebook',  color: '#1877F2' },
+}
 
 useSeoMeta({
   title: computed(() => `${product.value.title} — Hamro3D`),
@@ -405,7 +413,76 @@ useSeoMeta({
             </p>
           </div>
 
-          <!-- Options -->
+          <!-- ── Collection + Tags ── -->
+          <div class="space-y-3">
+            <!-- Category pill -->
+            <div class="flex items-center gap-2">
+              <span class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-muted" style="letter-spacing: 0.14em">Collection</span>
+              <NuxtLink
+                to="/products"
+                class="inline-flex items-center gap-1.5 rounded-full border border-h3d-accent/40 bg-h3d-surface px-3 py-1 font-h3d-body text-2xs text-h3d-accent transition-colors hover:border-h3d-accent hover:bg-h3d-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+              >
+                <svg class="h-2.5 w-2.5 shrink-0" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
+                  <path d="M5 0L6.18 3.82 10 5 6.18 6.18 5 10 3.82 6.18 0 5 3.82 3.82 5 0z"/>
+                </svg>
+                {{ product.category }}
+              </NuxtLink>
+            </div>
+            <!-- Tags -->
+            <div v-if="product.tags?.length" class="flex flex-wrap gap-1.5">
+              <span
+                v-for="tag in product.tags"
+                :key="tag"
+                class="inline-block rounded-sm border border-h3d-border/60 bg-h3d-base px-2.5 py-0.5 font-h3d-body text-2xs text-h3d-muted transition-colors hover:border-h3d-accent/50 hover:text-h3d-text"
+              >
+                #{{ tag }}
+              </span>
+            </div>
+          </div>
+
+          <!-- ── See it in action ── -->
+          <div v-if="product.socialVideos?.length" class="space-y-3">
+            <p class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-muted" style="letter-spacing: 0.14em">
+              See it in action
+            </p>
+            <div class="flex flex-col gap-2">
+              <a
+                v-for="video in product.socialVideos"
+                :key="video.url + video.label"
+                :href="video.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group/sv flex items-center gap-3 rounded-lg border border-h3d-border/60 bg-h3d-surface px-4 py-2.5 transition-all duration-200 hover:border-h3d-accent/50 hover:bg-h3d-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+              >
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full" :style="`background: ${platformMeta[video.platform].color}22`">
+                  <svg v-if="video.platform === 'instagram'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="#E1306C" stroke-width="1.8"/>
+                    <circle cx="12" cy="12" r="5" stroke="#E1306C" stroke-width="1.8"/>
+                    <circle cx="17.5" cy="6.5" r="1" fill="#E1306C"/>
+                  </svg>
+                  <svg v-else-if="video.platform === 'tiktok'" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z" fill="#ffffff"/>
+                  </svg>
+                  <svg v-else-if="video.platform === 'youtube'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" fill="#FF0000"/>
+                    <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/>
+                  </svg>
+                  <svg v-else-if="video.platform === 'facebook'" class="h-4 w-4" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </span>
+                <span class="flex-1 min-w-0">
+                  <span class="block font-h3d-body text-h3d-body-sm text-h3d-text group-hover/sv:text-h3d-accent transition-colors duration-200 leading-snug truncate">{{ video.label }}</span>
+                  <span class="block font-h3d-body text-2xs text-h3d-muted/70 uppercase tracking-wider">{{ platformMeta[video.platform].label }}</span>
+                </span>
+                <svg class="h-4 w-4 shrink-0 text-h3d-muted/50 transition-transform duration-200 group-hover/sv:translate-x-0.5 group-hover/sv:text-h3d-accent" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- ── Material + Size options ── -->
           <div class="space-y-h3d-sm">
             <p class="font-h3d-body text-h3d-body-sm uppercase text-h3d-muted" style="letter-spacing: 0.14em">
               Material
@@ -452,79 +529,6 @@ useSeoMeta({
             </div>
           </div>
 
-          <!-- Quantity -->
-          <!-- <div class="space-y-h3d-sm">
-            <p class="font-h3d-body text-h3d-body-sm uppercase text-h3d-muted" style="letter-spacing: 0.14em">
-              Quantity
-            </p>
-            <div class="inline-flex items-center border border-h3d-border bg-h3d-surface">
-              <button
-                type="button"
-                class="px-h3d-sm py-2 font-h3d-body text-h3d-body text-h3d-text transition-colors hover:bg-h3d-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Decrease quantity"
-                :disabled="quantity <= 1"
-                @click="bumpQuantity(-1)"
-              >
-                −
-              </button>
-              <span class="min-w-[3rem] px-2 text-center font-h3d-body text-h3d-body text-h3d-text" aria-live="polite">
-                {{ quantity }}
-              </span>
-              <button
-                type="button"
-                class="px-h3d-sm py-2 font-h3d-body text-h3d-body text-h3d-text transition-colors hover:bg-h3d-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Increase quantity"
-                :disabled="quantity >= 10"
-                @click="bumpQuantity(1)"
-              >
-                +
-              </button>
-            </div>
-          </div> -->
-
-          <!-- CTAs -->
-          <!-- <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              class="inline-flex flex-1 items-center justify-center bg-h3d-accent px-h3d-md py-3 font-h3d-body text-h3d-cta uppercase tracking-wide text-h3d-base transition-colors duration-300 hover:bg-h3d-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-              style="letter-spacing: 0.22em"
-              @click="handleCommission"
-            >
-              Commission This Piece
-            </button>
-            <button
-              type="button"
-              class="inline-flex flex-1 items-center justify-center border px-h3d-md py-3 font-h3d-body text-h3d-cta uppercase tracking-wide transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-              :class="isInWishlist
-                ? 'border-h3d-accent bg-h3d-accent text-h3d-base hover:bg-h3d-accent-hover'
-                : 'border-h3d-border bg-transparent text-h3d-text hover:border-h3d-accent hover:text-h3d-accent'"
-              style="letter-spacing: 0.18em"
-              @click="handleWishlistToggle"
-            >
-              {{ isInWishlist ? 'Saved' : 'Save to Memories' }}
-            </button>
-          </div> -->
-
-          <!-- Specs -->
-          <!-- <div class="grid grid-cols-2 gap-px border border-h3d-border bg-h3d-border">
-            <div class="bg-h3d-surface p-h3d-sm">
-              <p class="font-h3d-body text-h3d-h5 uppercase text-h3d-muted" style="letter-spacing: 0.12em">Process</p>
-              <p class="mt-1 font-h3d-body text-h3d-body text-h3d-text">{{ product.processes[0]?.title.replace(/:$/, '') ?? '—' }}</p>
-            </div>
-            <div class="bg-h3d-surface p-h3d-sm">
-              <p class="font-h3d-body text-h3d-h5 uppercase text-h3d-muted" style="letter-spacing: 0.12em">Material</p>
-              <p class="mt-1 font-h3d-body text-h3d-body text-h3d-text">{{ product.material.join(' · ') }}</p>
-            </div>
-            <div class="bg-h3d-surface p-h3d-sm">
-              <p class="font-h3d-body text-h3d-h5 uppercase text-h3d-muted" style="letter-spacing: 0.12em">Lead time</p>
-              <p class="mt-1 font-h3d-body text-h3d-body text-h3d-text line-clamp-4">{{ craftLeadLine }}</p>
-            </div>
-            <div class="bg-h3d-surface p-h3d-sm">
-              <p class="font-h3d-body text-h3d-h5 uppercase text-h3d-muted" style="letter-spacing: 0.12em">Origin</p>
-              <p class="mt-1 font-h3d-body text-h3d-body text-h3d-text">Made in Nepal</p>
-            </div>
-          </div> -->
-
           <!-- Details label -->
           <p class="font-h3d-body text-h3d-body-sm uppercase text-h3d-muted" style="letter-spacing: 0.14em">
             Details
@@ -558,7 +562,6 @@ useSeoMeta({
                 :class="activeTab === tab.key ? 'text-h3d-muted' : 'text-h3d-muted hover:text-h3d-text'"
                 @click="activeTab = tab.key"
               >
-                <!-- Active indicator line only — subtle, not a pill -->
                 <span
                   v-if="activeTab === tab.key"
                   class="absolute bottom-0 inset-x-3 h-px bg-h3d-accent opacity-60"
@@ -568,8 +571,7 @@ useSeoMeta({
               </button>
             </div>
 
-            <!-- Panel grid — all panels in DOM so container never collapses (zero layout shift).
-                 CSS transition on opacity; pointer-events toggled so inactive panels are non-interactive. -->
+            <!-- Panel grid — all panels in DOM so container never collapses (zero layout shift) -->
             <div class="relative grid">
 
               <!-- Description -->
@@ -581,7 +583,6 @@ useSeoMeta({
                 :class="activeTab === 'description' ? 'h3d-tab-panel--active' : 'h3d-tab-panel--hidden'"
                 :aria-hidden="activeTab !== 'description'"
               >
-                <!-- Lead paragraph with left accent bar (no italic) -->
                 <div
                   v-if="product.descriptions[0]"
                   class="border-l-2 border-h3d-accent/50 pl-3 mx-h3d-md mt-h3d-md mb-3"
@@ -590,7 +591,6 @@ useSeoMeta({
                     {{ product.descriptions[0] }}
                   </p>
                 </div>
-                <!-- Remaining paragraphs -->
                 <div class="px-h3d-md pb-h3d-md space-y-2.5">
                   <p
                     v-for="(para, idx) in product.descriptions.slice(1)"
@@ -671,6 +671,7 @@ useSeoMeta({
 
             </div>
           </div>
+
         </div>
       </div>
 

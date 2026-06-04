@@ -12,6 +12,24 @@ export interface MockProductSize {
   value: number[]
 }
 
+export type MockProductCategory =
+  | 'Figurines'
+  | 'Keychains'
+  | 'Nameplates'
+  | 'Lamps'
+  | 'Sculptures'
+  | 'Puzzles'
+  | 'Home Decor'
+  | 'Festival Gifts'
+  | 'Wearables'
+  | 'Bespoke'
+
+export interface MockProductSocialVideo {
+  platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook'
+  url: string
+  label: string
+}
+
 export interface MockProduct {
   id: number
   /** Lower = higher prominence (1 = featured first). */
@@ -31,7 +49,35 @@ export interface MockProduct {
   material: string[]
   size: MockProductSize
   relatedProductIds: number[]
+  /** Primary product category */
+  category: MockProductCategory
+  /** Searchable / filterable tags */
+  tags: string[]
+  /** Social media video links featuring this piece */
+  socialVideos?: MockProductSocialVideo[]
 }
+
+// ─── Shared social video links (mock — point to real reels when available) ───
+const IG_REEL = (label: string): MockProductSocialVideo => ({
+  platform: 'instagram',
+  url: 'https://www.instagram.com/hamro3d/',
+  label,
+})
+const TT_VIDEO = (label: string): MockProductSocialVideo => ({
+  platform: 'tiktok',
+  url: 'https://www.tiktok.com/@hamro3d',
+  label,
+})
+const YT_SHORT = (label: string): MockProductSocialVideo => ({
+  platform: 'youtube',
+  url: 'https://www.youtube.com/@hamro3d',
+  label,
+})
+const FB_VIDEO = (label: string): MockProductSocialVideo => ({
+  platform: 'facebook',
+  url: 'https://www.facebook.com/hamro3d',
+  label,
+})
 
 // Shared image pools for reuse across mock entries
 const FIG = (n: number) => `/images/products/custom-human-figurine/${n}.png`
@@ -85,6 +131,13 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [10, 15, 17] },
     relatedProductIds: [8, 20, 3, 14],
+    category: 'Figurines',
+    tags: ['figurine', 'custom', 'personalized', 'gift', 'portrait', 'keepsake', 'anniversary', 'birthday'],
+    socialVideos: [
+      IG_REEL('Watch the making process — Instagram'),
+      TT_VIDEO('Timelapse: sculpt to finish — TikTok'),
+      YT_SHORT('Unboxing a custom figurine — YouTube'),
+    ],
   },
   {
     id: 20,
@@ -110,6 +163,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [12, 8, 18] },
     relatedProductIds: [0, 8, 21, 3],
+    category: 'Figurines',
+    tags: ['figurine', 'couple', 'wedding', 'anniversary', 'love', 'personalized', 'gift'],
+    socialVideos: [
+      IG_REEL('Couple figurine reveal — Instagram'),
+      FB_VIDEO('Wedding gift unboxing — Facebook'),
+    ],
   },
   {
     id: 21,
@@ -135,6 +194,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [20, 10, 18] },
     relatedProductIds: [0, 20, 8, 22],
+    category: 'Figurines',
+    tags: ['figurine', 'family', 'group', 'personalized', 'gift', 'keepsake', 'Dashain'],
+    socialVideos: [
+      IG_REEL('Family figurine set — Instagram'),
+      TT_VIDEO('Crafting a family in miniature — TikTok'),
+    ],
   },
   {
     id: 22,
@@ -159,6 +224,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [8, 10, 12] },
     relatedProductIds: [0, 20, 14, 3],
+    category: 'Figurines',
+    tags: ['figurine', 'pet', 'cat', 'dog', 'animal', 'personalized', 'gift'],
+    socialVideos: [
+      IG_REEL('Pet figurine making — Instagram'),
+      TT_VIDEO('Your pet, in miniature — TikTok'),
+    ],
   },
   // ─── KEYCHAINS ───────────────────────────────────────────────────────────────
   {
@@ -186,6 +257,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [4, 3, 1] },
     relatedProductIds: [4, 0, 3, 22],
+    category: 'Keychains',
+    tags: ['keychain', 'custom', 'personalized', 'pocket', 'gift', 'daily', 'charm'],
+    socialVideos: [
+      IG_REEL('Keychain figurine — Instagram'),
+      TT_VIDEO('Smallest figurine we make — TikTok'),
+    ],
   },
   {
     id: 4,
@@ -212,6 +289,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [4, 3, 1] },
     relatedProductIds: [14, 0, 3, 22],
+    category: 'Keychains',
+    tags: ['keychain', 'custom', 'pocket', 'gift', 'affordable', 'charm', 'everyday'],
+    socialVideos: [
+      IG_REEL('Memory keychain unboxing — Instagram'),
+    ],
   },
   {
     id: 23,
@@ -235,6 +317,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [4, 3, 1] },
     relatedProductIds: [14, 4, 20, 3],
+    category: 'Keychains',
+    tags: ['keychain', 'couple', 'love', 'pair', 'gift', 'anniversary', 'Valentine'],
+    socialVideos: [
+      IG_REEL('Couple keychain set — Instagram'),
+      FB_VIDEO('Valentine gift idea — Facebook'),
+    ],
   },
   // ─── NAMEPLATES ──────────────────────────────────────────────────────────────
   {
@@ -262,6 +350,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [30, 10, 2] },
     relatedProductIds: [24, 0, 14, 8],
+    category: 'Nameplates',
+    tags: ['nameplate', 'custom', 'Devanagari', 'Nepali', 'wall', 'home', 'identity', 'personalized'],
+    socialVideos: [
+      IG_REEL('Custom nameplate — Instagram'),
+      YT_SHORT('Nameplate: Nepali script in 3D — YouTube'),
+    ],
   },
   {
     id: 24,
@@ -287,6 +381,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Weather-resistant coating'],
     size: { unit: 'cm', value: [35, 12, 3] },
     relatedProductIds: [3, 25, 0, 14],
+    category: 'Nameplates',
+    tags: ['nameplate', 'door', 'outdoor', 'home', 'Nepali', 'Devanagari', 'weather-resistant'],
+    socialVideos: [
+      IG_REEL('Door nameplate install — Instagram'),
+    ],
   },
   {
     id: 25,
@@ -310,6 +409,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [25, 8, 5] },
     relatedProductIds: [3, 24, 0, 14],
+    category: 'Nameplates',
+    tags: ['nameplate', 'desk', 'office', 'professional', 'corporate', 'gift'],
+    socialVideos: [
+      IG_REEL('Office desk nameplate — Instagram'),
+    ],
   },
   // ─── LAMPS ───────────────────────────────────────────────────────────────────
   {
@@ -336,6 +440,13 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'LED base'],
     size: { unit: 'cm', value: [12, 12, 15] },
     relatedProductIds: [2, 26, 8, 0],
+    category: 'Lamps',
+    tags: ['lamp', 'litholamp', 'portrait', 'light', 'photo', 'glow', 'ambient', 'gift'],
+    socialVideos: [
+      IG_REEL('Litholamp in the dark — Instagram'),
+      YT_SHORT('Portrait litholamp unboxing — YouTube'),
+      TT_VIDEO('How a litholamp is made — TikTok'),
+    ],
   },
   {
     id: 2,
@@ -361,6 +472,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'LED base'],
     size: { unit: 'cm', value: [15, 15, 18] },
     relatedProductIds: [1, 26, 8, 0],
+    category: 'Lamps',
+    tags: ['lamp', 'moon', 'lunar', 'night', 'date', 'anniversary', 'romantic', 'gift'],
+    socialVideos: [
+      IG_REEL('Moon lamp — your date in light — Instagram'),
+      TT_VIDEO('Moon lamp timelapse — TikTok'),
+    ],
   },
   {
     id: 26,
@@ -385,6 +502,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'LED strip'],
     size: { unit: 'cm', value: [40, 8, 10] },
     relatedProductIds: [1, 2, 3, 24],
+    category: 'Lamps',
+    tags: ['lamp', 'name', 'night light', 'Nepali', 'children', 'bedroom', 'gift', 'glow'],
+    socialVideos: [
+      IG_REEL('Name night light — Instagram'),
+      FB_VIDEO('Name lamp gift for kids — Facebook'),
+    ],
   },
   // ─── SCULPTURES & MILESTONE PIECES ──────────────────────────────────────────
   {
@@ -412,6 +535,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [15, 10, 20] },
     relatedProductIds: [0, 20, 3, 27],
+    category: 'Sculptures',
+    tags: ['sculpture', 'anniversary', 'milestone', 'couple', 'love', 'premium', 'bespoke'],
+    socialVideos: [
+      IG_REEL('Anniversary sculpture reveal — Instagram'),
+      YT_SHORT('Milestone in physical form — YouTube'),
+    ],
   },
   {
     id: 27,
@@ -437,6 +566,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [12, 8, 18] },
     relatedProductIds: [8, 0, 1, 20],
+    category: 'Sculptures',
+    tags: ['memorial', 'remembrance', 'tribute', 'figurine', 'lamp', 'grief', 'healing'],
+    socialVideos: [
+      IG_REEL('A tribute, handcrafted — Instagram'),
+    ],
   },
   // ─── PUZZLES ─────────────────────────────────────────────────────────────────
   {
@@ -464,6 +598,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [20, 20, 5] },
     relatedProductIds: [28, 0, 14, 3],
+    category: 'Puzzles',
+    tags: ['puzzle', '3D', 'dinosaur', 'children', 'gift', 'educational', 'fun', 'activity'],
+    socialVideos: [
+      IG_REEL('3D dino puzzle build — Instagram'),
+      TT_VIDEO('Puzzle assembly timelapse — TikTok'),
+    ],
   },
   {
     id: 28,
@@ -487,6 +627,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [20, 15, 1] },
     relatedProductIds: [5, 0, 14, 3],
+    category: 'Puzzles',
+    tags: ['puzzle', 'photo', 'custom', 'memory', 'gift', 'personalised', 'activity'],
+    socialVideos: [
+      IG_REEL('Photo puzzle unboxing — Instagram'),
+    ],
   },
   // ─── DESK & HOME DECOR ───────────────────────────────────────────────────────
   {
@@ -513,6 +658,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [10, 10, 15] },
     relatedProductIds: [8, 3, 25, 0],
+    category: 'Home Decor',
+    tags: ['desk', 'sculpture', 'office', 'art', 'meaningful', 'bespoke', 'home'],
+    socialVideos: [
+      IG_REEL('Desk sculpture — Instagram'),
+    ],
   },
   {
     id: 30,
@@ -536,6 +686,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [30, 30, 3] },
     relatedProductIds: [29, 8, 3, 0],
+    category: 'Home Decor',
+    tags: ['wall art', 'relief', '3D', 'photo', 'home', 'interior', 'gift'],
+    socialVideos: [
+      IG_REEL('Wall relief in natural light — Instagram'),
+      YT_SHORT('Custom wall art process — YouTube'),
+    ],
   },
   // ─── FESTIVAL & OCCASION GIFTS ───────────────────────────────────────────────
   {
@@ -561,6 +717,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [20, 15, 8] },
     relatedProductIds: [14, 3, 0, 20],
+    category: 'Festival Gifts',
+    tags: ['festival', 'Dashain', 'Tihar', 'gift set', 'Nepal', 'occasion', 'keychain', 'nameplate'],
+    socialVideos: [
+      IG_REEL('Festival gift set — Instagram'),
+      FB_VIDEO('Dashain gifting idea — Facebook'),
+    ],
   },
   {
     id: 32,
@@ -586,6 +748,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [15, 10, 20] },
     relatedProductIds: [20, 8, 3, 1],
+    category: 'Festival Gifts',
+    tags: ['wedding', 'couple', 'gift', 'keepsake', 'love', 'anniversary', 'personalized'],
+    socialVideos: [
+      IG_REEL('Wedding keepsake reveal — Instagram'),
+      YT_SHORT('The perfect wedding gift — YouTube'),
+    ],
   },
   {
     id: 33,
@@ -609,6 +777,12 @@ export const mockProducts: MockProduct[] = [
     material: ['Resin'],
     size: { unit: 'cm', value: [20, 25, 3] },
     relatedProductIds: [22, 21, 27, 0],
+    category: 'Festival Gifts',
+    tags: ['baby', 'newborn', 'footprint', 'birth', 'keepsake', 'memory', 'family', 'gift'],
+    socialVideos: [
+      IG_REEL('Baby footprint frame — Instagram'),
+      FB_VIDEO('New arrival keepsake — Facebook'),
+    ],
   },
   // ─── JEWELLERY & WEARABLE ────────────────────────────────────────────────────
   {
@@ -634,6 +808,12 @@ export const mockProducts: MockProduct[] = [
     material: ['Resin', 'Gold/Silver finish'],
     size: { unit: 'cm', value: [3, 3, 0.5] },
     relatedProductIds: [14, 4, 23, 0],
+    category: 'Wearables',
+    tags: ['pendant', 'jewellery', 'wearable', 'custom', 'miniature', 'portrait', 'gift'],
+    socialVideos: [
+      IG_REEL('Custom pendant close-up — Instagram'),
+      TT_VIDEO('Wearable memory — TikTok'),
+    ],
   },
   // ─── PREMIUM & BESPOKE ───────────────────────────────────────────────────────
   {
@@ -660,6 +840,12 @@ export const mockProducts: MockProduct[] = [
     material: ['Varies'],
     size: { unit: 'cm', value: [0, 0, 0] },
     relatedProductIds: [8, 0, 20, 27],
+    category: 'Bespoke',
+    tags: ['bespoke', 'custom', 'commission', 'one-of-a-kind', 'premium', 'unique', 'luxury'],
+    socialVideos: [
+      IG_REEL('Our most ambitious commission — Instagram'),
+      YT_SHORT('Bespoke piece: from idea to object — YouTube'),
+    ],
   },
   {
     id: 36,
@@ -685,6 +871,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [15, 10, 20] },
     relatedProductIds: [8, 29, 3, 35],
+    category: 'Bespoke',
+    tags: ['corporate', 'recognition', 'award', 'bulk', 'team', 'office', 'premium', 'gift'],
+    socialVideos: [
+      IG_REEL('Corporate recognition piece — Instagram'),
+    ],
   },
   {
     id: 37,
@@ -708,6 +899,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [10, 8, 18] },
     relatedProductIds: [0, 3, 29, 25],
+    category: 'Festival Gifts',
+    tags: ['graduation', 'achievement', 'figurine', 'keepsake', 'gift', 'milestone'],
+    socialVideos: [
+      IG_REEL('Graduation keepsake — Instagram'),
+      TT_VIDEO('The gift every graduate deserves — TikTok'),
+    ],
   },
   {
     id: 38,
@@ -731,6 +928,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [10, 8, 18] },
     relatedProductIds: [0, 14, 31, 20],
+    category: 'Festival Gifts',
+    tags: ['birthday', 'figurine', 'gift', 'custom', 'personalized', 'celebration'],
+    socialVideos: [
+      IG_REEL('Birthday figurine surprise — Instagram'),
+      FB_VIDEO('Best birthday gift idea — Facebook'),
+    ],
   },
   {
     id: 39,
@@ -756,6 +959,11 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA', 'Resin'],
     size: { unit: 'cm', value: [10, 8, 20] },
     relatedProductIds: [0, 8, 27, 20],
+    category: 'Figurines',
+    tags: ['devotional', 'deity', 'spiritual', 'puja', 'altar', 'Nepal', 'faith', 'figurine'],
+    socialVideos: [
+      IG_REEL('Devotional figurine — Instagram'),
+    ],
   },
   {
     id: 40,
@@ -781,6 +989,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [8, 6, 14] },
     relatedProductIds: [0, 22, 5, 28],
+    category: 'Figurines',
+    tags: ['children', 'storybook', 'character', 'figurine', 'gift', 'kids', 'custom', 'imagination'],
+    socialVideos: [
+      IG_REEL('Storybook character in real life — Instagram'),
+      TT_VIDEO('Your child\'s favourite character — TikTok'),
+    ],
   },
   {
     id: 41,
@@ -804,6 +1018,12 @@ export const mockProducts: MockProduct[] = [
     material: ['PLA'],
     size: { unit: 'cm', value: [10, 8, 20] },
     relatedProductIds: [0, 37, 8, 36],
+    category: 'Figurines',
+    tags: ['sports', 'trophy', 'figurine', 'athlete', 'cricket', 'football', 'achievement', 'gift'],
+    socialVideos: [
+      IG_REEL('Sports trophy figurine — Instagram'),
+      YT_SHORT('Better than a trophy — YouTube'),
+    ],
   },
 ]
 
