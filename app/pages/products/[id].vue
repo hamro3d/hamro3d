@@ -27,6 +27,57 @@ const relatedPieces = computed(() => getRelatedMockProducts(product.value))
 const activeThumb = ref(0)
 const quantity = ref(1)
 
+// Ordered media: gif first (slot 0), then up to 10 images
+type MediaItem = { src: string; isGif: boolean }
+const mediaItems = computed<MediaItem[]>(() => {
+  const p = product.value
+  const items: MediaItem[] = []
+  if (p.gif) items.push({ src: p.gif, isGif: true })
+  for (const src of p.images.slice(0, 10)) {
+    items.push({ src, isGif: false })
+  }
+  return items
+})
+
+// Gallery swipe / keyboard support
+const galleryEl = ref<HTMLElement | null>(null)
+const isAnimating = ref(false)
+const slideDir = ref<'next' | 'prev'>('next')
+
+function galleryGo(idx: number) {
+  if (isAnimating.value || idx === activeThumb.value) return
+  slideDir.value = idx > activeThumb.value ? 'next' : 'prev'
+  isAnimating.value = true
+  activeThumb.value = idx
+  setTimeout(() => { isAnimating.value = false }, 400)
+}
+
+function galleryNext() {
+  const total = mediaItems.value.length
+  galleryGo((activeThumb.value + 1) % total)
+}
+
+function galleryPrev() {
+  const total = mediaItems.value.length
+  galleryGo((activeThumb.value - 1 + total) % total)
+}
+
+// Touch swipe
+let touchStartX = 0
+function onTouchStart(e: TouchEvent) {
+  touchStartX = e.touches[0]?.clientX ?? 0
+}
+function onTouchEnd(e: TouchEvent) {
+  const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX
+  if (Math.abs(dx) > 40) dx < 0 ? galleryNext() : galleryPrev()
+}
+
+// Keyboard navigation (only when gallery is focused)
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'ArrowRight') galleryNext()
+  else if (e.key === 'ArrowLeft') galleryPrev()
+}
+
 const materialOptions = computed(() =>
   product.value.material.map((label, i) => ({
     id: `${i}-${label}`,
@@ -126,10 +177,11 @@ useSeoMeta({
 
 <template>
   <div class="bg-h3d-base min-h-screen font-h3d-body text-h3d-text">
-    <div class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg">
-      <!-- Breadcrumb -->
+
+    <!-- Sticky breadcrumb — fixes to top below navbar on scroll -->
+    <div class="sticky top-[68px] z-50 bg-h3d-base/90 backdrop-blur-sm border-b border-h3d-border">
       <nav
-        class="font-h3d-body text-h3d-body-sm text-h3d-muted mb-h3d-md"
+        class="mx-auto w-full max-w-h3d-max px-h3d-md py-3 font-h3d-body text-h3d-body-sm text-h3d-muted"
         aria-label="Breadcrumb"
       >
         <ol class="flex flex-wrap items-center gap-2">
@@ -156,63 +208,175 @@ useSeoMeta({
           </li>
         </ol>
       </nav>
+    </div>
+
+    <div class="mx-auto w-full max-w-h3d-max px-h3d-md py-h3d-lg">
 
       <!-- Two columns: gallery + info -->
       <div class="grid grid-cols-1 gap-h3d-gutter lg:grid-cols-2 lg:items-start">
         <!-- Gallery -->
-        <div class="lg:sticky lg:top-h3d-md lg:self-start">
-          <div
-            class="relative flex h-[420px] w-full items-center justify-center overflow-hidden border border-h3d-border bg-h3d-surface"
+        <div class="lg:sticky lg:top-[120px] lg:self-start">
+          <!-- Main swipeable image viewer -->
+          <section
+            ref="galleryEl"
+            class="group relative rounded-xl overflow-hidden border border-h3d-border bg-h3d-base select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-h3d-accent"
+            aria-label="Product image gallery"
+            @keydown="onKeydown"
+            @touchstart.passive="onTouchStart"
+            @touchend.passive="onTouchEnd"
           >
+            <!-- Atmospheric layers -->
+            <div
+              class="absolute inset-0 pointer-events-none z-0"
+              style="background: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(96,52,168,0.65) 0%, rgba(58,30,96,0.3) 55%, transparent 80%)"
+              aria-hidden="true"
+            />
+            <div
+              class="absolute inset-0 pointer-events-none z-10"
+              style="background: radial-gradient(ellipse 100% 60% at 50% 115%, rgba(16,8,26,0.85) 0%, transparent 70%)"
+              aria-hidden="true"
+            />
+            <div
+              class="absolute inset-0 pointer-events-none z-10"
+              style="background: radial-gradient(ellipse 130% 110% at 50% 50%, transparent 42%, rgba(16,8,26,0.5) 100%)"
+              aria-hidden="true"
+            />
+
+            <!-- Signature badge -->
             <span
               v-if="product.id === 0"
-              class="absolute left-h3d-sm top-h3d-sm font-h3d-body text-h3d-body-sm uppercase text-h3d-base z-10"
+              class="absolute left-h3d-sm top-h3d-sm font-h3d-body text-h3d-body-sm uppercase text-h3d-base z-30"
               style="letter-spacing: 0.18em"
             >
               <span class="bg-h3d-accent px-h3d-sm py-1">Signature piece</span>
             </span>
-            <NuxtImg
-              v-if="product.images[activeThumb]"
-              :src="product.images[activeThumb]"
-              :alt="`${product.title} — view ${activeThumb + 1}`"
-              class="max-h-full max-w-full object-contain"
-              loading="lazy"
-              decoding="async"
-              sizes="sm:100vw md:60vw lg:50vw"
-            />
-            <p
-              v-else
-              class="font-h3d-body text-h3d-body text-h3d-muted px-h3d-md text-center"
-            >
-              Photography for this piece is coming soon.
-            </p>
-            <p
-              v-if="product.images.length"
-              class="absolute bottom-h3d-sm right-h3d-sm font-h3d-body text-h3d-body-sm text-h3d-muted tabular-nums"
-            >
-              {{ activeThumb + 1 }} / {{ product.images.length }}
-            </p>
-          </div>
 
+            <!-- Logo watermark -->
+            <div class="absolute top-3.5 right-3.5 z-30 opacity-60">
+              <NuxtImg src="/logo/C4907A-H3D-logo.png" alt="Hamro3D" class="w-7 h-7 object-contain" width="28" height="28" loading="lazy" />
+            </div>
+
+            <!-- Fixed-height media slot — gif or image, never collapses -->
+            <div class="relative z-20 w-full" style="height: 460px;">
+              <Transition name="gallery-fade">
+                <!-- GIF slide — plain <img> so animation plays -->
+                <img
+                  v-if="mediaItems[activeThumb]?.isGif"
+                  :key="`gif-${activeThumb}`"
+                  :src="mediaItems[activeThumb]!.src"
+                  :alt="`${product.title} — animated view`"
+                  class="absolute inset-0 h-full w-full object-contain p-8"
+                />
+                <!-- Static image slide -->
+                <NuxtImg
+                  v-else-if="mediaItems[activeThumb]"
+                  :key="activeThumb"
+                  :src="mediaItems[activeThumb]!.src"
+                  :alt="`${product.title} — view ${activeThumb + 1}`"
+                  class="absolute inset-0 h-full w-full object-contain p-8"
+                  loading="lazy"
+                  decoding="async"
+                  sizes="sm:100vw md:60vw lg:50vw"
+                />
+                <p
+                  v-else
+                  :key="`empty-${activeThumb}`"
+                  class="absolute inset-0 flex items-center justify-center font-h3d-body text-h3d-body text-h3d-muted px-h3d-md text-center"
+                >
+                  Photography for this piece is coming soon.
+                </p>
+              </Transition>
+            </div>
+
+            <!-- Prev / Next arrow CTAs -->
+            <template v-if="mediaItems.length > 1">
+              <button
+                type="button"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-40 flex h-9 w-9 items-center justify-center rounded-full border border-h3d-border bg-h3d-base/80 text-h3d-muted opacity-0 backdrop-blur-sm transition-all duration-300 hover:border-h3d-accent hover:text-h3d-accent group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-h3d-accent"
+                aria-label="Previous"
+                @click.stop="galleryPrev"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M10 3L5 8l5 5"/>
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-40 flex h-9 w-9 items-center justify-center rounded-full border border-h3d-border bg-h3d-base/80 text-h3d-muted opacity-0 backdrop-blur-sm transition-all duration-300 hover:border-h3d-accent hover:text-h3d-accent group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-h3d-accent"
+                aria-label="Next"
+                @click.stop="galleryNext"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 3l5 5-5 5"/>
+                </svg>
+              </button>
+            </template>
+
+            <!-- Dot indicators + counter -->
+            <div
+              v-if="mediaItems.length > 1"
+              class="absolute bottom-3 inset-x-0 z-40 flex items-center justify-center gap-3"
+            >
+              <div class="flex items-center gap-1.5">
+                <button
+                  v-for="(item, i) in mediaItems"
+                  :key="i"
+                  type="button"
+                  class="rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-h3d-accent"
+                  :class="[
+                    activeThumb === i ? 'w-4 h-1.5 bg-h3d-accent' : 'w-1.5 h-1.5 bg-h3d-border hover:bg-h3d-muted',
+                    item.isGif ? 'ring-1 ring-h3d-accent/40' : '',
+                  ]"
+                  :aria-label="`Go to ${item.isGif ? 'animated view' : `image ${i}`}`"
+                  :aria-current="activeThumb === i ? 'true' : undefined"
+                  @click.stop="galleryGo(i)"
+                />
+              </div>
+              <span class="font-h3d-body text-h3d-body-sm text-h3d-muted tabular-nums">
+                {{ activeThumb + 1 }}&thinsp;/&thinsp;{{ mediaItems.length }}
+              </span>
+            </div>
+
+            <!-- Swipe hint mobile -->
+            <p
+              v-if="mediaItems.length > 1"
+              class="pointer-events-none absolute bottom-10 inset-x-0 z-40 text-center font-h3d-body text-h3d-body-sm text-h3d-muted opacity-50 lg:hidden"
+              aria-hidden="true"
+            >
+              Swipe to explore
+            </p>
+
+            <!-- Bottom accent line -->
+            <div class="absolute bottom-0 inset-x-0 h-px z-30 bg-h3d-accent opacity-30" aria-hidden="true" />
+          </section>
+
+          <!-- Thumbnail strip — scrollable row for 11 items -->
           <div
-            v-if="product.images.length > 1"
-            class="mt-h3d-sm flex flex-wrap gap-2"
+            v-if="mediaItems.length > 1"
+            class="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-thin"
           >
             <button
-              v-for="(src, i) in product.images"
-              :key="src + i"
+              v-for="(item, i) in mediaItems"
+              :key="item.src + i"
               type="button"
-              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border text-h3d-body-sm transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent sm:h-[4.5rem] sm:w-[4.5rem]"
+              class="relative rounded-lg flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent sm:h-[4.5rem] sm:w-[4.5rem]"
               :class="
                 activeThumb === i
-                  ? 'border-h3d-accent bg-h3d-surface text-h3d-text'
-                  : 'border-h3d-border bg-h3d-base text-h3d-muted hover:border-h3d-accent hover:text-h3d-text'
+                  ? 'border-h3d-accent border-2 bg-h3d-base shadow-[0_0_14px_rgba(196,144,122,0.40)]'
+                  : 'border-h3d-border bg-h3d-base hover:border-h3d-accent opacity-70 hover:opacity-100'
               "
               :aria-pressed="activeThumb === i"
-              :aria-label="`View image ${i + 1}`"
-              @click="activeThumb = i"
+              :aria-label="`View ${item.isGif ? 'animated' : `image ${i}`}`"
+              @click="galleryGo(i)"
             >
-              <NuxtImg :src="src" alt="" class="h-full w-full object-cover" loading="lazy" sizes="72px" />
+              <!-- GIF thumbnail -->
+              <template v-if="item.isGif">
+                <img :src="item.src" alt="" class="h-full w-full object-contain p-1.5" />
+                <!-- GIF badge -->
+                <span class="absolute bottom-0.5 right-0.5 rounded-sm bg-h3d-accent px-1 font-h3d-body leading-none text-h3d-base" style="font-size: 8px; padding-top: 2px; padding-bottom: 2px;">GIF</span>
+              </template>
+              <!-- Static image thumbnail -->
+              <NuxtImg v-else :src="item.src" alt="" class="h-full w-full object-contain p-1.5" loading="lazy" sizes="72px" />
             </button>
           </div>
         </div>
@@ -361,89 +525,150 @@ useSeoMeta({
             </div>
           </div> -->
 
-          <!-- Tabs -->
+          <!-- Details label -->
           <p class="font-h3d-body text-h3d-body-sm uppercase text-h3d-muted" style="letter-spacing: 0.14em">
             Details
           </p>
-          <div class="border border-h3d-border bg-h3d-surface">
+
+          <!-- Details tabs — toned down so image remains primary focus -->
+          <div
+            class="overflow-hidden rounded-lg border border-h3d-border/60"
+            style="background: rgba(27,14,40,0.5)"
+          >
+            <!-- Tab bar -->
             <div
-              class="flex flex-wrap border-b border-h3d-border"
+              class="relative flex border-b border-h3d-border/50 px-2 pt-1.5 gap-0.5"
+              style="background: rgba(16,8,26,0.35)"
               role="tablist"
               aria-label="Piece details"
             >
               <button
-                id="tab-desc"
+                v-for="tab in ([
+                  { key: 'description', label: 'Description' },
+                  { key: 'process',     label: 'Our process' },
+                  { key: 'care',        label: 'Care' },
+                ] as const)"
+                :id="`tab-${tab.key}`"
+                :key="tab.key"
                 type="button"
                 role="tab"
-                class="flex-1 min-w-[8rem] px-h3d-sm py-3 font-h3d-body text-h3d-body-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-                :class="activeTab === 'description' ? 'text-h3d-text border-b-2 border-h3d-accent -mb-px' : 'text-h3d-muted hover:text-h3d-text'"
-                :aria-selected="activeTab === 'description'"
-                aria-controls="panel-desc"
-                @click="activeTab = 'description'"
+                :aria-selected="activeTab === tab.key"
+                :aria-controls="`panel-${tab.key}`"
+                class="relative flex-1 rounded-t-md px-3 py-2 font-h3d-body text-h3d-body-sm transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+                :class="activeTab === tab.key ? 'text-h3d-muted' : 'text-h3d-muted hover:text-h3d-text'"
+                @click="activeTab = tab.key"
               >
-                Description
-              </button>
-              <button
-                id="tab-process"
-                type="button"
-                role="tab"
-                class="flex-1 min-w-[8rem] px-h3d-sm py-3 font-h3d-body text-h3d-body-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-                :class="activeTab === 'process' ? 'text-h3d-text border-b-2 border-h3d-accent -mb-px' : 'text-h3d-muted hover:text-h3d-text'"
-                :aria-selected="activeTab === 'process'"
-                aria-controls="panel-process"
-                @click="activeTab = 'process'"
-              >
-                Our process
-              </button>
-              <button
-                id="tab-care"
-                type="button"
-                role="tab"
-                class="flex-1 min-w-[8rem] px-h3d-sm py-3 font-h3d-body text-h3d-body-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-                :class="activeTab === 'care' ? 'text-h3d-text border-b-2 border-h3d-accent -mb-px' : 'text-h3d-muted hover:text-h3d-text'"
-                :aria-selected="activeTab === 'care'"
-                aria-controls="panel-care"
-                @click="activeTab = 'care'"
-              >
-                Care
+                <!-- Active indicator line only — subtle, not a pill -->
+                <span
+                  v-if="activeTab === tab.key"
+                  class="absolute bottom-0 inset-x-3 h-px bg-h3d-accent opacity-60"
+                  aria-hidden="true"
+                />
+                <span class="relative">{{ tab.label }}</span>
               </button>
             </div>
 
-            <div class="p-h3d-md">
+            <!-- Panel grid — all panels in DOM so container never collapses (zero layout shift).
+                 CSS transition on opacity; pointer-events toggled so inactive panels are non-interactive. -->
+            <div class="relative grid">
+
+              <!-- Description -->
               <div
-                v-show="activeTab === 'description'"
-                id="panel-desc"
+                id="panel-description"
                 role="tabpanel"
-                aria-labelledby="tab-desc"
-                class="font-h3d-body text-h3d-body text-h3d-muted leading-relaxed space-y-4"
+                aria-labelledby="tab-description"
+                class="col-start-1 row-start-1 h3d-tab-panel"
+                :class="activeTab === 'description' ? 'h3d-tab-panel--active' : 'h3d-tab-panel--hidden'"
+                :aria-hidden="activeTab !== 'description'"
               >
-                <p v-for="(para, idx) in product.descriptions" :key="idx">
-                  {{ para }}
-                </p>
+                <!-- Lead paragraph with left accent bar (no italic) -->
+                <div
+                  v-if="product.descriptions[0]"
+                  class="border-l-2 border-h3d-accent/50 pl-3 mx-h3d-md mt-h3d-md mb-3"
+                >
+                  <p class="font-h3d-body text-h3d-body text-h3d-muted leading-relaxed">
+                    {{ product.descriptions[0] }}
+                  </p>
+                </div>
+                <!-- Remaining paragraphs -->
+                <div class="px-h3d-md pb-h3d-md space-y-2.5">
+                  <p
+                    v-for="(para, idx) in product.descriptions.slice(1)"
+                    :key="idx"
+                    class="font-h3d-body text-h3d-body-sm text-h3d-muted/80 leading-relaxed"
+                  >
+                    {{ para }}
+                  </p>
+                </div>
               </div>
+
+              <!-- Our process — numbered steps -->
               <div
-                v-show="activeTab === 'process'"
                 id="panel-process"
                 role="tabpanel"
                 aria-labelledby="tab-process"
-                class="font-h3d-body text-h3d-body text-h3d-muted leading-relaxed space-y-5"
+                class="col-start-1 row-start-1 px-h3d-md py-h3d-md h3d-tab-panel"
+                :class="activeTab === 'process' ? 'h3d-tab-panel--active' : 'h3d-tab-panel--hidden'"
+                :aria-hidden="activeTab !== 'process'"
               >
-                <div v-for="(step, idx) in product.processes" :key="idx">
-                  <p class="font-medium text-h3d-text">{{ step.title.replace(/:$/, '') }}</p>
-                  <p class="mt-1">{{ step.description }}</p>
-                </div>
+                <ol class="space-y-0">
+                  <li
+                    v-for="(step, idx) in product.processes"
+                    :key="idx"
+                    class="relative flex gap-3"
+                  >
+                    <div class="flex flex-col items-center">
+                      <div
+                        class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-h3d-border font-h3d-body font-medium text-h3d-muted/70"
+                        style="background: rgba(58,36,80,0.4); font-size: 11px;"
+                      >
+                        {{ idx + 1 }}
+                      </div>
+                      <div
+                        v-if="idx < product.processes.length - 1"
+                        class="mt-1 w-px flex-1 bg-h3d-border/40"
+                        style="min-height: 18px"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div class="pb-4">
+                      <p class="font-h3d-body text-h3d-body-sm font-medium text-h3d-muted" style="letter-spacing: 0.04em">
+                        {{ step.title.replace(/:$/, '') }}
+                      </p>
+                      <p class="mt-0.5 font-h3d-body text-h3d-body-sm text-h3d-muted/70 leading-relaxed">
+                        {{ step.description }}
+                      </p>
+                    </div>
+                  </li>
+                </ol>
               </div>
+
+              <!-- Care — icon bullets -->
               <div
-                v-show="activeTab === 'care'"
                 id="panel-care"
                 role="tabpanel"
                 aria-labelledby="tab-care"
-                class="font-h3d-body text-h3d-body text-h3d-muted leading-relaxed space-y-4"
+                class="col-start-1 row-start-1 px-h3d-md py-h3d-md h3d-tab-panel"
+                :class="activeTab === 'care' ? 'h3d-tab-panel--active' : 'h3d-tab-panel--hidden'"
+                :aria-hidden="activeTab !== 'care'"
               >
-                <p v-for="(line, idx) in product.care" :key="idx">
-                  {{ line }}
-                </p>
+                <ul class="space-y-3">
+                  <li
+                    v-for="(line, idx) in product.care"
+                    :key="idx"
+                    class="flex gap-2.5"
+                  >
+                    <span class="mt-1 shrink-0 text-h3d-accent/60" aria-hidden="true">
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 13c1-5 5-8 10-9.5C11.5 8 8 11.5 3 13z"/>
+                        <path d="M3 13 8 8"/>
+                      </svg>
+                    </span>
+                    <p class="font-h3d-body text-h3d-body-sm text-h3d-muted/80 leading-relaxed">{{ line }}</p>
+                  </li>
+                </ul>
               </div>
+
             </div>
           </div>
         </div>
@@ -454,36 +679,13 @@ useSeoMeta({
         <h2 id="related-heading" class="font-h3d-display text-h3d-h3 text-h3d-text mb-h3d-md">
           Related pieces
         </h2>
-        <div class="grid grid-cols-2 gap-h3d-gutter lg:grid-cols-4">
-          <NuxtLink
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <H3dProductCard
             v-for="p in relatedPieces"
             :key="p.id"
-            :to="`/products/${p.id}`"
-            class="group border border-h3d-border bg-h3d-surface transition-colors duration-300 hover:border-h3d-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-          >
-            <div class="aspect-h3d-product relative overflow-hidden border-b border-h3d-border bg-h3d-base">
-              <NuxtImg
-                v-if="p.images[0]"
-                :src="p.images[0]"
-                :alt="p.title"
-                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                loading="lazy"
-                sizes="sm:50vw md:33vw lg:25vw"
-              />
-              <span
-                v-else
-                class="flex h-full items-center justify-center font-h3d-body text-h3d-body-sm text-h3d-muted"
-              >Preview</span>
-            </div>
-            <div class="p-h3d-sm">
-              <p class="font-h3d-display text-h3d-h4 text-h3d-text group-hover:text-h3d-accent">
-                {{ p.title }}
-              </p>
-              <p class="mt-1 font-h3d-body text-h3d-body-sm text-h3d-muted">
-                NPR {{ formatNprPrice(p.price) }}
-              </p>
-            </div>
-          </NuxtLink>
+            :product="p"
+            variant="related"
+          />
         </div>
       </section>
 

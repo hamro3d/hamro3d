@@ -78,33 +78,13 @@
         </NuxtLink>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-        <NuxtLink v-for="product in products" :key="product.id" :to="`/products/${product.id}`" class="block bg-h3d-surface border border-h3d-border transition-all hover:border-h3d-accent hover:-translate-y-0.5 text-decoration-none">
-          <div class="aspect-square bg-h3d-base flex items-center justify-center border-b border-h3d-border relative overflow-hidden">
-            <NuxtImg
-              v-if="product.image"
-              :src="product.image"
-              :alt="product.name"
-              class="absolute inset-0 h-full w-full object-contain p-4"
-              loading="lazy"
-              decoding="async"
-              sizes="sm:100vw md:50vw lg:33vw"
-            />
-            <div
-              v-else
-              class="w-14 h-20 bg-h3d-border border border-h3d-border-light flex items-center justify-center opacity-70"
-            />
-            <!-- <button class="absolute top-3 right-3 bg-transparent border-none cursor-pointer opacity-40 hover:opacity-100 transition-opacity">
-              <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-            </button> -->
-          </div>
-          <div class="h-0.5 bg-h3d-accent opacity-30"></div>
-          <div class="p-4">
-            <div class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase mb-1.5">{{ product.collection }}</div>
-            <h3 class="font-h3d-display text-sm text-h3d-text mb-1 italic">{{ product.name }}</h3>
-            <div class="font-h3d-body text-xs text-h3d-muted">From NPR {{ product.price }}</div>
-          </div>
-        </NuxtLink>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <H3dProductCard
+          v-for="product in products"
+          :key="product.id"
+          :product="product"
+          variant="collection"
+        />
       </div>
     </section>
 
@@ -214,7 +194,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from 'nuxt/app'
 import { computed } from 'vue'
-import { formatNprPrice, getTopRankedMockProducts } from '~/data/mock-products'
+import { getTopRankedMockProducts } from '~/data/mock-products'
 
 useSeoMeta({
   title: 'Hamro3D — Crafted with Care',
@@ -223,22 +203,7 @@ useSeoMeta({
   ogType: 'website',
 })
 
-/** First phrase before · in `head`, sentence-cased for the home grid label */
-function homepageCollectionLabel(head: string): string {
-  const raw = head.split('·')[0]?.trim() ?? head
-  const lower = raw.toLowerCase()
-  return lower.charAt(0).toUpperCase() + lower.slice(1)
-}
-
-const products = computed(() =>
-  getTopRankedMockProducts(3).map((p) => ({
-    id: p.id,
-    collection: homepageCollectionLabel(p.head),
-    name: p.title,
-    price: formatNprPrice(p.price),
-    image: p.images[0] ?? '',
-  })),
-)
+const products = computed(() => getTopRankedMockProducts(3))
 
 const scrollToMarquee = () => {
   const marqueeSection = document.getElementById('marquee-section')

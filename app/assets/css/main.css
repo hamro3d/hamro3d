@@ -32,6 +32,47 @@ html {
   opacity: 0;
 }
 
+/* ─── Details tab panel smooth crossfade ─────────────────── */
+/* All panels stay in DOM (grid stacking) for zero layout shift.
+   Active: visible + opaque. Inactive: fades out then becomes
+   visibility:hidden (so keyboard focus can't reach it). */
+.h3d-tab-panel {
+  transition: opacity 0.22s ease;
+}
+.h3d-tab-panel--active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.h3d-tab-panel--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+}
+
+/* ─── Product gallery crossfade ──────────────────────────── */
+/* Images are absolutely positioned inside a fixed-height slot,
+   so both the entering and leaving image coexist during the fade.
+   No layout shift, no collapse. */
+.gallery-fade-enter-active,
+.gallery-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.gallery-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.97);
+}
+.gallery-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.02);
+}
+.gallery-fade-enter-to,
+.gallery-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
 /* ─── Custom animations ──────────────────────────────────── */
 @layer utilities {
   .h3d-animate-in {

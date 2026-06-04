@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mockProducts, formatNprPrice } from '~/data/mock-products'
+import { mockProducts } from '~/data/mock-products'
 import { useWishlistStore } from '~/stores/wishlist'
 
 const wishlist = useWishlistStore()
@@ -128,85 +128,17 @@ useSeoMeta({
       <div
         :class="
           viewMode === 'grid'
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8'
-            : 'flex flex-col gap-6'
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6'
+            : 'flex flex-col gap-5'
         "
       >
-        <NuxtLink
+        <H3dProductCard
           v-for="product in sortedProducts"
           :key="product.id"
-          :to="`/products/${product.id}`"
-          :class="[
-            'group border border-h3d-border bg-h3d-surface transition-all hover:border-h3d-accent',
-            viewMode === 'grid'
-              ? 'block hover:-translate-y-0.5'
-              : 'flex flex-col sm:flex-row sm:items-stretch hover:-translate-y-0',
-          ]"
-        >
-          <!-- Image + wishlist -->
-          <div
-            :class="[
-              'aspect-square bg-h3d-base flex items-center justify-center border-b border-h3d-border relative overflow-hidden',
-              viewMode === 'list' ? 'sm:aspect-auto sm:w-52 sm:min-h-[200px] md:w-60' : '',
-            ]"
-          >
-            <NuxtImg
-              v-if="product.images[0]"
-              :src="product.images[0]"
-              :alt="product.title"
-              class="absolute inset-0 h-full w-full object-contain p-4"
-              loading="lazy"
-              decoding="async"
-              sizes="sm:100vw md:50vw lg:33vw"
-            />
-            <div
-              v-else
-              class="w-14 h-20 bg-h3d-border border border-h3d-border-light flex items-center justify-center opacity-70"
-              aria-hidden="true"
-            />
-            <!--
-            <button
-              type="button"
-              class="absolute top-3 right-3 bg-transparent border-none p-1 cursor-pointer transition-opacity z-10"
-              :class="wishlist.isSaved(product.id) ? 'opacity-100' : 'opacity-40 hover:opacity-100'"
-              :aria-label="wishlist.isSaved(product.id) ? `Remove ${product.title} from saved memories` : `Save ${product.title} to saved memories`"
-              @click.prevent.stop="wishlist.toggle(product.id)"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                class="w-5 h-5 stroke-h3d-accent pointer-events-none"
-                :class="wishlist.isSaved(product.id) ? 'fill-h3d-accent' : 'fill-none'"
-                aria-hidden="true"
-              >
-                <path
-                  d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
-                />
-              </svg>
-            </button>
-            -->
-          </div>
-
-          <!-- Body -->
-          <div
-            :class="[
-              'p-5 sm:p-6 flex flex-col justify-center flex-1 min-w-0',
-              viewMode === 'list' ? 'sm:pl-8 sm:pr-6' : '',
-            ]"
-          >
-            <div class="w-10 h-px bg-h3d-accent mb-4" aria-hidden="true" />
-            <p class="font-h3d-body text-2xs text-h3d-accent tracking-wide uppercase mb-2">
-              {{ product.head }}
-            </p>
-            <h2
-              class="font-h3d-display text-xl sm:text-2xl font-light text-h3d-text mb-3 leading-snug group-hover:text-h3d-accent transition-colors"
-            >
-              {{ product.title }}
-            </h2>
-            <p class="font-h3d-body text-sm text-h3d-muted">
-              From <span class="text-h3d-text tabular-nums">NPR {{ formatNprPrice(product.price) }}</span>
-            </p>
-          </div>
-        </NuxtLink>
+          :product="product"
+          variant="collection"
+          :list-mode="viewMode === 'list'"
+        />
       </div>
 
     </div>
