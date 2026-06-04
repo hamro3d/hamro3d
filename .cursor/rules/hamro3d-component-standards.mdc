@@ -1,0 +1,243 @@
+---
+description: Vue component standards for Hamro3D — H3d prefix, script-before-template order, no style blocks, Tailwind-only with h3d- tokens, page meta patterns, and nested route conventions.
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Hamro3D Component Standards
+
+Apply these rules to every `.vue` file — components, layouts, and pages.
+
+## H3d Prefix Requirement
+
+Every Hamro3D component must be prefixed with `H3d`:
+
+```
+H3dButton.vue          H3dCard.vue            H3dInput.vue
+H3dNavbar.vue          H3dFooter.vue          H3dSideProfileNavbar.vue
+H3dProductCard.vue     H3dProductGallery.vue  H3dCommissionForm.vue
+H3dLogo.vue            H3dBadge.vue           H3dModal.vue
+```
+
+Nuxt auto-imports all components from `app/components/` — no manual imports needed.
+
+## File Order: Script Before Template
+
+Every `.vue` file follows this strict order — no exceptions:
+
+```vue
+<script setup lang="ts">
+// All logic here
+</script>
+
+<template>
+  <!-- All markup here -->
+</template>
+```
+
+- `<script setup lang="ts">` is always first
+- `<template>` is always second
+- `<style>` block is **never used** (see next rule)
+
+## No `<style>` Blocks
+
+Hamro3D has zero `<style>` blocks anywhere in the codebase. All styling uses Tailwind utility classes with `h3d-` tokens. If you find yourself needing a `<style>` block, you are doing one of these wrong things:
+
+1. Using hardcoded hex colors instead of `h3d-` tokens
+2. Writing component-specific CSS instead of utility classes
+3. Trying to override a third-party library (use a wrapper component instead)
+
+The only exception is a single inline `style` attribute for truly dynamic values that Tailwind cannot express (e.g., `style="height: calc(100vh - 64px)"`). Even then, prefer CSS variables over magic numbers.
+
+## Tailwind-Only Styling with h3d- Tokens
+
+All color, typography, spacing, and border values must use `h3d-` tokens:
+
+```vue
+<!-- Correct -->
+<div class="bg-h3d-surface border border-h3d-border rounded-sm p-6">
+  <h2 class="font-h3d-display text-2xl text-h3d-text">Piece Name</h2>
+  <p class="font-h3d-body text-sm text-h3d-muted">Details</p>
+</div>
+
+<!-- Wrong — Tailwind defaults, hardcoded hex, no h3d- tokens -->
+<div class="bg-gray-900 border border-gray-700 rounded-lg p-6">
+  <h2 class="font-serif text-2xl text-white">Piece Name</h2>
+  <p class="text-sm text-gray-400">Details</p>
+</div>
+```
+
+**Banned classes:**
+- `bg-white`, `bg-black`, `bg-gray-*`, `bg-slate-*`, `bg-zinc-*`
+- `text-gray-*`, `text-slate-*`, `text-neutral-*`
+- `border-gray-*`, `border-slate-*`
+- `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-full` on cards or panels
+- `font-serif`, `font-sans`, `font-mono` (use `font-h3d-*` instead)
+
+## definePageMeta Placement
+
+On every page file, `definePageMeta` must be the **first statement** in `<script setup>`:
+
+```typescript
+<script setup lang="ts">
+// 1. ALWAYS FIRST — compiler macro
+definePageMeta({
+  layout: 'profile',    // 'default' | 'profile' | 'admin' | 'checkout'
+})
+
+// 2. SEO meta — always second on page files
+useSeoMeta({
+  title: 'My Orders · Hamro3D',
+  description: 'View your handcrafted pieces and their current progress.',
+})
+
+// 3. Everything else below
+const route = useRoute()
+...
+</script>
+```
+
+## useSeoMeta Requirement
+
+Every page file (in `app/pages/`) must call `useSeoMeta()`. No exceptions.
+
+```typescript
+useSeoMeta({
+  title: '[Page Title] · Hamro3D',
+  description: '[145-160 chars, brand voice, warm copy]',
+  ogTitle: '[Page Title] · Hamro3D',
+  ogDescription: '[Social-optimized description]',
+  ogImage: '/og/page-slug.jpg',
+})
+```
+
+## Layout Declaration Pattern
+
+| Page location | Layout |
+|---|---|
+| `app/pages/index.vue` | default (omit or explicit) |
+| `app/pages/products/**` | default |
+| `app/pages/commission.vue` | default |
+| `app/pages/our-story.vue` | default |
+| `app/pages/contact.vue` | default |
+| `app/pages/auth.vue` | default |
+| `app/pages/cart.vue` | profile |
+| `app/pages/wishlist.vue` | profile |
+| `app/pages/checkout.vue` | default (or checkout) |
+| `app/pages/profile/**` | profile |
+| `app/pages/admin/**` | admin |
+
+## NuxtLink vs `<a>` Tag
+
+- **Always** use `<NuxtLink>` for internal navigation
+- **Always** use `<a href="..." target="_blank" rel="noopener noreferrer">` for external links
+- **Never** use `<a href="/products">` for internal routes — this causes full page reloads
+
+```vue
+<!-- Internal — always NuxtLink -->
+<NuxtLink to="/products/42" class="...">View Piece</NuxtLink>
+
+<!-- External — always <a> with rel -->
+<a href="https://instagram.com/hamro3d" target="_blank" rel="noopener noreferrer">
+  Instagram
+</a>
+
+<!-- Wrong — never use <a> for internal links -->
+<a href="/products/42">View Piece</a>
+```
+
+## Nested Route Sibling Pattern
+
+**The sibling pattern is mandatory** for all list + detail page pairs. Nuxt's file-based routing treats `orders.vue` + `orders/[id].vue` as parent/child — this breaks navigation. Always use the sibling pattern:
+
+```
+app/pages/profile/orders/
+├── index.vue    → /profile/orders       ← list (sibling)
+└── [id].vue     → /profile/orders/:id   ← detail (sibling)
+
+app/pages/admin/orders/
+├── index.vue    → /admin/orders         ← list (sibling)
+└── [id].vue     → /admin/orders/:id     ← detail (sibling)
+```
+
+**Never use:**
+```
+app/pages/profile/
+├── orders.vue           ← becomes parent shell — requires <NuxtPage /> slot
+└── orders/[id].vue      ← only renders inside orders.vue — never standalone
+```
+
+## Empty State Pattern
+
+Every list page that can have zero items must implement a branded empty state:
+
+```vue
+<template v-if="items.length === 0">
+  <div class="flex flex-col items-center gap-6 py-24 text-center">
+    <p class="font-h3d-display text-3xl text-h3d-text/60">
+      Nothing here yet.
+    </p>
+    <p class="font-h3d-body text-sm text-h3d-muted max-w-xs">
+      <!-- Warm, contextual copy — see hamro3d-copy-standards.mdc -->
+    </p>
+    <NuxtLink
+      to="/products"
+      class="font-h3d-body text-xs uppercase tracking-widest text-h3d-accent hover:text-h3d-text transition-colors"
+    >
+      Explore our pieces
+    </NuxtLink>
+  </div>
+</template>
+```
+
+## Status Badge Pattern
+
+Status badges always use three token layers — never a single background color:
+
+```vue
+<span
+  :class="[
+    'inline-flex items-center border px-2 py-0.5',
+    'text-2xs uppercase tracking-widest font-h3d-body rounded-sm',
+    statusBadgeClass(item.status)
+  ]"
+>
+  {{ item.status }}
+</span>
+```
+
+```typescript
+// Status-to-token mapping — always a dedicated helper function
+function statusBadgeClass(status: MockUserOrderStatus): string {
+  switch (status) {
+    case 'Delivered':   return 'border-h3d-success/50 bg-h3d-success/10 text-h3d-success'
+    case 'In Progress': return 'border-h3d-accent/50 bg-h3d-accent/10 text-h3d-accent'
+    case 'Processing':  return 'border-h3d-border bg-h3d-base text-h3d-muted'
+    case 'Cancelled':   return 'border-h3d-error/50 bg-h3d-error/10 text-h3d-error'
+    default:            return 'border-h3d-border bg-h3d-base text-h3d-muted'
+  }
+}
+```
+
+## Form Accessibility Rules
+
+```vue
+<!-- Every form field must have an associated label -->
+<label for="customer-name" class="font-h3d-body text-xs uppercase tracking-widest text-h3d-muted">
+  Your Name
+</label>
+<input
+  id="customer-name"
+  type="text"
+  class="bg-h3d-surface border border-h3d-border text-h3d-text ..."
+  aria-required="true"
+/>
+
+<!-- Icon-only buttons require aria-label -->
+<button type="button" aria-label="Remove from wishlist" class="...">
+  <svg .../>
+</button>
+
+<!-- Required field indicator — use aria-required, not just * -->
+<input aria-required="true" ... />
+```

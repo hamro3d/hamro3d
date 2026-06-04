@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Our Story — Hamro3D',
+  title: 'Our Story',
   description:
     'How Hamro3D began in Kathmandu as a memory-to-object studio, and why we choose emotion, craft, and meaning in every piece.',
 })
@@ -75,22 +75,19 @@ useSeoMeta({
             </div>
           </div>
           <div
-            class="relative min-h-[280px] lg:min-h-[340px] border border-h3d-border bg-gradient-to-br from-h3d-surface via-h3d-base to-h3d-surface overflow-hidden"
-            aria-hidden="true"
+            class="relative min-h-[280px] lg:min-h-[340px] border border-h3d-border overflow-hidden"
           >
-            <div
-              class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(196,144,122,0.12),transparent_50%)]"
+            <NuxtImg
+              src="/images/studio/studio-team.png"
+              alt="Hamro3D studio team crafting a memory piece"
+              class="absolute inset-0 w-full h-full object-cover object-center"
+              loading="lazy"
             />
+            <!-- subtle vignette so edges melt into the dark layout -->
             <div
-              class="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_80%,rgba(58,36,80,0.5),transparent_55%)]"
+              class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(16,8,26,0.55),transparent_65%)]"
+              aria-hidden="true"
             />
-            <div class="absolute inset-0 flex items-center justify-center p-8">
-              <p
-                class="font-h3d-display text-lg sm:text-xl text-h3d-text/90 text-center leading-relaxed max-w-xs"
-              >
-                Where emotions take tangible form.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -101,7 +98,8 @@ useSeoMeta({
         aria-labelledby="values-heading"
       >
         <div class="max-w-h3d-max mx-auto w-full px-6 sm:px-10 py-14 sm:py-16">
-          <h2 id="values-heading" class="sr-only">
+          <span class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase block mb-3">Our principles</span>
+          <h2 id="values-heading" class="font-h3d-display text-2xl sm:text-3xl font-light text-h3d-text mb-8 sm:mb-10">
             What we stand for
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
@@ -352,6 +350,23 @@ useSeoMeta({
             — Hamro3D
           </p>
         </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="max-w-h3d-max mx-auto w-full px-6 sm:px-10 py-16 sm:py-20 text-center" aria-label="Commission a piece">
+        <span class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase block mb-3">Ready to begin?</span>
+        <h2 class="font-h3d-display text-3xl sm:text-4xl font-light text-h3d-text mb-5 leading-tight max-w-xl mx-auto">
+          Your story deserves a permanent home.
+        </h2>
+        <p class="font-h3d-body text-sm text-h3d-muted mb-8 max-w-md mx-auto leading-relaxed">
+          Commission a piece that holds the person or moment you never want to forget.
+        </p>
+        <NuxtLink
+          to="/contact#commission-form"
+          class="bg-h3d-accent text-h3d-base px-8 py-3 font-h3d-body text-2xs font-semibold tracking-widest uppercase transition-colors hover:bg-h3d-accent-hover inline-block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+        >
+          Begin Your Commission
+        </NuxtLink>
       </section>
     </main>
   </div>

@@ -16,13 +16,16 @@
           We turn meaningful human moments into objects you can keep forever. Give someone the gift of being remembered.
         </p>
         <div class="flex gap-3 flex-wrap">
-          <!-- <NuxtLink to="/commission" class="bg-h3d-accent text-h3d-base px-6 sm:px-8 py-3 font-h3d-body text-2xs font-semibold tracking-widest uppercase transition-colors hover:bg-h3d-accent-hover">
-            Commission a Piece
+          <NuxtLink
+            to="/contact#commission-form"
+            class="bg-h3d-accent text-h3d-base px-6 sm:px-8 py-3 font-h3d-body text-2xs font-semibold tracking-widest uppercase transition-colors hover:bg-h3d-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+          >
+            Begin Your Commission
           </NuxtLink>
-          <NuxtLink to="/products" class="border border-h3d-border text-h3d-muted px-6 sm:px-8 py-3 font-h3d-serif text-sm font-light transition-colors hover:border-h3d-accent hover:text-h3d-text">
-            See Collection →
-          </NuxtLink> -->
-          <NuxtLink to="/products" class="bg-h3d-accent text-h3d-base px-6 sm:px-8 py-3 font-h3d-body text-2xs font-semibold tracking-widest uppercase transition-colors hover:bg-h3d-accent-hover">
+          <NuxtLink
+            to="/products"
+            class="border border-h3d-border text-h3d-muted px-6 sm:px-8 py-3 font-h3d-body text-2xs tracking-widest uppercase transition-colors hover:border-h3d-accent hover:text-h3d-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
+          >
             See Collection →
           </NuxtLink>
         </div>
@@ -31,7 +34,7 @@
       <!-- Occasions (Hidden on mobile) -->
       <div class="hidden lg:block absolute right-20 top-1/2 transform -translate-y-1/2 z-2">
         <p class="font-h3d-body text-2xs text-h3d-accent mb-3 tracking-widest">Perfect for</p>
-        <div class="space-y-2.5 font-h3d-serif text-sm text-h3d-muted">
+        <div class="space-y-2.5 font-h3d-body text-sm text-h3d-muted">
           <div class="pb-2.5 border-b border-h3d-border hover:text-h3d-text transition-colors">Family Rituals</div>
           <div class="pb-2.5 border-b border-h3d-border hover:text-h3d-text transition-colors">Valentine's Day</div>
           <div class="pb-2.5 border-b border-h3d-border hover:text-h3d-text transition-colors">Wedding Gifts</div>
@@ -78,32 +81,13 @@
         </NuxtLink>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-        <NuxtLink v-for="product in products" :key="product.id" :to="`/products/${product.id}`" class="block bg-h3d-surface border border-h3d-border transition-all hover:border-h3d-accent hover:-translate-y-0.5 text-decoration-none">
-          <div class="aspect-square bg-h3d-base flex items-center justify-center border-b border-h3d-border relative overflow-hidden">
-            <img
-              v-if="product.image"
-              :src="product.image"
-              :alt="product.name"
-              class="absolute inset-0 h-full w-full object-contain p-4"
-              loading="lazy"
-              decoding="async"
-            />
-            <div
-              v-else
-              class="w-14 h-20 bg-h3d-border border border-h3d-border-light flex items-center justify-center opacity-70"
-            />
-            <!-- <button class="absolute top-3 right-3 bg-transparent border-none cursor-pointer opacity-40 hover:opacity-100 transition-opacity">
-              <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-            </button> -->
-          </div>
-          <div class="h-0.5 bg-h3d-accent opacity-30"></div>
-          <div class="p-4">
-            <div class="font-h3d-body text-2xs text-h3d-accent tracking-widest uppercase mb-1.5">{{ product.category }}</div>
-            <h3 class="font-h3d-display text-sm text-h3d-text mb-1 italic">{{ product.name }}</h3>
-            <div class="font-h3d-body text-xs text-h3d-muted">From NPR {{ product.price }}</div>
-          </div>
-        </NuxtLink>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <H3dProductCard
+          v-for="product in products"
+          :key="product.id"
+          :product="product"
+          variant="collection"
+        />
       </div>
     </section>
 
@@ -114,42 +98,42 @@
         <h2 class="font-h3d-display text-3xl sm:text-4xl font-light text-h3d-text mb-10 max-w-md">How we make it meaningful</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-4.5 hover:border-h3d-accent transition-colors">
+          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-5 hover:border-h3d-accent transition-colors">
             <div class="w-11 h-11 border border-h3d-accent flex items-center justify-center bg-h3d-surface flex-shrink-0">
               <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             </div>
             <div>
-              <h4 class="font-h3d-serif text-base text-h3d-text font-light mb-1.5">Tell Us Your Story</h4>
+              <h3 class="font-h3d-display text-base text-h3d-text font-light mb-1.5">Tell Us Your Story</h3>
               <p class="font-h3d-body text-xs text-h3d-muted leading-relaxed">Share the memory. Our artisans will decide the best way to hold it in physical form.</p>
             </div>
           </div>
 
-          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-4.5 hover:border-h3d-accent transition-colors">
+          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-5 hover:border-h3d-accent transition-colors">
             <div class="w-11 h-11 border border-h3d-accent flex items-center justify-center bg-h3d-surface flex-shrink-0">
               <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
             <div>
-              <h4 class="font-h3d-serif text-base text-h3d-text font-light mb-1.5">Photo to Object</h4>
+              <h3 class="font-h3d-display text-base text-h3d-text font-light mb-1.5">Photo to Object</h3>
               <p class="font-h3d-body text-xs text-h3d-muted leading-relaxed">One photograph. One person. One piece that holds them close when they're far.</p>
             </div>
           </div>
 
-          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-4.5 hover:border-h3d-accent transition-colors">
+          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-5 hover:border-h3d-accent transition-colors">
             <div class="w-11 h-11 border border-h3d-accent flex items-center justify-center bg-h3d-surface flex-shrink-0">
               <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
             </div>
             <div>
-              <h4 class="font-h3d-serif text-base text-h3d-text font-light mb-1.5">Occasion Gifting</h4>
+              <h3 class="font-h3d-display text-base text-h3d-text font-light mb-1.5">Occasion Gifting</h3>
               <p class="font-h3d-body text-xs text-h3d-muted leading-relaxed">Weddings, Babyshower, Dashain, Anniversaries, Birthdays, Valentine's Day, Remembrance — we craft for the moments that matter.</p>
             </div>
           </div>
 
-          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-4.5 hover:border-h3d-accent transition-colors">
+          <div class="bg-h3d-base border border-h3d-border p-7 flex gap-5 hover:border-h3d-accent transition-colors">
             <div class="w-11 h-11 border border-h3d-accent flex items-center justify-center bg-h3d-surface flex-shrink-0">
               <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-h3d-accent fill-none"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>
             </div>
             <div>
-              <h4 class="font-h3d-serif text-base text-h3d-text font-light mb-1.5">Gift Ready Packaging</h4>
+              <h3 class="font-h3d-display text-base text-h3d-text font-light mb-1.5">Gift Ready Packaging</h3>
               <p class="font-h3d-body text-xs text-h3d-muted leading-relaxed">The presentation is part of the gift. Every piece arrives wrapped with intention.</p>
             </div>
           </div>
@@ -213,40 +197,16 @@
 <script setup lang="ts">
 import { useSeoMeta } from 'nuxt/app'
 import { computed } from 'vue'
+import { getTopRankedMockProducts } from '~/data/mock-products'
 
 useSeoMeta({
-  title: 'Hamro3D — Crafted with Care',
+  title: 'Crafted with Care',
   description: 'Meaningful keepsakes handcrafted in Kathmandu. Preserve moments in tangible form.',
   ogImage: '/og/home.jpg',
   ogType: 'website',
 })
 
-function formatNprPrice(amount: number): string {
-  return Number(amount).toLocaleString('en-IN')
-}
-
-const { data: productsData } = await useFetch('/api/products?limit=3&status=Active')
-
-const products = computed(() => {
-  const list = (productsData.value as any[]) ?? []
-  return list.map((p) => {
-    let imgs: string[] = []
-    if (p.images) {
-      if (typeof p.images === 'string') {
-        try { imgs = JSON.parse(p.images) } catch { imgs = [] }
-      } else {
-        imgs = p.images
-      }
-    }
-    return {
-      id: p.id,
-      category: p.category_name ?? 'Personalized Piece',
-      name: p.title,
-      price: formatNprPrice(p.price),
-      image: imgs[0] ?? '',
-    }
-  })
-})
+const products = computed(() => getTopRankedMockProducts(3))
 
 const scrollToMarquee = () => {
   const marqueeSection = document.getElementById('marquee-section')

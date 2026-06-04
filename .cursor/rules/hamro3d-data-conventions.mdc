@@ -1,0 +1,205 @@
+---
+description: Mock data conventions for app/data/ — file naming, interface patterns, required exports, ID uniqueness, and NPR price formatting rules for Phase 0 mock files.
+globs: "app/data/**"
+alwaysApply: false
+---
+
+# Hamro3D Mock Data Conventions
+
+Apply these rules to every file in `app/data/`. This directory holds all Phase 0 mock data that will be replaced with API calls in Phase 1.
+
+## Phase 0 Header Comment
+
+Every mock file must begin with this JSDoc comment:
+
+```typescript
+/** Phase 0 mock — replace with API call in Phase 1 */
+```
+
+## File Naming
+
+```
+app/data/mock-{entity}.ts
+```
+
+| File | Entity covered |
+|---|---|
+| `mock-products.ts` | Piece / product catalogue |
+| `mock-cart.ts` | Cart line items |
+| `mock-wishlist.ts` | Wishlist product IDs |
+| `mock-user-orders.ts` | Orders visible to authenticated users |
+| `mock-admin-orders.ts` | Orders visible to admin |
+
+New files follow the same pattern: `mock-{plural-entity}.ts`.
+
+## Interface Naming
+
+All interfaces in mock files use the `Mock` prefix:
+
+```typescript
+// Main entity interface
+export interface MockUserOrder { ... }
+export interface MockAdminOrder { ... }
+export interface MockProduct { ... }
+
+// Sub-interfaces for nested data
+export interface MockUserOrderLineItem { ... }
+export interface MockAdminOrderPayment { ... }
+export interface MockUserOrderTimelineStep { ... }
+```
+
+## Status Types as Union Strings
+
+Never use `enum`. Always use union string types:
+
+```typescript
+// Correct
+export type MockUserOrderStatus = 'Processing' | 'In Progress' | 'Delivered' | 'Cancelled'
+export type MockAdminOrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled'
+
+// Wrong — never
+enum OrderStatus { Processing, InProgress, Delivered, Cancelled }
+```
+
+## Required Exports per File
+
+Every mock file must export these named exports, in this order:
+
+```typescript
+/** Phase 0 mock — replace with API call in Phase 1 */
+
+// 1. Status union type (if applicable)
+export type MockUserOrderStatus = 'Processing' | 'In Progress' | 'Delivered' | 'Cancelled'
+
+// 2. Sub-interfaces (define before the main interface that uses them)
+export interface MockUserOrderLineItem {
+  productId: number
+  name: string
+  meta: string        // e.g. "Keychain · Matte Black · 1 piece"
+  quantity: number
+  price: number       // Raw NPR — never pre-formatted string
+  image: string       // Path relative to /public
+}
+
+export interface MockUserOrderPayment {
+  method: 'eSewa' | 'Khalti' | 'Cash on Delivery' | 'Bank Transfer'
+  subtotal: number    // Raw NPR
+  shipping: number    // Raw NPR
+  total: number       // Raw NPR
+}
+
+export interface MockUserOrderTimelineStep {
+  label: string
+  date: string        // ISO 8601 or human-readable date string
+  state: 'done' | 'active' | 'pending'
+}
+
+// 3. Main interface
+export interface MockUserOrder {
+  id: string                           // e.g. 'H3D-0001' — unique, no duplicates
+  date: string                         // ISO 8601 string
+  status: MockUserOrderStatus
+  lines: MockUserOrderLineItem[]
+  delivery: {
+    address: string
+    estimated: string                  // Human-readable: 'June 10–12, 2026'
+  }
+  payment: MockUserOrderPayment
+  timeline: MockUserOrderTimelineStep[]
+}
+
+// 4. Data array — named mock{Entity}s (plural)
+export const mockUserOrders: MockUserOrder[] = [
+  {
+    id: 'H3D-0001',
+    // ...
+  },
+]
+
+// 5. Lookup helper — getMock{Entity}ById
+export function getMockUserOrderById(id: string): MockUserOrder | undefined {
+  return mockUserOrders.find(o => o.id === id)
+}
+
+// 6. Utility functions (define once per file that needs them)
+export function formatNprPrice(price: number): string {
+  return `NPR ${price.toLocaleString('en-NP')}`
+}
+```
+
+## No Duplicate IDs
+
+Every mock entity must have a **globally unique `id`** within its array. IDs must not conflict across related files:
+
+```typescript
+// Wrong — duplicate IDs within same array
+export const mockProducts = [
+  { id: 7, name: 'Keychain' },
+  { id: 8, name: 'Litholamp' },
+  { id: 8, name: 'Nameplate' },  // DUPLICATE — forbidden
+]
+
+// Correct — all IDs unique
+export const mockProducts = [
+  { id: 7, name: 'Keychain' },
+  { id: 8, name: 'Litholamp' },
+  { id: 9, name: 'Nameplate' },
+]
+```
+
+For order IDs, use the `H3D-` prefix with zero-padded sequential numbering:
+- User orders: `H3D-0001`, `H3D-0002`, `H3D-0003`
+- Product IDs: sequential integers starting at 1
+
+## Price Storage Rule
+
+**All prices are stored as raw integers (NPR). Never store a pre-formatted string.**
+
+```typescript
+// Correct — raw number
+price: 1500   // NPR 1,500
+
+// Wrong — pre-formatted string
+price: 'NPR 1,500'
+price: '1500.00'
+```
+
+Format at display time only:
+
+```typescript
+// In component or page
+formatNprPrice(order.payment.total)  // → "NPR 4,500"
+```
+
+`formatNprPrice` is defined in the data file and imported where needed. Do not duplicate it across files — import from `mock-user-orders.ts` or `mock-admin-orders.ts` as the canonical source.
+
+## Cross-File Reference Rules
+
+If a mock order references a product, the `productId` must exist in `mock-products.ts`:
+
+```typescript
+// In mock-user-orders.ts
+lines: [
+  {
+    productId: 3,  // Must exist as { id: 3, ... } in mock-products.ts
+    name: 'Custom Photo Keychain',
+    ...
+  }
+]
+```
+
+## TypeScript Strictness
+
+Mock data arrays must be typed with their interface — never `any` or implicit `object[]`:
+
+```typescript
+// Correct
+export const mockUserOrders: MockUserOrder[] = [ ... ]
+
+// Or readonly if the data should never be mutated
+export const mockProducts: ReadonlyArray<MockProduct> = [ ... ]
+
+// Wrong
+export const mockUserOrders = [ ... ]         // implicit any[]
+export const mockUserOrders: any[] = [ ... ]  // explicit any — forbidden
+```

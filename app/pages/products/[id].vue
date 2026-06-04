@@ -83,6 +83,54 @@ const relatedPieces = computed(() => {
 const activeThumb = ref(0)
 const quantity = ref(1)
 
+// ── Gallery system (images only — API products have no gif field) ─────────
+type MediaItem = { src: string; isGif: false }
+const mediaItems = computed<MediaItem[]>(() => {
+  const p = product.value
+  if (!p?.images?.length) return []
+  return p.images.slice(0, 10).map((src: string) => ({ src, isGif: false as const }))
+})
+
+const galleryEl      = ref<HTMLElement | null>(null)
+const isAnimating    = ref(false)
+const slideDir       = ref<'next' | 'prev'>('next')
+
+function galleryGo(idx: number) {
+  if (isAnimating.value || idx === activeThumb.value) return
+  slideDir.value = idx > activeThumb.value ? 'next' : 'prev'
+  isAnimating.value = true
+  activeThumb.value = idx
+  setTimeout(() => { isAnimating.value = false }, 400)
+}
+
+function galleryNext() {
+  const total = mediaItems.value.length
+  if (!total) return
+  galleryGo((activeThumb.value + 1) % total)
+}
+
+function galleryPrev() {
+  const total = mediaItems.value.length
+  if (!total) return
+  galleryGo((activeThumb.value - 1 + total) % total)
+}
+
+let touchStartX = 0
+function onTouchStart(e: TouchEvent) {
+  touchStartX = e.touches[0]?.clientX ?? 0
+}
+function onTouchEnd(e: TouchEvent) {
+  const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX
+  if (Math.abs(dx) > 40) dx < 0 ? galleryNext() : galleryPrev()
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'ArrowRight') galleryNext()
+  else if (e.key === 'ArrowLeft') galleryPrev()
+}
+
+
+
 const materialOptions = computed(() => {
   if (!product.value) return []
   return product.value.material.map((label: string, i: number) => ({
@@ -234,58 +282,96 @@ useSeoMeta({
       <!-- Two columns: gallery + info -->
       <div class="grid grid-cols-1 gap-h3d-gutter lg:grid-cols-2 lg:items-start">
         <!-- Gallery -->
-        <div class="lg:sticky lg:top-h3d-md lg:self-start">
-          <div
-            class="relative flex h-[420px] w-full items-center justify-center overflow-hidden border border-h3d-border bg-h3d-surface"
+        <div class="lg:sticky lg:top-[120px] lg:self-start">
+          <!-- Main swipeable image viewer -->
+          <section
+            ref="galleryEl"
+            class="group relative rounded-xl overflow-hidden border border-h3d-border bg-h3d-base select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-h3d-accent"
+            aria-label="Product image gallery"
+            tabindex="0"
+            @keydown="onKeydown"
+            @touchstart.passive="onTouchStart"
+            @touchend.passive="onTouchEnd"
           >
-            <span
-              v-if="product.id === 0"
-              class="absolute left-h3d-sm top-h3d-sm font-h3d-body text-h3d-body-sm uppercase text-h3d-base z-10"
-              style="letter-spacing: 0.18em"
-            >
-              <span class="bg-h3d-accent px-h3d-sm py-1">Signature piece</span>
-            </span>
-            <img
-              v-if="product.images[activeThumb]"
-              :src="product.images[activeThumb]"
-              :alt="`${product.title} — view ${activeThumb + 1}`"
-              class="max-h-full max-w-full object-contain"
-              loading="lazy"
-              decoding="async"
-            />
-            <p
-              v-else
-              class="font-h3d-body text-h3d-body text-h3d-muted px-h3d-md text-center"
-            >
-              Photography for this piece is coming soon.
-            </p>
-            <p
-              v-if="product.images.length"
-              class="absolute bottom-h3d-sm right-h3d-sm font-h3d-body text-h3d-body-sm text-h3d-muted tabular-nums"
-            >
-              {{ activeThumb + 1 }} / {{ product.images.length }}
-            </p>
-          </div>
+            <!-- Atmosphere layers -->
+            <div class="absolute inset-0 pointer-events-none z-0" style="background: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(96,52,168,0.65) 0%, rgba(58,30,96,0.3) 55%, transparent 80%)" aria-hidden="true" />
+            <div class="absolute inset-0 pointer-events-none z-10" style="background: radial-gradient(ellipse 100% 60% at 50% 115%, rgba(16,8,26,0.85) 0%, transparent 70%)" aria-hidden="true" />
 
+            <!-- Logo watermark -->
+            <div class="absolute top-3.5 right-3.5 z-30 opacity-60">
+              <NuxtImg src="/logo/C4907A-H3D-logo.png" alt="Hamro3D" class="w-7 h-7 object-contain" width="28" height="28" loading="lazy" />
+            </div>
+
+            <!-- Fixed-height media slot -->
+            <div class="relative z-20 w-full" style="height: 460px;">
+              <Transition name="gallery-fade">
+                <NuxtImg
+                  v-if="mediaItems[activeThumb]"
+                  :key="activeThumb"
+                  :src="mediaItems[activeThumb]!.src"
+                  :alt="`${product.title} — view ${activeThumb + 1}`"
+                  class="absolute inset-0 h-full w-full object-contain p-8"
+                  loading="lazy"
+                  decoding="async"
+                  sizes="sm:100vw md:60vw lg:50vw"
+                />
+                <p
+                  v-else
+                  class="absolute inset-0 flex items-center justify-center font-h3d-body text-h3d-body text-h3d-muted px-h3d-md text-center"
+                >
+                  Photography for this piece is coming soon.
+                </p>
+              </Transition>
+            </div>
+
+            <!-- Counter -->
+            <p
+              v-if="mediaItems.length > 1"
+              class="absolute bottom-h3d-sm right-h3d-sm z-30 font-h3d-body text-h3d-body-sm text-h3d-muted tabular-nums"
+            >
+              {{ activeThumb + 1 }} / {{ mediaItems.length }}
+            </p>
+
+            <!-- Prev / Next arrows -->
+            <button
+              v-if="mediaItems.length > 1"
+              type="button"
+              class="absolute left-3 top-1/2 z-30 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-h3d-border bg-h3d-base/60 text-h3d-muted opacity-0 backdrop-blur-sm transition-opacity duration-200 hover:border-h3d-accent hover:text-h3d-accent focus-visible:opacity-100 focus-visible:outline-none group-hover:opacity-100"
+              aria-label="Previous image"
+              @click.stop="galleryPrev"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button
+              v-if="mediaItems.length > 1"
+              type="button"
+              class="absolute right-3 top-1/2 z-30 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-h3d-border bg-h3d-base/60 text-h3d-muted opacity-0 backdrop-blur-sm transition-opacity duration-200 hover:border-h3d-accent hover:text-h3d-accent focus-visible:opacity-100 focus-visible:outline-none group-hover:opacity-100"
+              aria-label="Next image"
+              @click.stop="galleryNext"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </section>
+
+          <!-- Thumbnail strip -->
           <div
-            v-if="product.images.length > 1"
+            v-if="mediaItems.length > 1"
             class="mt-h3d-sm flex flex-wrap gap-2"
+            role="list"
+            aria-label="Image thumbnails"
           >
             <button
-              v-for="(src, i) in product.images"
-              :key="src + i"
+              v-for="(item, i) in mediaItems"
+              :key="item.src + i"
               type="button"
-              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border text-h3d-body-sm transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent sm:h-[4.5rem] sm:w-[4.5rem]"
-              :class="
-                activeThumb === i
-                  ? 'border-h3d-accent bg-h3d-surface text-h3d-text'
-                  : 'border-h3d-border bg-h3d-base text-h3d-muted hover:border-h3d-accent hover:text-h3d-text'
-              "
+              role="listitem"
+              class="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent sm:h-[4.5rem] sm:w-[4.5rem]"
+              :class="activeThumb === i ? 'border-h3d-accent bg-h3d-surface' : 'border-h3d-border bg-h3d-base hover:border-h3d-accent'"
               :aria-pressed="activeThumb === i"
               :aria-label="`View image ${i + 1}`"
-              @click="activeThumb = i"
+              @click="galleryGo(i)"
             >
-              <img :src="src" alt="" class="h-full w-full object-cover" loading="lazy" />
+              <NuxtImg :src="item.src" alt="" class="h-full w-full object-contain p-1.5" loading="lazy" sizes="72px" />
             </button>
           </div>
         </div>
@@ -527,35 +613,13 @@ useSeoMeta({
         <h2 id="related-heading" class="font-h3d-display text-h3d-h3 text-h3d-text mb-h3d-md">
           Related pieces
         </h2>
-        <div class="grid grid-cols-2 gap-h3d-gutter lg:grid-cols-4">
-          <NuxtLink
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <H3dProductCard
             v-for="p in relatedPieces"
             :key="p.id"
-            :to="`/products/${p.id}`"
-            class="group border border-h3d-border bg-h3d-surface transition-colors duration-300 hover:border-h3d-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h3d-accent"
-          >
-            <div class="aspect-h3d-product relative overflow-hidden border-b border-h3d-border bg-h3d-base">
-              <img
-                v-if="p.images[0]"
-                :src="p.images[0]"
-                :alt="p.title"
-                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                loading="lazy"
-              />
-              <span
-                v-else
-                class="flex h-full items-center justify-center font-h3d-body text-h3d-body-sm text-h3d-muted"
-              >Preview</span>
-            </div>
-            <div class="p-h3d-sm">
-              <p class="font-h3d-display text-h3d-h4 text-h3d-text group-hover:text-h3d-accent">
-                {{ p.title }}
-              </p>
-              <p class="mt-1 font-h3d-body text-h3d-body-sm text-h3d-muted">
-                NPR {{ formatNprPrice(p.price) }}
-              </p>
-            </div>
-          </NuxtLink>
+            :product="p"
+            variant="related"
+          />
         </div>
       </section>
 
@@ -584,3 +648,14 @@ useSeoMeta({
     </Transition>
   </div>
 </template>
+
+<style scoped>
+.gallery-fade-enter-active,
+.gallery-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.gallery-fade-enter-from,
+.gallery-fade-leave-to {
+  opacity: 0;
+}
+</style>
