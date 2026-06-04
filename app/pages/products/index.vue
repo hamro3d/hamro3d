@@ -2,7 +2,7 @@
 const route = useRoute()
 
 // ── Real API data ────────────────────────────────────────────────────────
-const { data: rawData, pending } = await useFetch('/api/products?status=Active')
+const { data: rawData, pending, error: apiError } = await useFetch('/api/products?status=Active')
 
 function parseJson<T>(val: unknown, fallback: T): T {
   if (!val) return fallback
@@ -469,8 +469,23 @@ useSeoMeta({
         </div>
       </Transition>
 
-      <!-- ── Empty state ─────────────────────────────────────────────────── -->
-      <div v-if="filteredProducts.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
+      <!-- ── API error state ───────────────────────────────────────────── -->
+      <div v-if="apiError" class="flex flex-col items-center justify-center py-24 text-center">
+        <svg class="h-10 w-10 text-h3d-border mb-5" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+          <circle cx="20" cy="20" r="16"/><path d="M20 12v10M20 28v1" stroke-linecap="round"/>
+        </svg>
+        <p class="font-h3d-display text-xl font-light text-h3d-text mb-2">Our collection is being updated</p>
+        <p class="font-h3d-body text-sm text-h3d-muted mb-6 max-w-xs leading-relaxed">We are preparing something beautiful. In the meantime, reach out to commission your piece directly.</p>
+        <NuxtLink
+          to="/contact"
+          class="font-h3d-body text-2xs uppercase tracking-widest border border-h3d-border px-5 py-2.5 text-h3d-muted hover:border-h3d-accent hover:text-h3d-accent transition-colors"
+        >
+          Commission a piece
+        </NuxtLink>
+      </div>
+
+      <!-- ── Empty state (filters) ─────────────────────────────────────── -->
+      <div v-else-if="filteredProducts.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
         <svg class="h-10 w-10 text-h3d-border mb-5" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
           <rect x="4" y="4" width="32" height="32" rx="4"/><circle cx="15" cy="15" r="4"/><path d="M4 28l10-8 6 6 5-4 11 10"/>
         </svg>
