@@ -3,9 +3,15 @@
 /* Tailwind v4: load legacy theme tokens (h3d-* colors, fonts, etc.) */
 @config "../../../tailwind.config.ts";
 
-/* ─── Smooth scrolling ─────────────────────────────────────── */
+/* ─── Smooth scrolling + lock overscroll ──────────────────── */
+/* overscroll-behavior: none stops the rubber-band / bounce
+   so the page never scrolls past its own boundary. */
 html {
   scroll-behavior: smooth;
+  overscroll-behavior: none;
+}
+body {
+  overscroll-behavior: none;
 }
 
 /* ─── Page transitions (Nuxt pageTransition: 'page') ─────── */
@@ -121,6 +127,60 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ─── Memory card: share toast ───────────────────────────── */
+.h3d-toast-enter-active {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.h3d-toast-leave-active {
+  transition: opacity 0.2s ease;
+}
+.h3d-toast-enter-from {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.h3d-toast-leave-to {
+  opacity: 0;
+}
+
+/* ─── Memory card: comment section expand ────────────────── */
+.h3d-expand-enter-active,
+.h3d-expand-leave-active {
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+.h3d-expand-enter-from,
+.h3d-expand-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ─── Share modal backdrop ───────────────────────────────── */
+.h3d-modal-enter-active,
+.h3d-modal-leave-active {
+  transition: opacity 0.25s ease;
+}
+.h3d-modal-enter-from,
+.h3d-modal-leave-to {
+  opacity: 0;
+}
+
+/* ─── Share modal panel ──────────────────────────────────── */
+.h3d-modal-panel-enter-active {
+  transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.h3d-modal-panel-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.h3d-modal-panel-enter-from {
+  opacity: 0;
+  transform: translateY(18px) scale(0.97);
+}
+.h3d-modal-panel-leave-to {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
 }
 
 /* Grain texture overlay (optional) */

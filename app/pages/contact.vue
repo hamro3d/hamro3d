@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Contact — Hamro3D',
+  title: 'Connect',
   description:
     'Reach Hamro3D in Kathmandu. Share your story and begin a commission for a piece that holds meaning.',
   ogImage: '/og/contact.jpg',
@@ -237,7 +237,10 @@ const socialLinks = [
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-h3d-border border border-h3d-border mb-14">
 
         <!-- Email -->
-        <div class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-[#321960]">
+        <a
+          href="mailto:hamro3d@gmail.com"
+          class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-h3d-surface-alt"
+        >
           <div class="w-[42px] h-[42px] border border-h3d-accent flex items-center justify-center shrink-0 bg-[rgba(196,144,122,0.06)]">
             <svg viewBox="0 0 24 24" fill="none" stroke="#C4907A" stroke-width="1.5" class="w-[18px] h-[18px]">
               <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
@@ -246,39 +249,47 @@ const socialLinks = [
           <p class="font-h3d-body text-2xs tracking-[0.22em] text-h3d-accent uppercase">EMAIL</p>
           <p class="font-h3d-display text-lg font-normal text-h3d-text">Gmail</p>
           <p class="font-h3d-body text-xs text-h3d-muted font-light leading-relaxed break-all">hamro3d@gmail.com</p>
-          <a href="mailto:hamro3d@gmail.com" class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] text-h3d-accent font-medium transition-colors hover:text-h3d-text mt-auto">
+          <span class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] text-h3d-accent font-medium transition-colors mt-auto">
             Send us a message
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" class="w-3 h-3"><path d="M2 6h8M6 2l4 4-4 4"/></svg>
-          </a>
-        </div>
+          </span>
+        </a>
 
         <!-- WhatsApp -->
-        <div class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-[#321960]">
+        <a
+          href="https://wa.me/9779869666056?text=Hi%2C%20I%27d%20like%20to%20commission%20a%20piece"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-h3d-surface-alt"
+        >
           <div class="w-[42px] h-[42px] border border-h3d-accent flex items-center justify-center shrink-0 bg-[rgba(196,144,122,0.06)]">
             <svg viewBox="0 0 24 24" fill="#25D366" class="w-[18px] h-[18px]"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
           </div>
           <p class="font-h3d-body text-2xs tracking-[0.22em] text-h3d-accent uppercase">DIRECT MESSAGE</p>
           <p class="font-h3d-display text-lg font-normal text-h3d-text">WhatsApp Business</p>
           <p class="font-h3d-body text-xs text-h3d-muted font-light leading-relaxed">+977 9869666056<br>Send your photo directly in chat</p>
-          <a href="https://wa.me/9779869666056?text=Hi%2C%20I%27d%20like%20to%20commission%20a%20piece" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] font-medium transition-colors mt-auto" style="color:#25D366">
+          <span class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] font-medium transition-colors mt-auto" style="color:#25D366">
             Start a conversation
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" class="w-3 h-3"><path d="M2 6h8M6 2l4 4-4 4"/></svg>
-          </a>
-        </div>
+          </span>
+        </a>
 
         <!-- Viber -->
-        <div class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-[#321960]">
+        <a
+          href="viber://chat?number=9779869666056"
+          class="bg-h3d-surface flex flex-col gap-3.5 p-7 transition-colors hover:bg-h3d-surface-alt"
+        >
           <div class="w-[42px] h-[42px] border border-h3d-accent flex items-center justify-center shrink-0 bg-[rgba(196,144,122,0.06)]">
             <svg viewBox="0 0 24 24" fill="#7360F2" class="w-[18px] h-[18px]"><path d="M11.4 0C8.956.012 3.49.245 1.07 2.466-.41 3.946.036 6.097.036 11.97c0 4.832-.753 9.838 3.532 11.013L3.58 24l4.63-1.27c1.57.43 3.181.643 4.802.636 8.493 0 14.986-5.447 14.986-15.868C27.998 3.508 19.893-.041 11.4 0zm8.348 18.02c-.52.99-1.87 1.98-3.049 2.24-.792.17-1.828.305-5.318-1.143-4.468-1.842-7.344-6.383-7.565-6.678-.22-.294-1.853-2.461-1.853-4.694s1.156-3.509 1.566-3.989c.408-.48.89-.6 1.188-.6.296 0 .592.003.851.016.272.014.637-.103.996.76.373.895 1.265 3.093 1.376 3.317.11.223.184.484.037.777-.147.294-.22.477-.44.737-.22.258-.462.578-.661.776-.22.22-.449.46-.192.899.257.44 1.143 1.885 2.451 3.053 1.683 1.5 3.1 1.963 3.54 2.183.44.22.693.184.951-.11.258-.293 1.1-1.283 1.395-1.723.293-.44.587-.367 1.026-.22.44.147 2.784 1.312 3.264 1.55.48.24.8.36.918.563.117.202.117 1.178-.432 2.276z"/></svg>
           </div>
           <p class="font-h3d-body text-2xs tracking-[0.22em] text-h3d-accent uppercase">DIRECT MESSAGE</p>
           <p class="font-h3d-display text-lg font-normal text-h3d-text">Viber</p>
           <p class="font-h3d-body text-xs text-h3d-muted font-light leading-relaxed">+977 9869666056<br>Send your photo directly in chat</p>
-          <a href="viber://chat?number=9779869666056" class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] font-medium transition-colors mt-auto" style="color:#7360F2">
+          <span class="inline-flex items-center gap-1.5 font-h3d-body text-xs tracking-[0.14em] font-medium transition-colors mt-auto" style="color:#7360F2">
             Start a conversation
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" class="w-3 h-3"><path d="M2 6h8M6 2l4 4-4 4"/></svg>
-          </a>
-        </div>
+          </span>
+        </a>
 
       </div>
 
@@ -409,7 +420,7 @@ const socialLinks = [
 
       <!-- Quote block -->
       <div class="border border-h3d-border bg-h3d-surface px-9 py-9 text-center mb-16">
-        <p class="font-h3d-display text-xl font-light text-h3d-text italic leading-relaxed mb-4">
+        <p class="font-h3d-display text-xl font-light text-h3d-text leading-relaxed mb-4">
           We are not building a product company. We are building a brand that turns human emotion into something you can hold.
         </p>
         <div class="w-8 h-px bg-h3d-accent mx-auto mb-3" aria-hidden="true" />

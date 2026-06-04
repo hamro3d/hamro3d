@@ -20,6 +20,7 @@
       <li><NuxtLink to="/" :class="navClass('/', true)">Home</NuxtLink></li>
       <li><NuxtLink to="/products" :class="navClass('/products')">Products</NuxtLink></li>
       <li><NuxtLink to="/our-story" :class="navClass('/our-story')">Our Story</NuxtLink></li>
+      <li><NuxtLink to="/memories" :class="navClass('/memories')">Memories</NuxtLink></li>
       <li><NuxtLink to="/contact" :class="navClass('/contact')">Connect</NuxtLink></li>
     </ul>
 
@@ -98,6 +99,11 @@
           <li>
             <NuxtLink to="/our-story" :class="mobileNavClass('/our-story')" @click="mobileMenuOpen = false">
               Our Story
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/memories" :class="mobileNavClass('/memories')" @click="mobileMenuOpen = false">
+              Memories
             </NuxtLink>
           </li>
           <li>
