@@ -56,8 +56,7 @@ hamro3d-ui/
 │   ├── middleware/           # Server middleware
 │   └── utils/                # Server utilities
 ├── public/                   # Static assets, OG images
-├── docs/brand/               # Brand foundation & guidelines
-└── logo/                     # Brand logo assets
+└── .cursor/docs/brand/       # Brand foundation & guidelines
 ```
 
 ## Design System

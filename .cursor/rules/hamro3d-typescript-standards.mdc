@@ -1,0 +1,200 @@
+---
+description: TypeScript standards for the Hamro3D Nuxt 3 codebase — strict mode, interface naming, Pinia typing, Zod validation, and composable return types.
+globs: "**/*.{ts,tsx,vue}"
+alwaysApply: false
+---
+
+# Hamro3D TypeScript Standards
+
+Apply these rules to every `.ts`, `.tsx`, and `.vue` file in the Hamro3D codebase.
+
+## Strict Mode Requirements
+
+- TypeScript strict mode is always on — no exceptions
+- **No `any`** — ever. If you don't know the type, define an interface or use `unknown` with narrowing
+- **No `unknown` without narrowing** — always narrow before use:
+  ```typescript
+  // Wrong
+  function handle(value: unknown) { return value.name }
+
+  // Correct
+  function handle(value: unknown) {
+    if (typeof value === 'object' && value !== null && 'name' in value) {
+      return (value as { name: string }).name
+    }
+  }
+  ```
+- **No `as any`** casts — use proper type guards instead
+- **No non-null assertions (`!`)** unless the value is truly guaranteed to exist
+
+## Interface Naming Conventions
+
+Follow the established patterns from `app/data/`:
+
+| Context | Pattern | Examples |
+|---|---|---|
+| Mock data main entity | `Mock{Entity}` | `MockProduct`, `MockUserOrder`, `MockAdminOrder` |
+| Mock data sub-interface | `Mock{Entity}{Part}` | `MockUserOrderLineItem`, `MockAdminOrderPayment` |
+| Pinia store state shape | `{Store}State` (if extracted) | `CartState` |
+| Composable return type | `Use{Name}Return` | `UseCommissionReturn` |
+| API request body | `{Action}Payload` | `CommissionPayload`, `ContactPayload` |
+| API response | `{Entity}Response` | `PieceResponse`, `OrderListResponse` |
+| Props interface | defined inline via `defineProps<T>()` | see Props section |
+
+## Type Export Pattern
+
+```typescript
+// Export types and interfaces explicitly — named exports only
+export type MockUserOrderStatus = 'Processing' | 'In Progress' | 'Delivered' | 'Cancelled'
+export interface MockUserOrder { ... }
+
+// Re-export from a barrel only if the module is imported in 3+ places
+// app/data/index.ts (barrel — add only when needed, do not create prematurely)
+export type { MockProduct, MockUserOrder, MockAdminOrder } from './mock-products'
+```
+
+## No Enums — Use Union Types
+
+Enums are forbidden. Use union string types instead:
+
+```typescript
+// Wrong — never use enum
+enum OrderStatus { Processing, Delivered, Cancelled }
+
+// Correct — always use union type
+export type MockUserOrderStatus = 'Processing' | 'In Progress' | 'Delivered' | 'Cancelled'
+export type MockAdminOrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled'
+```
+
+This matches the existing patterns in `app/data/mock-user-orders.ts` and `app/data/mock-admin-orders.ts`.
+
+## Zod Schema Pattern (Server Routes)
+
+Every Nitro POST/PUT/PATCH handler validates its request body with Zod:
+
+```typescript
+// server/api/commission/index.post.ts
+import { z } from 'zod'
+
+const CommissionSchema = z.object({
+  pieceId: z.string().min(1),
+  customerName: z.string().min(1).max(100),
+  message: z.string().max(500).optional(),
+  deliveryAddress: z.string().min(10),
+  phone: z.string().regex(/^\+?977\d{9,10}$/).optional(),
+})
+
+export default defineEventHandler(async (event) => {
+  const body = await readValidatedBody(event, CommissionSchema.parse)
+  // body is fully typed — CommissionSchema['_output']
+})
+```
+
+- Infer types from Zod schemas in server files: `type CommissionInput = z.infer<typeof CommissionSchema>`
+- Never duplicate the type — infer from the schema
+
+## Pinia Store Typing Pattern
+
+Use the **Setup Store** syntax (arrow function) — never Options Store:
+
+```typescript
+// app/stores/cart.ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import type { MockCartLineView } from '~/data/mock-cart'
+import { initialMockCartLines } from '~/data/mock-cart'
+
+export const useCartStore = defineStore('cart', () => {
+  // State — always explicitly typed refs
+  const items = ref<MockCartLineView[]>(initialMockCartLines())
+
+  // Getters — always computed(), typed by inference
+  const itemCount = computed(() =>
+    items.value.reduce((n, i) => n + i.quantity, 0)
+  )
+
+  // Actions — plain functions with typed parameters
+  function addItem(productId: number, variant: string, quantity = 1): void { ... }
+  function removeItem(productId: number, variant: string): void { ... }
+  function clear(): void { items.value = [] }
+
+  return { items, itemCount, addItem, removeItem, clear }
+})
+```
+
+- Store ID string must match the filename: `defineStore('cart', ...)` lives in `cart.ts`
+- Never use `$patch` with object syntax in components — call actions instead
+- Access stores in components via destructuring after `storeToRefs` for reactive properties:
+  ```typescript
+  const cartStore = useCartStore()
+  const { items, itemCount } = storeToRefs(cartStore)
+  const { addItem, removeItem } = cartStore  // actions are not reactive — no storeToRefs needed
+  ```
+
+## Composable Return Type Pattern
+
+Every composable explicitly types its return value:
+
+```typescript
+// app/composables/useCommission.ts
+export interface UseCommissionReturn {
+  step: Ref<number>
+  payload: Ref<CommissionPayload | null>
+  isComplete: ComputedRef<boolean>
+  nextStep: () => void
+  submit: () => Promise<void>
+}
+
+export function useCommission(): UseCommissionReturn {
+  const step = ref(1)
+  const payload = ref<CommissionPayload | null>(null)
+  const isComplete = computed(() => step.value === 4)
+
+  function nextStep() { step.value++ }
+  async function submit() { ... }
+
+  return { step, payload, isComplete, nextStep, submit }
+}
+```
+
+## Props Typing with defineProps
+
+Always use the generic TypeScript form — never runtime declaration for complex props:
+
+```typescript
+// Correct — TypeScript generic form
+interface Props {
+  order: MockUserOrder
+  compact?: boolean
+}
+const props = defineProps<Props>()
+
+// Correct with defaults
+const props = withDefaults(defineProps<Props>(), {
+  compact: false,
+})
+
+// Wrong — never use runtime prop validation for typed interfaces
+defineProps({
+  order: Object,  // loses all type information
+})
+```
+
+## Common Type Utilities
+
+```typescript
+// Computed ref type
+import type { ComputedRef, Ref } from 'vue'
+
+// Partial update helper
+type PartialMockProduct = Partial<MockProduct>
+
+// Readonly array (for mock data that should not be mutated)
+const mockProducts: ReadonlyArray<MockProduct> = [ ... ]
+
+// Extract status from union — useful for switch exhaustiveness
+type OrderStatus = MockUserOrder['status']
+
+// Nullable convenience
+type Nullable<T> = T | null
+```
