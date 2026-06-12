@@ -1,0 +1,207 @@
+---
+description: Copy and language standards for Hamro3D — brand vocabulary, SEO meta voice, error/loading/empty state copy, CTA language, Nepali cultural terms, and anti-patterns.
+globs: "**/*.{vue,ts,md}"
+alwaysApply: false
+---
+
+# Hamro3D Copy Standards
+
+Apply these rules to every user-facing string in `.vue` templates, TypeScript copy constants, and Markdown content. Hamro3D copy is warm, intimate, and editorial — never salesy, clinical, or generic.
+
+## Copy Translation Table
+
+Every word matters. This table is the law:
+
+| Never write | Always write |
+|---|---|
+| Add to Cart | Commission This Piece |
+| Buy Now | Gift This |
+| Purchase | Commission |
+| Product | Piece or Creation |
+| Products | Pieces or Collection |
+| Order | Commission |
+| Orders | Commissions |
+| Category | Collection |
+| Customer | You (direct address) |
+| User | You / the person |
+| Checkout | Complete Your Gift |
+| Shipping | Delivery |
+| Ship | Deliver |
+| Reviews | Stories or Memories Shared |
+| Cart | Your Selections |
+| Wishlist | Saved Memories |
+| Account | Your Space |
+| Sign Up | Join |
+| Login | Welcome Back |
+| Logout | See You Soon |
+| Submit | Send |
+| Confirm | Yes, Commission This |
+| Edit | Update |
+| Delete | Remove |
+| Error | Something didn't go as planned |
+| Not found | We couldn't find that piece |
+| Out of stock | Currently being crafted |
+| In stock | Ready to commission |
+| Price | Starting from / From NPR |
+| Quantity | How many |
+| Description | About this piece |
+| Details | The craft behind it |
+| Manufacturer | Artisan |
+| Manufacture | Craft |
+| Produce | Create |
+| Process | Craft |
+| Admin | Studio |
+| Dashboard | Studio Overview |
+| Manage | Oversee |
+
+## CTA Copy Rules
+
+CTAs (calls to action) are the most important copy on the page. They must:
+1. Feel like an invitation, not a command
+2. Reflect the emotional outcome — not the mechanical action
+3. Use brand vocabulary exclusively
+
+### Primary CTAs
+
+| Situation | CTA Copy |
+|---|---|
+| Piece detail — start commission | `Commission This Piece` |
+| Piece detail — alternate | `Begin Your Commission` |
+| Gift context | `Gift This` |
+| Commission flow — advance step | `Continue` |
+| Commission flow — final submit | `Send My Commission` |
+| Browse all pieces | `Explore Our Pieces` |
+| Learn about Hamro3D | `Read Our Story` |
+| Contact/inquiry | `Start a Conversation` |
+| Return to pieces after empty | `Explore Our Pieces` |
+| Checkout / payment | `Complete Your Gift` |
+
+### What NOT to Write
+
+These phrases are banned from all user-facing copy:
+
+- `Add to Cart`
+- `Buy Now`
+- `Place Order`
+- `Submit Order`
+- `Purchase`
+- `Proceed to Checkout`
+- `Continue Shopping`
+- `My Account`
+- `View Products`
+- `Product Details`
+- `Item`
+- `SKU`
+- `In Stock` / `Out of Stock`
+
+## SEO Meta Description Voice Guidelines
+
+Meta descriptions must be warm and editorial — not keyword-stuffed.
+
+**Rules:**
+- Write as if speaking to someone about to give a meaningful gift
+- Lead with the emotional outcome, not the technical specification
+- Include at most one or two natural keywords — never force them
+- 145–160 characters
+- End with a gentle CTA or occasion reference when natural
+
+**Good examples:**
+
+> "Turn a favourite photo into a keepsake keychain, handcrafted by hand in Kathmandu. A deeply personal gift for Dashain, anniversaries, or any day worth remembering."
+
+> "Commission a custom figurine of someone you love — sculpted and crafted to last a lifetime. Made in Nepal, for the moments that matter most."
+
+**Bad examples (forbidden):**
+
+> "Buy custom 3D printed keychains in Nepal. Cheap personalised gifts Kathmandu. Order now."
+
+> "Best 3D printing service Nepal. Fast shipping. Low price keychain Nepal."
+
+## Error Message Copy
+
+Errors must feel like an artisan helping you recover — not a machine reporting a failure.
+
+| Situation | Warm Copy |
+|---|---|
+| Generic server error | "Something didn't go as planned. Let's try again." |
+| Form validation error | "We need a little more detail to proceed." |
+| Field required | "This field is needed to complete your commission." |
+| Invalid email | "That email doesn't look quite right. Let's try again." |
+| Commission submission failed | "We couldn't send your commission just now. Please try again in a moment." |
+| Page not found (404) | "We couldn't find that piece. It may have moved or been retired." |
+| Order not found | "That commission doesn't seem to exist in our records." |
+| Auth required | "Please sign in to continue your commission." |
+| Upload failed | "The image didn't come through. Please try a different file." |
+
+**Principles:**
+- Never show raw error codes (`Error 500`, `404 Not Found`) to users
+- Never use cold, technical language (`Request failed`, `Null response`, `Unexpected error`)
+- Always end with what the user can do next
+
+## Loading State Copy
+
+Loading states must feel like unwrapping a thoughtful gift — never like waiting for a server.
+
+| Situation | Loading Copy |
+|---|---|
+| Page loading | `Preparing your view…` |
+| Product list loading | `Gathering our pieces…` |
+| Piece detail loading | `Bringing this piece to light…` |
+| Commission form submitting | `Sending your commission…` |
+| Order history loading | `Retrieving your commissions…` |
+| Checkout processing | `Completing your gift…` |
+| Auth loading | `Just a moment…` |
+
+**Principles:**
+- Use an ellipsis (`…`) not three dots (`...`) — it is more refined
+- Never show generic spinners without copy
+- Loading copy should feel consistent with the page purpose
+
+## Empty State Copy (by Page)
+
+| Page | Headline | Supporting copy | CTA |
+|---|---|---|---|
+| Cart empty | `Your selections are empty.` | `Every meaningful piece begins with a single choice.` | `Explore Our Pieces` |
+| Wishlist empty | `No saved memories yet.` | `Browse our pieces and save what moves you.` | `Browse Pieces` |
+| Orders empty | `No commissions yet.` | `Your first piece is waiting to be made.` | `Commission a Piece` |
+| Search no results | `Nothing found here.` | `But something might be made just for you.` | `Commission It` |
+| Admin orders empty | `No commissions in the studio yet.` | `When someone places a commission, it will appear here.` | — |
+
+## Nepali Cultural Occasion Terms
+
+Use these naturally in copy, meta descriptions, and OG content. Never force-insert them.
+
+| Term | Context |
+|---|---|
+| Dashain | Nepal's biggest festival — gifting time (October) |
+| Tihar | Festival of lights — gifting, celebration (October/November) |
+| Teej | Women's festival — personal gifts |
+| Wedding | `विवाह` — custom figurines, nameplates, keepsakes |
+| Anniversary | Relationship milestone — custom photos, pieces |
+| Remembrance | Memory of a loved one — emotionally powerful context |
+| Graduation | Academic milestone — personalised gift |
+| Baby shower | New arrival — custom keepsakes |
+| हाम्रो | "Our" in Nepali — part of the brand name, emotional resonance |
+
+## Devanagari Copy Standards
+
+- Always use Unicode Devanagari — never romanized Nepali for production content
+- The brand name in Devanagari: `हाम्रो 3D`
+- Devanagari content in templates: wrap in `<span lang="ne">हाम्रो 3D</span>`
+- Devanagari headlines: use `font-h3d-devanagari` (Rozha One)
+- Devanagari body: use `font-h3d-devanagari-body` (Noto Sans Devanagari)
+
+## What NOT to Write
+
+These patterns are banned from all Hamro3D copy:
+
+- Superlatives: `Best`, `Cheapest`, `Fastest`, `#1`
+- Sales language: `Limited time offer`, `Only X left`, `Flash sale`, `Discount`
+- Generic e-commerce: `Shop now`, `Add to cart`, `Browse our store`
+- Clinical descriptions: `High-quality PLA material`, `FDM technology`, `Layer resolution`
+- Feature-first framing: `Supports 10 colors`, `Ships in 3–5 days`
+
+Instead, lead with meaning:
+- Not `High-quality PLA material` → `Crafted to last a lifetime`
+- Not `Ships in 3–5 days` → `Delivered within 3–5 days of completion`
+- Not `10 color options` → `Choose the finish that feels right`
