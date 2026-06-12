@@ -21,7 +21,7 @@ export async function fetchAuthSession(): Promise<void> {
     sessionPromise = (async () => {
       try {
         const res = await requestAuthMe()
-        auth.setUser(res.user)
+        auth.setUser(res.user ? { ...res.user } : null)
       } catch {
         auth.setUser(null)
       } finally {

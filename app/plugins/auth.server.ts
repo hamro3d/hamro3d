@@ -4,7 +4,8 @@ export default defineNuxtPlugin(() => {
   const event = useRequestEvent()
   if (!event) return
 
+  const sessionUser = getSessionUser(event)
   const auth = useAuthStore()
-  auth.setUser(getSessionUser(event))
+  auth.setUser(sessionUser ? { ...sessionUser } : null)
   auth.sessionLoaded = true
 })

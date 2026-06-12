@@ -15,6 +15,10 @@ export default defineNuxtConfig({
     dbName: process.env.NUXT_DB_NAME || 'hamro3d',
     sessionSecret:
       process.env.NUXT_SESSION_SECRET || 'hamro3d-dev-session-secret-change-in-production',
+    googleClientSecret: process.env.NUXT_GOOGLE_CLIENT_SECRET || '',
+    public: {
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+    },
   },
 
   // Pages, layouts, and components live under app/
@@ -84,6 +88,14 @@ export default defineNuxtConfig({
   // TypeScript
   typescript: {
     strict: true,
+  },
+
+  hooks: {
+    'app:resolve'(app) {
+      app.plugins = app.plugins.filter(
+        (plugin) => !String(plugin.src).includes('pinia') || !String(plugin.src).includes('payload-plugin'),
+      )
+    },
   },
 
   // Vite configuration for development

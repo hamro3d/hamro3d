@@ -113,6 +113,7 @@
             <button
               type="button"
               class="font-h3d-body flex w-full items-center justify-center gap-2 border border-h3d-border bg-transparent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-text transition-colors hover:border-h3d-accent hover:text-h3d-accent"
+              @click="handleGoogleLogin"
             >
               <svg
                 class="h-5 w-5"
@@ -268,6 +269,7 @@
             <button
               type="button"
               class="font-h3d-body flex w-full items-center justify-center gap-2 border border-h3d-border bg-transparent px-6 py-3.5 text-2xs font-semibold tracking-widest uppercase text-h3d-text transition-colors hover:border-h3d-accent hover:text-h3d-accent"
+              @click="handleGoogleLogin"
             >
               <svg
                 class="h-5 w-5"
@@ -429,12 +431,23 @@ useSeoMeta({
     'Sign in or join Hamro3D to save memories, track commissions, and gift tangible stories crafted in Kathmandu.',
 })
 
+const config = useRuntimeConfig()
+const googleClientId = computed(() => config.public.googleClientId)
+
 const route = useRoute()
 const auth = useAuthStore()
 
 const authMode = ref<AuthMode>('login')
 const authError = ref('')
 const submitting = ref(false)
+
+function handleGoogleLogin() {
+  const redirect = route.query.redirect as string || ''
+  const url = redirect
+    ? `/api/auth/google?redirect=${encodeURIComponent(redirect)}`
+    : '/api/auth/google'
+  window.location.href = url
+}
 
 const loginForm = reactive({
   email: '',
@@ -473,6 +486,11 @@ async function redirectAfterAuth(user: AuthUser) {
 }
 
 onMounted(async () => {
+  const oauthError = route.query.error
+  if (typeof oauthError === 'string' && oauthError) {
+    authError.value = oauthError
+  }
+
   if (!auth.sessionLoaded) {
     await fetchAuthSession()
   }

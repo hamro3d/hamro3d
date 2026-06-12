@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'profile' })
+definePageMeta({ layout: 'profile', middleware: 'auth' })
 
 const { data: rawOrders, pending } = await useFetch('/api/profile/orders')
 

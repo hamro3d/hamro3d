@@ -51,7 +51,7 @@
           Admin Panel
         </NuxtLink>
         <NuxtLink v-else to="/profile" class="flex h-8 w-8 items-center justify-center rounded-full border border-h3d-accent bg-h3d-base font-h3d-display text-xs text-h3d-accent no-underline hover:bg-h3d-accent hover:text-h3d-base transition-colors">
-          {{ userInitials.join('') }}
+          {{ userInitials }}
         </NuxtLink>
       </template>
       <NuxtLink v-else to="/auth" class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-muted hover:text-h3d-text transition-colors no-underline p-2">

@@ -123,6 +123,7 @@ import { useWishlistStore } from '~/stores/wishlist'
 
 definePageMeta({
   layout: 'profile',
+  middleware: 'auth',
 })
 
 const wishlist = useWishlistStore()

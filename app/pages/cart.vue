@@ -206,6 +206,7 @@ import { useCartStore } from '~/stores/cart'
 
 definePageMeta({
   layout: 'profile',
+  middleware: 'auth',
 })
 
 const cart = useCartStore()
