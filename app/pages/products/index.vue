@@ -1,105 +1,109 @@
 <script setup lang="ts">
-import { mockProducts, type MockProductCategory } from '~/data/mock-products'
-
 const route = useRoute()
 
-// ── Derive unique filter options from catalogue ─────────────────────────────
-const allCategories = computed<MockProductCategory[]>(() => {
-  const set = new Set(mockProducts.map((p) => p.category))
-  return [...set].sort() as MockProductCategory[]
+// ── Real API data ────────────────────────────────────────────────────────
+const { data: rawData, pending, error: apiError } = await useFetch('/api/products?status=Active')
+
+function parseJson<T>(val: unknown, fallback: T): T {
+  if (!val) return fallback
+  if (typeof val !== 'string') return val as T
+  try { return JSON.parse(val) as T } catch { return fallback }
+}
+
+function formatNprPrice(amount: number): string {
+  return Number(amount).toLocaleString('en-IN')
+}
+
+// Normalised products — JSON columns parsed from MySQL TEXT
+const products = computed(() => {
+  const list = (rawData.value as any[]) ?? []
+  return list.map((p: any) => ({
+    ...p,
+    images:   parseJson<string[]>(p.images, []),
+    material: parseJson<string[]>(p.material, []),
+  }))
+})
+
+// ── Derive unique filter options from API catalogue ──────────────────────
+const allCategories = computed<string[]>(() => {
+  const set = new Set(products.value.map((p: any) => p.category_name).filter(Boolean))
+  return [...set].sort() as string[]
 })
 
 const allMaterials = computed<string[]>(() => {
-  const set = new Set(mockProducts.flatMap((p) => p.material))
+  const set = new Set(products.value.flatMap((p: any) => p.material ?? []))
   return [...set].sort()
 })
 
-const allTags = computed<string[]>(() => {
-  const set = new Set(mockProducts.flatMap((p) => p.tags ?? []))
-  return [...set].sort()
+const priceMin = computed(() => {
+  const prices = products.value.map((p: any) => Number(p.price))
+  return prices.length ? Math.min(...prices) : 0
+})
+const priceMax = computed(() => {
+  const prices = products.value.map((p: any) => Number(p.price))
+  return prices.length ? Math.max(...prices) : 10000
 })
 
-const priceMin = computed(() => Math.min(...mockProducts.map((p) => p.price)))
-const priceMax = computed(() => Math.max(...mockProducts.map((p) => p.price)))
-
-// ── State ───────────────────────────────────────────────────────────────────
-const viewMode   = ref<'grid' | 'list'>('grid')
-const sortBy     = ref('signature')
+// ── State ─────────────────────────────────────────────────────────────────
+const viewMode    = ref<'grid' | 'list'>('grid')
+const sortBy      = ref('featured')
 const filtersOpen = ref(false)
 
-// Active (applied) filters — pre-populate from URL query if present
 const initialCategory = route.query.category ? [String(route.query.category)] : []
 const selectedCategories = ref<string[]>(initialCategory)
 const selectedMaterials  = ref<string[]>([])
-const selectedTags       = ref<string[]>([])
-const priceRange         = ref<[number, number]>([priceMin.value, priceMax.value])
-const hasGifOnly         = ref(false)
+const priceRange         = ref<[number, number]>([0, 10000])
 
-// Draft filters (local to the panel while it's open — committed on Apply)
+// Init price range once data loads
+watch(priceMin, (min) => {
+  if (priceRange.value[0] === 0 && priceRange.value[1] === 10000) {
+    priceRange.value = [min, priceMax.value]
+  }
+}, { immediate: false })
+
 const draftCategories = ref<string[]>([])
 const draftMaterials  = ref<string[]>([])
-const draftTags       = ref<string[]>([])
-const draftPriceRange = ref<[number, number]>([priceMin.value, priceMax.value])
-const draftGifOnly    = ref(false)
+const draftPriceRange = ref<[number, number]>([0, 10000])
 
-// Sync draft ← applied when panel opens
 function openFilters() {
   draftCategories.value = [...selectedCategories.value]
   draftMaterials.value  = [...selectedMaterials.value]
-  draftTags.value       = [...selectedTags.value]
   draftPriceRange.value = [...priceRange.value] as [number, number]
-  draftGifOnly.value    = hasGifOnly.value
   filtersOpen.value     = true
 }
 
-// Commit draft → applied and close
 function applyFilters() {
   selectedCategories.value = [...draftCategories.value]
   selectedMaterials.value  = [...draftMaterials.value]
-  selectedTags.value       = [...draftTags.value]
   priceRange.value         = [...draftPriceRange.value] as [number, number]
-  hasGifOnly.value         = draftGifOnly.value
   filtersOpen.value        = false
 }
 
 function clearDraftFilters() {
   draftCategories.value = []
   draftMaterials.value  = []
-  draftTags.value       = []
   draftPriceRange.value = [priceMin.value, priceMax.value]
-  draftGifOnly.value    = false
 }
 
 function clearAllFilters() {
   clearDraftFilters()
   selectedCategories.value = []
   selectedMaterials.value  = []
-  selectedTags.value       = []
   priceRange.value         = [priceMin.value, priceMax.value]
-  hasGifOnly.value         = false
 }
 
-// Draft filter count (shown inside the open panel)
 const draftFilterCount = computed(() =>
   draftCategories.value.length +
   draftMaterials.value.length +
-  draftTags.value.length +
-  (draftGifOnly.value ? 1 : 0) +
   (draftPriceRange.value[0] !== priceMin.value || draftPriceRange.value[1] !== priceMax.value ? 1 : 0),
 )
 
-// Active filter count (for the toolbar badge — reflects applied state)
 const activeFilterCount = computed(() =>
   selectedCategories.value.length +
   selectedMaterials.value.length +
-  selectedTags.value.length +
-  (hasGifOnly.value ? 1 : 0) +
   (priceRange.value[0] !== priceMin.value || priceRange.value[1] !== priceMax.value ? 1 : 0),
 )
 
-// NOTE: In Vue 3 <script setup>, refs passed from the template are auto-unwrapped.
-// So we must accept the actual Ref objects and NOT use them as plain arrays.
-// We pass specific named refs and use a switch to identify which to mutate.
 function toggleCategory(cat: string) {
   const idx = draftCategories.value.indexOf(cat)
   draftCategories.value = idx === -1
@@ -114,57 +118,33 @@ function toggleMaterial(mat: string) {
     : draftMaterials.value.filter((v: string) => v !== mat)
 }
 
-function toggleTag(tag: string) {
-  const idx = draftTags.value.indexOf(tag)
-  draftTags.value = idx === -1
-    ? [...draftTags.value, tag]
-    : draftTags.value.filter((v: string) => v !== tag)
-}
-
-// Remove a single applied filter from the pill row (without opening panel)
-function removeApplied(type: 'category' | 'material' | 'tag' | 'gif' | 'price', val?: string) {
+function removeApplied(type: 'category' | 'material' | 'price', val?: string) {
   if (type === 'category' && val) selectedCategories.value = selectedCategories.value.filter((v: string) => v !== val)
   if (type === 'material' && val) selectedMaterials.value  = selectedMaterials.value.filter((v: string) => v !== val)
-  if (type === 'tag'      && val) selectedTags.value       = selectedTags.value.filter((v: string) => v !== val)
-  if (type === 'gif')             hasGifOnly.value         = false
   if (type === 'price')           priceRange.value         = [priceMin.value, priceMax.value]
 }
 
-// ── Filtered + sorted list ──────────────────────────────────────────────────
 const filteredProducts = computed(() => {
-  let list = [...mockProducts]
+  let list = [...products.value]
 
   if (selectedCategories.value.length)
-    list = list.filter((p) => selectedCategories.value.includes(p.category))
+    list = list.filter((p: any) => selectedCategories.value.includes(p.category_name))
 
   if (selectedMaterials.value.length)
-    list = list.filter((p) => p.material.some((m) => selectedMaterials.value.includes(m)))
-
-  if (selectedTags.value.length)
-    list = list.filter((p) => (p.tags ?? []).some((t) => selectedTags.value.includes(t)))
-
-  if (hasGifOnly.value)
-    list = list.filter((p) => !!p.gif)
+    list = list.filter((p: any) => (p.material ?? []).some((m: string) => selectedMaterials.value.includes(m)))
 
   list = list.filter(
-    (p) => p.price >= priceRange.value[0] && p.price <= priceRange.value[1],
+    (p: any) => Number(p.price) >= priceRange.value[0] && Number(p.price) <= priceRange.value[1],
   )
 
   switch (sortBy.value) {
-    // Signature-first: signature pieces float to top by rank, then remaining by rank
-    case 'signature':
-      list.sort((a, b) => {
-        const aSig = a.isSignaturePiece ? 0 : 1
-        const bSig = b.isSignaturePiece ? 0 : 1
-        return aSig !== bSig ? aSig - bSig : a.rank - b.rank
-      })
-      break
-    case 'rank-low':      list.sort((a, b) => a.rank - b.rank); break
-    case 'rank-high':     list.sort((a, b) => b.rank - a.rank); break
-    case 'name-asc':      list.sort((a, b) => a.title.localeCompare(b.title)); break
-    case 'name-desc':     list.sort((a, b) => b.title.localeCompare(a.title)); break
-    case 'price-low':     list.sort((a, b) => a.price - b.price); break
-    case 'price-high':    list.sort((a, b) => b.price - a.price); break
+    case 'featured':   list.sort((a: any, b: any) => (a.rank ?? 0) - (b.rank ?? 0)); break
+    case 'rank-low':   list.sort((a: any, b: any) => (a.rank ?? 0) - (b.rank ?? 0)); break
+    case 'rank-high':  list.sort((a: any, b: any) => (b.rank ?? 0) - (a.rank ?? 0)); break
+    case 'name-asc':   list.sort((a: any, b: any) => (a.title ?? '').localeCompare(b.title ?? '')); break
+    case 'name-desc':  list.sort((a: any, b: any) => (b.title ?? '').localeCompare(a.title ?? '')); break
+    case 'price-low':  list.sort((a: any, b: any) => Number(a.price) - Number(b.price)); break
+    case 'price-high': list.sort((a: any, b: any) => Number(b.price) - Number(a.price)); break
   }
 
   return list
@@ -221,7 +201,7 @@ useSeoMeta({
         <div class="flex items-center gap-3">
           <p class="font-h3d-body text-sm text-h3d-muted">
             Showing <span class="text-h3d-text tabular-nums font-medium">{{ filteredProducts.length }}</span>
-            <span class="text-h3d-muted"> of {{ mockProducts.length }}</span>
+            <span class="text-h3d-muted"> of {{ products.length }}</span>
             pieces
           </p>
 
@@ -247,27 +227,6 @@ useSeoMeta({
               @click="removeApplied('material', mat)"
             >
               {{ mat }}
-              <svg class="h-2.5 w-2.5" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l6 6M8 2l-6 6"/></svg>
-            </button>
-            <button
-              v-for="tag in selectedTags"
-              :key="`tag-${tag}`"
-              type="button"
-              class="inline-flex items-center gap-1 rounded-full border border-h3d-border/70 bg-h3d-surface px-2 py-0.5 font-h3d-body text-2xs text-h3d-muted hover:border-h3d-accent/50 hover:text-h3d-text transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-h3d-accent"
-              :aria-label="`Remove tag filter: ${tag}`"
-              @click="removeApplied('tag', tag)"
-            >
-              #{{ tag }}
-              <svg class="h-2.5 w-2.5" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l6 6M8 2l-6 6"/></svg>
-            </button>
-            <button
-              v-if="hasGifOnly"
-              type="button"
-              class="inline-flex items-center gap-1 rounded-full border border-h3d-border/70 bg-h3d-surface px-2 py-0.5 font-h3d-body text-2xs text-h3d-muted hover:border-h3d-accent/50 hover:text-h3d-text transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-h3d-accent"
-              aria-label="Remove GIF preview filter"
-              @click="removeApplied('gif')"
-            >
-              GIF preview
               <svg class="h-2.5 w-2.5" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l6 6M8 2l-6 6"/></svg>
             </button>
             <button
@@ -322,7 +281,7 @@ useSeoMeta({
             class="font-h3d-body text-2xs tracking-widest uppercase bg-h3d-surface text-h3d-text border border-h3d-border px-3 py-2 pr-8 cursor-pointer focus:outline-none focus:ring-1 focus:ring-h3d-accent appearance-none"
           >
             <optgroup label="Relevance">
-              <option value="signature">Signature first</option>
+              <option value="featured">Featured first</option>
               <option value="rank-low">Rank · Best first</option>
               <option value="rank-high">Rank · Last first</option>
             </optgroup>
@@ -371,7 +330,7 @@ useSeoMeta({
           class="border border-t-0 border-h3d-border bg-h3d-surface mb-8"
           aria-label="Filter options"
         >
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-h3d-border/50">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-h3d-border/50">
 
             <!-- Collection / Category -->
             <div class="p-5">
@@ -397,7 +356,7 @@ useSeoMeta({
                     </svg>
                   </span>
                   <span class="font-h3d-body text-h3d-body-sm select-none transition-colors flex-1" :class="draftCategories.includes(cat) ? 'text-h3d-text' : 'text-h3d-muted group-hover/f:text-h3d-text'">{{ cat }}</span>
-                  <span class="font-h3d-body text-2xs text-h3d-muted/50 tabular-nums">{{ mockProducts.filter(p => p.category === cat).length }}</span>
+                  <span class="font-h3d-body text-2xs text-h3d-muted/50 tabular-nums">{{ products.filter((p: any) => p.category_name === cat).length }}</span>
                 </button>
               </div>
             </div>
@@ -426,12 +385,12 @@ useSeoMeta({
                     </svg>
                   </span>
                   <span class="font-h3d-body text-h3d-body-sm select-none transition-colors flex-1" :class="draftMaterials.includes(mat) ? 'text-h3d-text' : 'text-h3d-muted group-hover/f:text-h3d-text'">{{ mat }}</span>
-                  <span class="font-h3d-body text-2xs text-h3d-muted/50 tabular-nums">{{ mockProducts.filter(p => p.material.includes(mat)).length }}</span>
+                  <span class="font-h3d-body text-2xs text-h3d-muted/50 tabular-nums">{{ products.filter((p: any) => (p.material ?? []).includes(mat)).length }}</span>
                 </button>
               </div>
             </div>
 
-            <!-- Price range + GIF preview -->
+            <!-- Price range -->
             <div class="p-5 space-y-6">
               <!-- Price -->
               <div>
@@ -478,49 +437,7 @@ useSeoMeta({
                 </div>
               </div>
 
-              <!-- GIF preview -->
-              <div>
-                <p class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-accent mb-3" style="letter-spacing:0.16em">Preview</p>
-                <button
-                  type="button"
-                  class="flex w-full items-center gap-2.5 rounded px-1 py-1 text-left transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-h3d-accent group/f"
-                  :aria-pressed="draftGifOnly"
-                  @click="draftGifOnly = !draftGifOnly"
-                >
-                  <span
-                    class="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors duration-150"
-                    :class="draftGifOnly ? 'border-h3d-accent bg-h3d-accent' : 'border-h3d-border bg-h3d-base group-hover/f:border-h3d-accent/60'"
-                    aria-hidden="true"
-                  >
-                    <svg v-if="draftGifOnly" class="h-2.5 w-2.5 text-h3d-base" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                  <span class="font-h3d-body text-h3d-body-sm select-none transition-colors flex-1" :class="draftGifOnly ? 'text-h3d-text' : 'text-h3d-muted group-hover/f:text-h3d-text'">Animated GIF preview</span>
-                  <span class="font-h3d-body text-2xs text-h3d-muted/50 tabular-nums">{{ mockProducts.filter(p => !!p.gif).length }}</span>
-                </button>
-              </div>
             </div>
-
-            <!-- Tags -->
-            <div class="p-5">
-              <p class="font-h3d-body text-2xs uppercase tracking-widest text-h3d-accent mb-3" style="letter-spacing:0.16em">Tags</p>
-              <div class="flex flex-wrap gap-1.5 max-h-52 overflow-y-auto pr-1">
-                <button
-                  v-for="tag in allTags"
-                  :key="tag"
-                  type="button"
-                  class="inline-block rounded-sm border px-2 py-0.5 font-h3d-body text-2xs transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-h3d-accent"
-                  :class="draftTags.includes(tag)
-                    ? 'border-h3d-accent bg-h3d-accent/15 text-h3d-accent'
-                    : 'border-h3d-border/60 bg-h3d-base text-h3d-muted hover:border-h3d-accent/50 hover:text-h3d-text'"
-                  @click="toggleTag(tag)"
-                >
-                  #{{ tag }}
-                </button>
-              </div>
-            </div>
-
           </div>
 
           <!-- Filter footer -->
@@ -552,8 +469,23 @@ useSeoMeta({
         </div>
       </Transition>
 
-      <!-- ── Empty state ─────────────────────────────────────────────────── -->
-      <div v-if="filteredProducts.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
+      <!-- ── API error state ───────────────────────────────────────────── -->
+      <div v-if="apiError" class="flex flex-col items-center justify-center py-24 text-center">
+        <svg class="h-10 w-10 text-h3d-border mb-5" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+          <circle cx="20" cy="20" r="16"/><path d="M20 12v10M20 28v1" stroke-linecap="round"/>
+        </svg>
+        <p class="font-h3d-display text-xl font-light text-h3d-text mb-2">Our collection is being updated</p>
+        <p class="font-h3d-body text-sm text-h3d-muted mb-6 max-w-xs leading-relaxed">We are preparing something beautiful. In the meantime, reach out to commission your piece directly.</p>
+        <NuxtLink
+          to="/contact"
+          class="font-h3d-body text-2xs uppercase tracking-widest border border-h3d-border px-5 py-2.5 text-h3d-muted hover:border-h3d-accent hover:text-h3d-accent transition-colors"
+        >
+          Commission a piece
+        </NuxtLink>
+      </div>
+
+      <!-- ── Empty state (filters) ─────────────────────────────────────── -->
+      <div v-else-if="filteredProducts.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
         <svg class="h-10 w-10 text-h3d-border mb-5" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
           <rect x="4" y="4" width="32" height="32" rx="4"/><circle cx="15" cy="15" r="4"/><path d="M4 28l10-8 6 6 5-4 11 10"/>
         </svg>

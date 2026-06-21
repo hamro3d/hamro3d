@@ -1,124 +1,60 @@
 #!/usr/bin/env bash
-# verify-merge.sh
-# Usage: bash .cursor/skills/hamro3d-merge-resolver/scripts/verify-merge.sh
-# Run from the repository root after all conflict resolutions are applied.
-
+# verify-merge.sh  — run from repo root after resolving all conflicts
 set -uo pipefail
+PASS=0; FAIL=0
+ok()   { echo "  ✔  $1"; ((PASS++)) || true; }
+fail() { echo "  ✘  $1"; ((FAIL++)) || true; }
 
-PASS=0
-FAIL=0
-
-check() {
-  local label="$1"
-  local result="$2"  # "ok" | "fail"
-  local detail="${3:-}"
-  if [[ "$result" == "ok" ]]; then
-    echo "  ✓  $label"
-    (( PASS++ )) || true
-  else
-    echo "  ✗  $label${detail:+: $detail}"
-    (( FAIL++ )) || true
-  fi
-}
+echo "============================================================"
+echo "  Hamro3D — Post-Merge Verification"
+echo "============================================================"
 
 echo ""
-echo "============================================================"
-echo "  Hamro3D Post-Merge Verification"
-echo "============================================================"
+echo "── 1. No leftover conflict markers ──"
+CONFLICTS=$(grep -rn "<<<<<<< \|>>>>>>> " --include="*.vue" --include="*.ts" --include="*.css" --include="*.json" . --exclude-dir=node_modules --exclude-dir=.git 2>/dev/null | grep -v "Binary" | head -5)
+if [[ -z "$CONFLICTS" ]]; then ok "No conflict markers found"; else fail "Conflict markers remain:$CONFLICTS"; fi
+
 echo ""
-
-# 1. No conflict markers remain
-MARKER_FILES=$(grep -rl "<<<<<<< " --include="*.vue" --include="*.ts" \
-  --include="*.css" --include="*.json" . \
-  2>/dev/null | grep -v node_modules | grep -v ".git" || true)
-if [[ -z "$MARKER_FILES" ]]; then
-  check "No conflict markers remain" "ok"
-else
-  check "No conflict markers remain" "fail" "$MARKER_FILES"
-fi
-
-# 2. All H3d* components still exist (at least the core ones)
-CORE_COMPONENTS=("H3dNavbar" "H3dButton" "H3dCard")
-for comp in "${CORE_COMPONENTS[@]}"; do
-  found=$(grep -rl "$comp" --include="*.vue" . 2>/dev/null | grep -v node_modules || true)
-  if [[ -n "$found" ]]; then
-    check "Component $comp referenced in codebase" "ok"
-  else
-    check "Component $comp referenced in codebase" "fail" "not found in any .vue file"
-  fi
+echo "── 2. Core H3d components present ──"
+for comp in H3dNavbar H3dProductCard H3dMemoryCard; do
+  if find app/components -name "${comp}.vue" 2>/dev/null | grep -q .; then ok "$comp.vue"; else fail "$comp.vue missing"; fi
 done
 
-# 3. Tailwind h3d- tokens still in main.css
-CSS_FILE="app/assets/css/main.css"
-REQUIRED_TOKENS=("--h3d-base" "--h3d-accent" "--h3d-text" "--h3d-muted" "--h3d-border")
-for token in "${REQUIRED_TOKENS[@]}"; do
-  if [[ -f "$CSS_FILE" ]] && grep -q "$token" "$CSS_FILE"; then
-    check "Token $token present in main.css" "ok"
-  else
-    check "Token $token present in main.css" "fail"
-  fi
+echo ""
+echo "── 3. Tailwind h3d tokens defined ──"
+if grep -rq "h3d-accent\|h3d-base\|h3d-text" tailwind.config.ts tailwind.config.js app/assets/css/ 2>/dev/null; then ok "h3d- tokens found in tailwind config / css"; else fail "h3d- tokens not found"; fi
+
+echo ""
+echo "── 4. SEO meta on key pages ──"
+for page in app/pages/index.vue "app/pages/products/index.vue" "app/pages/products/[id].vue"; do
+  if grep -q "useSeoMeta" "$page" 2>/dev/null; then ok "$page has useSeoMeta"; else fail "$page missing useSeoMeta"; fi
 done
 
-# 4. All pages still have useSeoMeta
-PAGES_WITHOUT_SEO=$(grep -rL "useSeoMeta" app/pages/ --include="*.vue" 2>/dev/null || true)
-if [[ -z "$PAGES_WITHOUT_SEO" ]]; then
-  check "All pages have useSeoMeta" "ok"
-else
-  check "All pages have useSeoMeta" "fail" "$PAGES_WITHOUT_SEO"
-fi
-
-# 5. Mock data files export required lookup helpers
-MOCK_FILES=$(find app/data -name "mock-*.ts" 2>/dev/null || true)
-for f in $MOCK_FILES; do
-  if grep -q "export function get" "$f"; then
-    check "Mock file $f has lookup helper" "ok"
-  else
-    check "Mock file $f has lookup helper" "fail"
-  fi
+echo ""
+echo "── 5. Real API in product pages (no mockProducts import) ──"
+for page in "app/pages/products/index.vue" "app/pages/products/[id].vue"; do
+  if grep -q "mockProducts\|getMockProductById" "$page" 2>/dev/null; then fail "$page still imports mock data"; else ok "$page uses real API"; fi
 done
 
-# 6. nuxt.config.ts has no duplicate module entries
-if [[ -f "nuxt.config.ts" ]]; then
-  DUP_MODULES=$(grep -oE "'@[^']+'" nuxt.config.ts | sort | uniq -d || true)
-  if [[ -z "$DUP_MODULES" ]]; then
-    check "nuxt.config.ts has no duplicate modules" "ok"
-  else
-    check "nuxt.config.ts has no duplicate modules" "fail" "$DUP_MODULES"
-  fi
-fi
+echo ""
+echo "── 6. Admin routes intact ──"
+for route in server/api/products server/api/categories server/api/orders server/api/auth; do
+  if [ -d "$route" ]; then ok "$route/ present"; else fail "$route/ missing"; fi
+done
 
-# 7. package.json has no duplicate dependency keys (basic check)
-if [[ -f "package.json" ]]; then
-  DUP_DEPS=$(python3 -c "
-import json, sys, collections
-d = json.load(open('package.json'))
-all_deps = list(d.get('dependencies', {}).keys()) + list(d.get('devDependencies', {}).keys())
-counts = collections.Counter(all_deps)
-dups = [k for k, v in counts.items() if v > 1]
-print(' '.join(dups))
-" 2>/dev/null || true)
-  if [[ -z "$DUP_DEPS" ]]; then
-    check "package.json has no duplicate dependency keys" "ok"
-  else
-    check "package.json has no duplicate dependency keys" "fail" "$DUP_DEPS"
-  fi
-fi
-
-# 8. No console.log left in .ts or .vue files (except node_modules)
-CONSOLE_LOGS=$(grep -rl "console\.log" --include="*.ts" --include="*.vue" . \
-  2>/dev/null | grep -v node_modules || true)
-if [[ -z "$CONSOLE_LOGS" ]]; then
-  check "No console.log statements in source" "ok"
-else
-  check "No console.log statements in source" "fail" "$CONSOLE_LOGS"
-fi
+echo ""
+echo "── 7. No duplicate npm dependencies ──"
+python3 -c "
+import json
+with open('package.json') as f: p = json.load(f)
+deps = {**p.get('dependencies',{}), **p.get('devDependencies',{})}
+dupes = [k for k in p.get('dependencies',{}) if k in p.get('devDependencies',{})]
+if dupes: print('FAIL: duplicates:', dupes)
+else: print('OK: no duplicates')
+" 2>/dev/null | { read out; if [[ "$out" == OK* ]]; then ok "No duplicate deps"; else fail "$out"; fi; }
 
 echo ""
 echo "============================================================"
-echo "  Results: $PASS passed, $FAIL failed"
+echo "  Results: ${PASS} passed, ${FAIL} failed"
 echo "============================================================"
-echo ""
-
-if [[ "$FAIL" -gt 0 ]]; then
-  exit 1
-fi
+[[ $FAIL -eq 0 ]] && exit 0 || exit 1

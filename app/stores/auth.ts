@@ -1,9 +1,21 @@
 import { defineStore } from 'pinia'
+import { apiFetch } from '~/utils/apiFetch'
+
+export interface AuthUser {
+  id: number
+  name: string
+  email: string
+  role: string
+}
 
 export const useAuthStore = defineStore('auth', () => {
-  const isLoggedIn = ref(false)
-  const userName = ref('Aarav Sharma')
-  const userEmail = ref('aarav@example.com')
+  const user = ref<AuthUser | null>(null)
+  const sessionLoaded = ref(false)
+
+  const isLoggedIn = computed(() => !!user.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
+  const userName = computed(() => user.value?.name ?? '')
+  const userEmail = computed(() => user.value?.email ?? '')
 
   const userInitials = computed(() => {
     if (!userName.value) return '?'
@@ -15,15 +27,61 @@ export const useAuthStore = defineStore('auth', () => {
       .slice(0, 2)
   })
 
-  function login(name: string, email: string) {
-    userName.value = name
-    userEmail.value = email
-    isLoggedIn.value = true
+  function setUser(next: AuthUser | null) {
+    user.value = next ? { ...next } : null
   }
 
-  function logout() {
-    isLoggedIn.value = false
+  async function fetchSession() {
+    await fetchAuthSession()
   }
 
-  return { isLoggedIn, userName, userEmail, userInitials, login, logout }
+  async function loginWithCredentials(email: string, password: string) {
+    const res = await apiFetch<{ user: AuthUser }>('/api/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+    setUser(res.user)
+    sessionLoaded.value = true
+    return res.user
+  }
+
+  async function registerAccount(payload: {
+    name: string
+    email: string
+    phone: string
+    address: string
+    password: string
+  }) {
+    const res = await apiFetch<{ user: AuthUser }>('/api/auth/register', {
+      method: 'POST',
+      body: payload,
+    })
+    setUser(res.user)
+    sessionLoaded.value = true
+    return res.user
+  }
+
+  async function logout() {
+    try {
+      await apiFetch('/api/auth/logout', { method: 'POST' })
+    } finally {
+      setUser(null)
+      resetAuthSessionCache()
+    }
+  }
+
+  return {
+    user,
+    sessionLoaded,
+    isLoggedIn,
+    isAdmin,
+    userName,
+    userEmail,
+    userInitials,
+    setUser,
+    fetchSession,
+    loginWithCredentials,
+    registerAccount,
+    logout,
+  }
 })

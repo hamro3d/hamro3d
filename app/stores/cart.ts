@@ -1,13 +1,20 @@
 import { defineStore } from 'pinia'
-import type { MockCartLineView } from '~/data/mock-cart'
-import { initialMockCartLines } from '~/data/mock-cart'
-import { getMockProductById } from '~/data/mock-products'
+
+export interface CartLineItem {
+  id: number
+  productId: number
+  name: string
+  tag: string
+  meta: string
+  unitPrice: number
+  quantity: number
+  image: string
+}
 
 let nextLineId = 2000
 
 export const useCartStore = defineStore('cart', () => {
-  // const items = ref<MockCartLineView[]>(initialMockCartLines())
-  const items = ref<MockCartLineView[]>([])
+  const items = ref<CartLineItem[]>([])
 
   const itemCount = computed(() =>
     items.value.reduce((n, line) => n + line.quantity, 0),
@@ -21,33 +28,38 @@ export const useCartStore = defineStore('cart', () => {
 
   const total = computed(() => subtotal.value + shippingNpr)
 
-  function lineTotal(line: MockCartLineView): number {
+  function lineTotal(line: CartLineItem): number {
     return line.unitPrice * line.quantity
   }
 
-  function addItem(productId: number, variantLabel: string = '') {
+  /**
+   * Add a product to the cart. Accepts the product data directly
+   * so the store doesn't need to fetch from the API itself.
+   */
+  function addItem(
+    product: { id: number; title: string; head: string; price: number; images?: string[] },
+    variantLabel: string = '',
+  ) {
     const existing = items.value.find(
-      (l) => l.productId === productId && l.meta === variantLabel,
+      (l) => l.productId === product.id && l.meta === variantLabel,
     )
     if (existing) {
       existing.quantity++
       return
     }
 
-    const p = getMockProductById(productId)
-    if (!p) return
-
-    const tail = p.head.split('·').pop()?.trim() ?? p.head
+    const tail = product.head?.split('·').pop()?.trim() ?? product.head ?? ''
+    const imgs = product.images ?? []
 
     items.value.push({
       id: nextLineId++,
-      productId: p.id,
-      name: p.title,
-      tag: `${tail} · Commission`,
+      productId: product.id,
+      name: product.title,
+      tag: tail ? `${tail} · Commission` : 'Commission',
       meta: variantLabel,
-      unitPrice: p.price,
+      unitPrice: product.price,
       quantity: 1,
-      image: p.images[0] ?? '',
+      image: imgs[0] ?? '',
     })
   }
 
@@ -83,3 +95,4 @@ export const useCartStore = defineStore('cart', () => {
     clear,
   }
 })
+

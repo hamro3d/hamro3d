@@ -63,7 +63,7 @@
         </NuxtLink>
       </div>
 
-      <div class="flex flex-col">
+      <div v-if="isAdmin" class="flex flex-col">
         <div
           class="font-h3d-body text-2xs text-h3d-muted px-7 py-4 tracking-widest"
         >
@@ -138,6 +138,7 @@ function navActive(href: string) {
 const userName = computed(() => auth.userName);
 const userEmail = computed(() => auth.userEmail);
 const userInitials = computed(() => auth.userInitials);
+const isAdmin = computed(() => auth.isAdmin);
 
 const userNavItems = [
   {
@@ -174,6 +175,11 @@ const adminNavItems = [
     icon: '<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',
   },
   {
+    href: "/admin/categories",
+    label: "Categories",
+    icon: '<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>',
+  },
+  {
     href: "/admin/orders",
     label: "Orders",
     icon: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>',
@@ -185,8 +191,8 @@ const adminNavItems = [
   },
 ];
 
-const logout = () => {
-  auth.logout();
-  navigateTo("/");
+const logout = async () => {
+  await auth.logout();
+  await navigateTo("/auth");
 };
 </script>

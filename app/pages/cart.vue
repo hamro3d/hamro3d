@@ -81,13 +81,12 @@
             class="relative h-[88px] w-[88px] flex-shrink-0 overflow-hidden border border-h3d-border bg-h3d-base"
             :aria-label="`View ${item.name}`"
           >
-            <NuxtImg
+            <img
               v-if="item.image"
               :src="item.image"
               alt=""
               class="h-full w-full object-cover"
               loading="lazy"
-              sizes="88px"
             />
             <span
               v-else
@@ -207,6 +206,7 @@ import { useCartStore } from '~/stores/cart'
 
 definePageMeta({
   layout: 'profile',
+  middleware: 'auth',
 })
 
 const cart = useCartStore()
